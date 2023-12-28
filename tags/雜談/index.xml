@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>雜談 on WellWells</title>
+        <link>https://wellstsai.com/tags/%E9%9B%9C%E8%AB%87/</link>
+        <description>Recent content in 雜談 on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Mon, 20 Nov 2023 11:43:21 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/%E9%9B%9C%E8%AB%87/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Hello Wells</title>
+        <link>https://wellstsai.com/post/hello-wells/</link>
+        <pubDate>Mon, 20 Nov 2023 11:43:21 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/hello-wells/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/hello-wells/cover.jpg" alt="Featured image of post Hello Wells" /&gt;&lt;p&gt;你好，我是 Wells。這是記錄我個人在開發過程中的心得、感想。&lt;/p&gt;
+&lt;p&gt;如果允許的話，針對職場生涯順便發發牢騷。&lt;/p&gt;
+&lt;h2 id=&#34;為什麼要寫技術文章&#34;&gt;為什麼要寫技術文章？&lt;/h2&gt;
+&lt;p&gt;取之於社會，用之於社會。&lt;/p&gt;
+&lt;p&gt;年幼時曾經營過 Blog，不過重點著重在軟體分享，除了需要龐大的營運成本（寫文、提供空間、更新版本軟體）。另外分享軟體好像也就如此，而市面上分享軟體太多了，不如就交給更專業的吧。&lt;/p&gt;
+&lt;p&gt;但日常生活中，重複講解的技術太多，能抱怨的事情太多，能分享的事情太多。&lt;/p&gt;
+&lt;p&gt;不如就把它紀錄下來，試著與大家分享心得與觀點。&lt;/p&gt;
+&lt;h2 id=&#34;為什麼選用-hugo-當作框架&#34;&gt;為什麼選用 Hugo 當作框架？&lt;/h2&gt;
+&lt;p&gt;在開始撰寫之前，以下是我個人考慮的因素&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;無伺服器 (Serverless)&lt;/p&gt;
+&lt;p&gt;建置傳統的 WordPress 走的是 PHP 框架，需要伺服器進行後端運行。相較於靜態網頁，可能找個 GitHub Pages, Cloudflare Pages, Firebase Hosting 之類的丟上去就完事了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;速度 (Speed)&lt;/p&gt;
+&lt;p&gt;網頁預覽速度要快，沒有太多的外掛、廣告。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;易用性 (Usability)&lt;/p&gt;
+&lt;p&gt;產生靜態網頁要簡單、避免自己在幾個月後忘記還要翻 API 研究如何產出靜態目錄、更新套件等一系列操作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;人氣 (Popularity)&lt;/p&gt;
+&lt;p&gt;一個框架如果人氣不夠，未來的可擴展性可能就被侷限住了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;市面上常見的網頁框架主要包括 Jekyll、Hexo 和 Hugo。不過&lt;strong&gt;考量各種因素後，最終選擇了 Hugo&lt;/strong&gt;。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;最初的選擇實際上是 Hexo，這是一個建立在 Node.js 上的框架。安裝完 Hexo 後就能夠開始撰寫文章並進行編譯。&lt;/p&gt;
+&lt;p&gt;然而，在2023年9月寫下第一篇文章後，直到2023年11月才真正開始撰寫。由於對語法不夠熟悉，花了3分鐘回憶。&lt;/p&gt;
+&lt;p&gt;此外，Node.js 與 Hexo 各自有特定的版本需求，使用 npm outdated 和 npm update 可以對 Hexo 的檢查版本與更新，但也間接地形成軟體維護更新的成本。
+（Node.js (20.9.0 LTS)、Hexo (7.0.0)）&lt;/p&gt;
+&lt;p&gt;相比之下，Hugo 是透過 Go 開發的，&lt;strong&gt;是一個執行檔&lt;/strong&gt;，安裝後一切就緒，進入到部落格的資料夾後下指令就可以建立 Server 或是編譯，使用上真的是快。&lt;/p&gt;
+&lt;p&gt;對於其他平台像是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Jekyll 則被聽說多文章編譯會較慢，而且安裝還需要下載 Ruby，類似 Node.js 的操作行為我也就沒有繼續深入探討&lt;/li&gt;
+&lt;li&gt;VuePress 相對小眾，從推廣的程度上來看似不及 Hexo 和 Hugo。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;不過無論如何，文章格式都是 Markdown，未來如果需要在不同平台轉換，應該是無感知的。在現階段要開始撰寫技術文章，選擇一個使用者眾多、具有成長性的框架就足夠了。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;本部落格為撰寫技術文章、分享心得，如果看到文章覺得有幫助也歡迎轉發網址給更多人看，若內容有誤也請不吝嗇回覆給我，非常感謝。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
