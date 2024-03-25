@@ -1,0 +1,1331 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Synology on WellWells</title>
+        <link>https://wellstsai.com/tags/synology/</link>
+        <description>Recent content in Synology on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Tue, 30 Jan 2024 16:40:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/synology/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安裝並使用 iPerf3 進行網路速度測試</title>
+        <link>https://wellstsai.com/post/iperf3/</link>
+        <pubDate>Tue, 30 Jan 2024 16:40:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/iperf3/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/iperf3/cover.jpg" alt="Featured image of post 安裝並使用 iPerf3 進行網路速度測試" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在選購無線路由器等網通裝置時，標榜 AC3000、AX6000、以及 BE7000 等規格的路由器規格已經成為現代家庭網路的主流選擇。&lt;/p&gt;
+&lt;p&gt;以某牌為例，其無線速度特性標榜為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Wi-Fi 5 (1024 QAM)：最高 1733 Mbps。&lt;/li&gt;
+&lt;li&gt;Wi-Fi 6 (2.4 GHz)：最高 574 Mbps。&lt;/li&gt;
+&lt;li&gt;Wi-Fi 4：最高 300 Mbps。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;這些傳輸速度代表兩個終端設備如手機或電腦連線上此 Wi-Fi 熱點時。如果兩個設備同時支持 Wi-Fi 5 與 1024 QAM，則其最高傳輸速度可達 1733 Mbps。如此一來內網的兩個端點設備可以更高速的傳輸。&lt;/p&gt;
+&lt;p&gt;這些速度指的是無線路由器在最佳情況下所能提供的理論最高傳輸速度。&lt;/p&gt;
+&lt;p&gt;然而，實際的傳輸速度會受到許多因素影響，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;設備之間的距離。&lt;/li&gt;
+&lt;li&gt;障礙物（牆、轉角）。&lt;/li&gt;
+&lt;li&gt;同頻干擾。&lt;/li&gt;
+&lt;li&gt;網絡擁擠。&lt;/li&gt;
+&lt;li&gt;Quality of Service（QoS）優先權。&lt;/li&gt;
+&lt;li&gt;裝置本身設計不良（熱、天線、EMI）。&lt;/li&gt;
+&lt;li&gt;線材（網路線）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也因此，若想知道兩設備之間實際傳輸速度，可以透過 iPerf3 進行測速與評估，並且也可以應用在外網、VPN 或是 Tailscale 測速。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;這邊要提及的一點是如果跟電信業者申請例如：300 Mbps/300Mbps (下載/上傳) 的網路。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;設備 A 使用 Wi-Fi 6 網卡走 2.4 GHz 頻段 (547 Mbps) 連線到無線路由器。無線路由器接了一個電信設備對外網 (300 Mbps)，並到客戶端 B 的電信設備 (300 Mbps) 進行接收，其速度會被限制在最高 300 Mbps 的電信設備。若客戶端 B 的是 (100 Mbps)，則速度會被限制在最高 100 Mbps。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設備 A 使用 CAT-5 有線網路 (100 Mbps) 進行上網，手機使用 2.4 GHz 連線到路由器（574 Mbps），兩個終端設備在測速時，其最高速度為 100 Mbps。要改善網路速度，可以讓設備 A 使用無線網卡或是更換網路線。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;網路速度受到終端設備的硬體參數、傳輸協定以及整個通信鏈路（telecommunications link）中&lt;code&gt;最低速度&lt;/code&gt;的影響。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;linux-安裝-iperf3&#34;&gt;Linux 安裝 iPerf3&lt;/h2&gt;
+&lt;p&gt;若為 Arm 架構或其他版本的 Linux，可以到&lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網查詢安裝方式&lt;/a&gt;，或是透過 &lt;a class=&#34;link&#34; href=&#34;https://github.com/userdocs/iperf3-static&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Github 直接下載 Arm 版本的 iPerf3&lt;/a&gt;，甚至是&lt;a class=&#34;link&#34; href=&#34;https://github.com/esnet/iperf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;下載 source code 自行編譯&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;以下說明測試環境為 Ubuntu 20.04 的安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新套件列表&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 iperf3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt install -y iperf3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 顯示 iperf3 的版本&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;iperf3 --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果需要移除 iperf3，可以使用以下命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt remove iperf3
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，檢查輸出版本為 iperf 3.9 (cJSON 1.7.13)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wells@server:~$ iperf3 --version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;iperf 3.9 &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;cJSON 1.7.13&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Linux server 5.15.0-91-generic &lt;span style=&#34;color:#75715e&#34;&gt;#101-Ubuntu SMP Tue Nov 14 13:30:08 UTC 2023 x86_64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;windows-安裝-iperf3&#34;&gt;Windows 安裝 iPerf3&lt;/h2&gt;
+&lt;p&gt;Windows 下是已經編譯好的執行檔，下載後即可執行。&lt;/p&gt;
+&lt;p&gt;可以到&lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/iperf-download.php#windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網&lt;/a&gt;進行下載，目前最新版本為 2016 年版的 &lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/download/windows/iperf-3.1.3-win64.zip&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf 3.1.3&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;下載後解壓縮到任何地方，資料夾 iperf-3.1.3-win64 內有執行檔，於該目錄底下，於 cmd 中執行 iperf3.exe 即可。&lt;/p&gt;
+&lt;h2 id=&#34;建立-iperf3-伺服器&#34;&gt;建立 iPerf3 伺服器&lt;/h2&gt;
+&lt;p&gt;測試兩個裝置彼此之間的網路速度，nodeA 運行為伺服器，而另一台 nodeB 模擬上傳或下載的行為。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;開啟 iperf3 的目錄&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/1_win_iperf_location.png&#34;
+	width=&#34;913&#34;
+	height=&#34;453&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/1_win_iperf_location_hu3b8113edffe1514757514f8e7e436982_15462_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/1_win_iperf_location_hu3b8113edffe1514757514f8e7e436982_15462_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開啟 iperf3 的目錄&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;483px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在路徑中輸入 cmd&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/2_type_cmd.png&#34;
+	width=&#34;913&#34;
+	height=&#34;453&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/2_type_cmd_hu917339c2bfdf9964c35c0cff1613e4c5_17351_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/2_type_cmd_hu917339c2bfdf9964c35c0cff1613e4c5_17351_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檔案總管中於路徑輸入 cmd&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;483px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;跳出 cmd，確定該路徑為 iperf3 目錄底下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/3_shows_the_cmd.png&#34;
+	width=&#34;904&#34;
+	height=&#34;407&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/3_shows_the_cmd_hufd43d7c766d4ee34a66aacd0ef8cbf2d_15112_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/3_shows_the_cmd_hufd43d7c766d4ee34a66aacd0ef8cbf2d_15112_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;終端視窗&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;222&#34;
+		data-flex-basis=&#34;533px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;輸入 &lt;code&gt;iperf3 -s&lt;/code&gt; 後會建立好 iperf3 伺服器，並打開 port 5201，等待客戶端進行連線。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/4_run_iperf_server.png&#34;
+	width=&#34;904&#34;
+	height=&#34;407&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/4_run_iperf_server_hud8d9f2b4883851cd514fa8def0ad8b27_19926_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/4_run_iperf_server_hud8d9f2b4883851cd514fa8def0ad8b27_19926_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;輸入指令 iperf3 -s 建立伺服器&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;222&#34;
+		data-flex-basis=&#34;533px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如果要自行指定 port，可以改為 iperf3 -s -p 5205，往後客戶端在連線需加上對應的端口號碼。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;內網-ip-直連&#34;&gt;內網 IP 直連&lt;/h2&gt;
+&lt;p&gt;硬體配置：兩台電腦透過有線網路進行內網測速，經過數台路由器。其中 nodeA 作為伺服器（192.168.1.30）。&lt;/p&gt;
+&lt;p&gt;nodeA 建立好伺服器後，在 nodeB 輸入 &lt;code&gt;iperf3 -c IP/HOST&lt;/code&gt;，便可以測試 nodeB 的上傳速度。即傳輸方向是從 nodeB 到 nodeA：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30
+Connecting to host 192.168.1.30, port 5201
+[  4] local 192.168.1.20 port 55482 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  85.3 MBytes   715 Mbits/sec    0    219 KBytes
+[  4]   1.00-2.00   sec  78.0 MBytes   655 Mbits/sec    0    219 KBytes
+[  4]   2.00-3.00   sec  86.2 MBytes   723 Mbits/sec    0    219 KBytes
+[  4]   3.00-4.00   sec  88.5 MBytes   742 Mbits/sec    0    219 KBytes
+[  4]   4.00-5.00   sec  86.4 MBytes   725 Mbits/sec    0    219 KBytes
+[  4]   5.00-6.00   sec  90.7 MBytes   761 Mbits/sec    0    219 KBytes
+[  4]   6.00-7.00   sec  85.6 MBytes   718 Mbits/sec    0    219 KBytes
+[  4]   7.00-8.00   sec  85.3 MBytes   715 Mbits/sec    0    219 KBytes
+[  4]   8.00-9.00   sec  78.7 MBytes   660 Mbits/sec    0    219 KBytes
+[  4]   9.00-10.00  sec  82.3 MBytes   691 Mbits/sec    0    219 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-10.00  sec   847 MBytes   711 Mbits/sec    0             sender
+[  4]   0.00-10.00  sec   846 MBytes   710 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表格參數的意義如下，其中著重在 Bandwidth 這個參數：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ID: 通常代表連接的編號。&lt;/li&gt;
+&lt;li&gt;Interval: 測試的時間間隔。&lt;/li&gt;
+&lt;li&gt;Transfer: 這段時間內傳輸的數據量。&lt;/li&gt;
+&lt;li&gt;Bandwidth: 這段時間的平均頻寬，&lt;code&gt;表示為傳輸速度&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;Retr: 重試的次數。&lt;/li&gt;
+&lt;li&gt;Cwnd: 現在的窗口大小。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;由上表可以得知 nodeB 傳資料到 nodeA 的平均速度為 711 Mbps。&lt;/p&gt;
+&lt;p&gt;若要測試 nodeB 的下載速度，即傳輸方向是從 nodeA 到 nodeB，可使用&lt;code&gt;iperf3 -c IP/HOST -R&lt;/code&gt;：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30 -R
+Connecting to host 192.168.1.30, port 5201
+Reverse mode, remote host 192.168.1.30 is sending
+[  4] local 192.168.1.20 port 42550 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec   111 MBytes   930 Mbits/sec
+[  4]   1.00-2.00   sec   106 MBytes   888 Mbits/sec
+[  4]   2.00-3.00   sec  94.4 MBytes   791 Mbits/sec
+[  4]   3.00-4.00   sec   108 MBytes   911 Mbits/sec
+[  4]   4.00-5.00   sec  91.8 MBytes   770 Mbits/sec
+[  4]   5.00-6.00   sec   101 MBytes   844 Mbits/sec
+[  4]   6.00-7.00   sec   101 MBytes   845 Mbits/sec
+[  4]   7.00-8.00   sec   102 MBytes   858 Mbits/sec
+[  4]   8.00-9.00   sec  93.2 MBytes   783 Mbits/sec
+[  4]   9.00-10.00  sec   102 MBytes   859 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec  1011 MBytes   848 Mbits/sec                  sender
+[  4]   0.00-10.00  sec  1011 MBytes   848 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;nodeA 傳資料到 nodeB 的平均速度為 848 Mbps。&lt;/p&gt;
+&lt;h2 id=&#34;內網-ip-經由-tailscale&#34;&gt;內網 IP 經由 Tailscale&lt;/h2&gt;
+&lt;p&gt;經由 Tailscale 組網後，若想要評估兩個節點傳送的速度，可以直接輸入對方的 hostname 進行測試。&lt;/p&gt;
+&lt;p&gt;以下測試為相同的電腦，但改為 Tailscale 的 hostname 進行測試。&lt;/p&gt;
+&lt;p&gt;上傳測試結果：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c nodeA
+Connecting to host nodeA, port 5201
+[  4] local 100.116.123.164 port 43086 connected to 100.110.114.119 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  46.3 MBytes   388 Mbits/sec    0    216 KBytes
+[  4]   1.00-2.00   sec  34.4 MBytes   289 Mbits/sec    0    216 KBytes
+[  4]   2.00-3.00   sec  41.0 MBytes   344 Mbits/sec    0    216 KBytes
+[  4]   3.00-4.00   sec  45.1 MBytes   379 Mbits/sec    0    216 KBytes
+[  4]   4.00-5.00   sec  44.4 MBytes   373 Mbits/sec    0    216 KBytes
+[  4]   5.00-6.00   sec  47.0 MBytes   395 Mbits/sec    0    216 KBytes
+[  4]   6.00-7.00   sec  45.1 MBytes   378 Mbits/sec    0    216 KBytes
+[  4]   7.00-8.00   sec  46.8 MBytes   393 Mbits/sec    0    216 KBytes
+[  4]   8.00-9.00   sec  45.2 MBytes   379 Mbits/sec    0    216 KBytes
+[  4]   9.00-10.00  sec  44.6 MBytes   374 Mbits/sec    0    216 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-10.00  sec   440 MBytes   369 Mbits/sec    0             sender
+[  4]   0.00-10.00  sec   439 MBytes   369 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;下載測試結果：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c nodeA -R
+Connecting to host nodeA, port 5201
+Reverse mode, remote host nodeA is sending
+[  4] local 100.116.123.164 port 32852 connected to 100.110.114.119 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec  95.6 MBytes   802 Mbits/sec
+[  4]   1.00-2.00   sec  86.9 MBytes   729 Mbits/sec
+[  4]   2.00-3.00   sec  90.6 MBytes   760 Mbits/sec
+[  4]   3.00-4.00   sec  72.0 MBytes   604 Mbits/sec
+[  4]   4.00-5.00   sec  81.5 MBytes   684 Mbits/sec
+[  4]   5.00-6.00   sec  73.5 MBytes   616 Mbits/sec
+[  4]   6.00-7.00   sec  78.9 MBytes   662 Mbits/sec
+[  4]   7.00-8.00   sec  87.9 MBytes   738 Mbits/sec
+[  4]   8.00-9.00   sec  90.8 MBytes   761 Mbits/sec
+[  4]   9.00-10.00  sec  70.4 MBytes   590 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec   828 MBytes   695 Mbits/sec                  sender
+[  4]   0.00-10.00  sec   828 MBytes   695 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Tailscale 與 IP 直連對比，上載速度降為原來的 52%，下載速度降為原來的 82%。&lt;/p&gt;
+&lt;h2 id=&#34;多客戶端並行測試multiple-parallel-client-connection&#34;&gt;多客戶端並行測試（multiple parallel client connection）&lt;/h2&gt;
+&lt;p&gt;如果想要測試伺服器的性能，可以使用 &lt;code&gt;iperf3 -c IP/HOST -P client_counts&lt;/code&gt; 進行&lt;/p&gt;
+&lt;p&gt;3 個用戶同時下傳：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30 -R -P3
+Connecting to host 192.168.1.30, port 5201
+Reverse mode, remote host 192.168.1.30 is sending
+[  4] local 192.168.1.20 port 60680 connected to 192.168.1.30 port 5201
+[  6] local 192.168.1.20 port 60694 connected to 192.168.1.30 port 5201
+[  8] local 192.168.1.20 port 60704 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec  37.2 MBytes   312 Mbits/sec
+[  6]   0.00-1.00   sec  37.2 MBytes   312 Mbits/sec
+[  8]   0.00-1.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   0.00-1.00   sec   112 MBytes   935 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   1.00-2.00   sec  37.1 MBytes   312 Mbits/sec
+[  6]   1.00-2.00   sec  37.1 MBytes   312 Mbits/sec
+[  8]   1.00-2.00   sec  37.0 MBytes   311 Mbits/sec
+[SUM]   1.00-2.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   2.00-3.00   sec  37.2 MBytes   312 Mbits/sec
+[  6]   2.00-3.00   sec  37.0 MBytes   310 Mbits/sec
+[  8]   2.00-3.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   2.00-3.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   3.00-4.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   4.00-5.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   5.00-6.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   6.00-7.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   7.00-8.00   sec  37.0 MBytes   311 Mbits/sec
+[  6]   7.00-8.00   sec  37.1 MBytes   312 Mbits/sec
+[  8]   7.00-8.00   sec  37.1 MBytes   312 Mbits/sec
+[SUM]   7.00-8.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   8.00-9.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   9.00-10.00  sec  37.2 MBytes   312 Mbits/sec
+[  6]   9.00-10.00  sec  37.1 MBytes   311 Mbits/sec
+[  8]   9.00-10.00  sec  37.0 MBytes   310 Mbits/sec
+[SUM]   9.00-10.00  sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  sender
+[  4]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  receiver
+[  6]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  sender
+[  6]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  receiver
+[  8]   0.00-10.00  sec   371 MBytes   311 Mbits/sec                  sender
+[  8]   0.00-10.00  sec   371 MBytes   311 Mbits/sec                  receiver
+[SUM]   0.00-10.00  sec  1.09 GBytes   935 Mbits/sec                  sender
+[SUM]   0.00-10.00  sec  1.09 GBytes   935 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;使用 iPerf3 測速後，若網速未達到需求，可進行進一步的除錯。&lt;/p&gt;
+&lt;p&gt;對於家用內部網路來說，線材品質、裝置設定以及協定支援等因素可能是導致網速不佳的主因。&lt;/p&gt;
+&lt;p&gt;甚至有時候重開路由器網速就正常了，遇到這種或許可以重新開始評估一台新的路由器了&amp;hellip;。&lt;/p&gt;
+&lt;p&gt;當遇到 Tailscale 速度過慢的問題時，可以使用 &lt;code&gt;tailscale ping host&lt;/code&gt; 命令評估裝置是否為直接連接或透過 DERP 中繼轉發。&lt;/p&gt;
+&lt;p&gt;我自己在使用 Tailscale 時通常是直接連接的，但有時連接某些 Wi-Fi 後開始使用 DERP 中繼。即使斷開 Wi-Fi 並切回原本的網路，仍無法直接連接。在這種情況下，強制重啟 Tailscale 服務有時會解決問題。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://lindevs.com/install-iperf-on-ubuntu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Install iPerf 3 on Ubuntu 20.04&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.oracle.com/cd/E88353_01/html/E37839/iperf3-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf3 user manual page&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</title>
+        <link>https://wellstsai.com/post/tailscale-synology/</link>
+        <pubDate>Thu, 25 Jan 2024 17:10:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale-synology/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale-synology/cover.jpg" alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在先前文章&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;中，說明如何透過 Tailscale 建立只有自己能夠存取的 VPN（tailnet）。&lt;/p&gt;
+&lt;p&gt;本篇文章將著重如何在 Synology 上如何安裝最新版本的 Tailscale。&lt;/p&gt;
+&lt;p&gt;並實現自動更新等機制。確保 Tailscale 保持在最新版本。&lt;/p&gt;
+&lt;p&gt;以下操作的系統配置：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NAS 裝置：DS220+&lt;/li&gt;
+&lt;li&gt;作業系統：DiskStation Manager 7 (DSM 7)&lt;/li&gt;
+&lt;li&gt;CPU：Intel Celeron J4025&lt;/li&gt;
+&lt;li&gt;Synology Package Arch：Geminilake&lt;/li&gt;
+&lt;li&gt;Generic Arch：&lt;code&gt;x86_64&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，如果要更新到最新版本的 Tailscale，需要知道 NAS 的通用架構（Generic Arch）。&lt;/p&gt;
+&lt;p&gt;這部分會根據不同的通用架構決定要下載哪個 Synology package（spk）檔案進行安裝與更新。&lt;/p&gt;
+&lt;p&gt;如果不知道自己的 NAS 架構，可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;以查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;h2 id=&#34;傳統安裝方式&#34;&gt;傳統安裝方式&lt;/h2&gt;
+&lt;p&gt;傳統安裝方式為透過 Synology 內的套件中心進行安裝，此版本為 Synology 釋出的版本。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選套件中心（Synology package center）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;套件中心&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在所有套件中，最下方找到 Tailscale，並點選安裝套件。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc.png&#34;
+	width=&#34;1899&#34;
+	height=&#34;885&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安裝 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;514px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;至此，安裝好後，點選主選單的 Tailscale 登入後就可以正常使用了。&lt;/p&gt;
+&lt;p&gt;在套件中心，已安裝的頁面中檢查安裝版本，可以看到為官方所提供的 1.38.4-700038004。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version.png&#34;
+	width=&#34;1458&#34;
+	height=&#34;698&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;208&#34;
+		data-flex-basis=&#34;501px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;該版本為 &lt;a class=&#34;link&#34; href=&#34;https://archive.synology.com/download/Package/Tailscale/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 發布&lt;/a&gt; (2023/5/8)。&lt;/p&gt;
+&lt;p&gt;根據 &lt;a class=&#34;link&#34; href=&#34;https://github.com/tailscale/tailscale/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 官方最新釋出版本&lt;/a&gt;為 1.58.2 (2024/1/25)。&lt;/p&gt;
+&lt;h2 id=&#34;從官網安裝最新版本的-tailscale&#34;&gt;從官網安裝最新版本的 Tailscale&lt;/h2&gt;
+&lt;p&gt;Tailscale 每次更新，官方會為 Synology 編譯並發布&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;最新版本的 spk&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;使用者可以自行下載，並在套件中心手動進行安裝。未來有更新，則重複此動作。&lt;/p&gt;
+&lt;p&gt;在此，Wells 已經整合成一個腳本，實現全自動安裝與定時更新。照著以下步驟執行即可。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新 Tailscale&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查更新是否成功&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; $? -eq &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;執行 Tailscale 更新成功&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exit &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 若找不到指令，手動下載指定版本的 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://pkgs.tailscale.com/stable/tailscale-x86_64-1.58.2-7000058002-dsm7.spk&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;basename &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 在使用者的家目錄下建立暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd ~
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下載 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wget &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg install &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$filename&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 啟動 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg start Tailscale
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 移除暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm -rf ~/tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 再次執行 Tailscale 更新&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;複製上述的腳本內容到記事本。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改腳本中 url，&lt;code&gt;需要針對 NAS 通用架構，進行更改&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;p&gt;找到自己的 NAS 型號所對應的 Generic Arch。以 DS220+ 為例，為&lt;code&gt;x86_64&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;到 &lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 釋出穩定版本&lt;/a&gt; 找到對應的 DSM 版本與 Generic Arch。&lt;/p&gt;
+&lt;p&gt;複製其 spk 網址，並取代腳本中 url 那行的網址即可。&lt;/p&gt;
+&lt;p&gt;其中腳本的 spk 網址為適用於 &lt;code&gt;x86_64&lt;/code&gt;，如果為相同的 Generic Arch，則腳本不需要更改。&lt;/p&gt;
+&lt;p&gt;例如：DS224+, DS923+, DS723+, DS423+, DS1621+, DS220+, DS420+, RS820+, RS1219+, FS1018, FS3017 等機種都是 x86_64，所以上述腳本不需修改可以直接使用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選控制台（Control Panel）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;控制台&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選任務排程表（Task Scheduler）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新增一個排程任務（定時執行）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;填寫任務名稱。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;填寫任務名稱，並使用 root 運行此腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定腳本定時執行時間，在此設定每天凌晨 0 點執行此腳本。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;設定腳本執行時間，此時間可自訂&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;任務設定中，在執行指令貼上對應 NAS 的架構，在此可設定是否透過信箱回傳執行結果。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;貼上對應 NAS 架構的腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選確認。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;點選確認後會出現警告訊息，點選確定即可&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第一次可以手動執行更新將 NAS 上的版本更新為最新版本。&lt;/p&gt;
+&lt;p&gt;這邊 Wells 安裝套件中心的版本（1.38），不移除該版本的情況下。&lt;/p&gt;
+&lt;p&gt;是可以直接正常升級到最新版本。所以有沒有先移除在執行腳本應該都沒差。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script.png&#34;
+	width=&#34;363&#34;
+	height=&#34;188&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;對任務點擊右鍵 → 執行&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;套件中心檢查版本，可以看到為 1.58.2，而 Synology的最新版本為 1.38.4&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;454&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本，透過腳本更新為最新版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;293&#34;
+		data-flex-basis=&#34;704px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如此一來，每天 0 點，會自動執行 tailscale update 進行自動更新。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;安裝好後，就可以進入到控制台，並點選 Tailscale 的 APP，此時會打開新的分頁，登入後就可以開始組網了。&lt;/p&gt;
+&lt;p&gt;詳細的組網可參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://kb.synology.com/zh-tw/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;我的 Synology NAS 使用哪種 CPU？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale套件 - 穩定版&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>使用 SSH 金鑰進行無密碼遠端連線</title>
+        <link>https://wellstsai.com/post/ssh-connection/</link>
+        <pubDate>Fri, 15 Dec 2023 18:50:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/ssh-connection/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/ssh-connection/cover.jpg" alt="Featured image of post 使用 SSH 金鑰進行無密碼遠端連線" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Secure Shell（SSH）是一個安全協定，允許兩台電腦通過安全的連接進行數據交換（執行命令、傳檔案），並提供加密保證數據的安全與完整性。&lt;/p&gt;
+&lt;p&gt;SSH 通常用於兩台電腦的遠端登錄。它取代了舊的遠端訪問協定，像是 Telnet 是以明文沒有加密的方式傳輸密碼和內容。而 PTT 也在 2020 年關閉不安全的 Telnet 協定，改用 SSH 或是 WebSocket 協定，以確保通訊過程都有加密，防止竊聽與竄改，提高安全性和隱私性。&lt;/p&gt;
+&lt;p&gt;SSH 除了裝置遠端連線，還可以：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;建立 SSH 隧道（Tunneling）進行端口轉發，安全的的訪問網路資源。&lt;/li&gt;
+&lt;li&gt;SFTP、SCP 提供安全檔案傳輸進行上傳或下載檔案。&lt;/li&gt;
+&lt;li&gt;rsync 用於檔案同步，減少傳輸用量。&lt;/li&gt;
+&lt;li&gt;其他應用&amp;hellip;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;預設 Linux、MacOS 或是 Windows 預設都整合了 OpenSSH 套件。OpenSSH 是一個開源的 SSH 實作，讓使用者可以透過 SSH 協定所實作的套件，裡面包含了：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;遠端操作工具&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ssh&lt;/strong&gt;，用於遠程登入到其他主機並執行命令。&lt;/li&gt;
+&lt;li&gt;scp，本地與遠端的檔案傳輸。&lt;/li&gt;
+&lt;li&gt;sftp，類似 FTP 的使用方式，但傳輸都有進行加密。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;金鑰管理工具&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ssh-add&lt;/strong&gt;，將私鑰加入 SSH 代理程式，以便在不需要再次輸入密碼的情況下使用私鑰進行身份驗證。&lt;/li&gt;
+&lt;li&gt;ssh-keysign，用於對 SSH 證書進行簽名以進行身份驗證。&lt;/li&gt;
+&lt;li&gt;ssh-keyscan，用於掃描遠端主機以檢索其 SSH 公鑰。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-keygen&lt;/strong&gt;，用於生成 SSH 金鑰對（公鑰和私鑰）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;伺服器端&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;sshd&lt;/strong&gt; (SSH Daemon)，在伺服器上運行的守護程序，負責接受來自客戶端的 SSH 連線請求。&lt;/li&gt;
+&lt;li&gt;sftp-server，處理 sftp 客戶端的請求並進行檔案傳輸。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ssh-agent&lt;/strong&gt;，管理用戶的 SSH 金鑰，並在需要時提供這些金鑰進行身份驗證。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;本文章重點會著重在如何建立公鑰與私鑰，並透過這兩把鑰匙實現無密碼認證。另外也會提及伺服器端如何運行 SSH 服務，並讓用戶端透過 SSH 進行連線。&lt;/p&gt;
+&lt;p&gt;在傳統上密碼登入方式，輸入正確的使用者密碼以進行身分驗證。若伺服器暴露在公共網路上時，可能會面臨暴力破解的風險，進而導致伺服器資料外洩。&lt;/p&gt;
+&lt;p&gt;為了提升安全性(與懶得輸入密碼?)，可以透過公私鑰進行驗證。如此一來不需要輸入密碼就可以連線，且駭客在沒有私鑰的情況下也無法登入。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;💡 本文章有使用 Tailscale 建立內網，達成本地端與伺服器端的電腦透過 hostname 或是 IP 進行連線。&lt;/p&gt;
+&lt;p&gt;兩台電腦要連線需要有 IP，如果是公網 IP 則需要設定路由器進行端口轉發到內網，但相對暴露 SSH 端口危險的。
+不想暴露端口、沒有公網 IP 或是無法修改路由器設定等，可閱讀&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;來實現兩台電腦的連線。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;ssh-重點摘要&#34;&gt;SSH 重點摘要&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;SSH 主要兩種驗證方式為：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;密碼身分認證（Password-based authentication）&lt;/li&gt;
+&lt;li&gt;公鑰認證（Public-key authentication）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;實現 SSH 金鑰後，登入方式可使用金鑰登入，不需要輸入密碼。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;公開金鑰&lt;/strong&gt; 內容會填寫在 &lt;strong&gt;遠端伺服器&lt;/strong&gt; 上的 authorized_keys。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;私密金鑰&lt;/strong&gt; 會保留在您的&lt;strong&gt;本機系統&lt;/strong&gt;上，保護此私密金鑰，不要共用它。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;公開金鑰可以與任何人共用，&lt;strong&gt;私密金鑰只有自己有存取權限&lt;/strong&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SSH 可以選擇不同加密演算法，RSA 為預設、目前廣泛且相容性最好的加密方法，相反，ED25519 對比於 RSA 具有更好的性能但較差的相容性，目前絕大多數伺服器都逐漸支援。為我個人目前產金鑰的首選。在此確保本地端與伺服器可以正常通訊即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;絕大多數存取 GIT 的傳輸協定是 SSH。意味著在遠端操作像是 clone, push, pull 都會要求認證。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;SSH 加密方式，雖然 RSA 比 Ed25519 相容性好，但實際在使用上建議以產生 Ed25519 為優先以確保安全性與速度。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;ssh-金鑰建立與連線流程&#34;&gt;SSH 金鑰建立與連線流程&lt;/h2&gt;
+&lt;p&gt;假設 nodeA 為本地端（使用者），nodeB 為伺服器端。&lt;/p&gt;
+&lt;p&gt;nodeA 為工作的電腦，像是要進行 git clone，或是進行 SSH 連線到別的電腦上。&lt;/p&gt;
+&lt;p&gt;nodeB 為被連線的電腦，像是 git 伺服器，網頁伺服器、代理伺服器、虛擬專用伺服器等&amp;hellip;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在 nodeA 或 nodeB 產生金鑰（公鑰與私鑰）。&lt;/li&gt;
+&lt;li&gt;把私鑰放在 nodeA，公鑰放在 nodeB。&lt;/li&gt;
+&lt;li&gt;nodeB 建立 ~/.ssh/authorized_keys，並填入公鑰。&lt;/li&gt;
+&lt;li&gt;nodeA 建立 ~/.ssh/config，填入連線資訊，連線資訊包含伺服器 IP 與私鑰路徑。&lt;/li&gt;
+&lt;li&gt;nodeA 在進行 SSH 連線時，預設會使用金鑰進行連線。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;💡要特別注意的是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;確定私鑰只有自己有存取權限，且 nodeB 沒有私鑰。&lt;/li&gt;
+&lt;li&gt;nodeB 如果是 Windows 且為系統管理員。路徑需改為：
+&lt;code&gt;C:\ProgramData\ssh\administrators_authorized_keys&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;如果連線失敗或設定金鑰後但卻要求輸入密碼，可在 SSH 連線時可以加上 -vvvv 進行除錯。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;確認-ssh-環境&#34;&gt;確認 SSH 環境&lt;/h2&gt;
+&lt;p&gt;Linux 與 Windows 預設已經安裝好客戶端，輸入 &lt;code&gt;ssh USER@IP&lt;/code&gt; 便可以連線到其他伺服器。&lt;/p&gt;
+&lt;p&gt;若想要建立 SSH 伺服器，則需要另外安裝，並運行 SSH 服務。&lt;/p&gt;
+&lt;h3 id=&#34;linux&#34;&gt;Linux&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 預設已安裝好 openssh-client，可以直接先檢查版本&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh -V
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 如果找不到指令表示尚未安裝，可透過以下指令安裝 openssh-client&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# sudo apt install openssh-client&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到 Linux 目前裝的版本為 OpenSSL 3.0.2。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@server:~$ ssh -V
+OpenSSH_8.9p1 Ubuntu-3ubuntu0.4, OpenSSL 3.0.2 15 Mar 2022
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;若要讓其他電腦能透過 SSH 連到這台 Linux，則需要安裝 openssh-server&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt install openssh-server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，透過 systemctl 指令來啟動、檢查服務。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo systemctl enable ssh &lt;span style=&#34;color:#75715e&#34;&gt;# 開機自動執行 sshd&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo service ssh start    &lt;span style=&#34;color:#75715e&#34;&gt;# 執行 sshd 服務&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo systemctl status ssh &lt;span style=&#34;color:#75715e&#34;&gt;# 檢查 sshd 服務狀態&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;若成功執行，會看到綠色 active&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/ssh_status.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;465&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/ssh_status_hua0da81854b4f8ff8affed24cb5022e52_182788_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/ssh_status_hua0da81854b4f8ff8affed24cb5022e52_182788_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 sshd 服務&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;239&#34;
+		data-flex-basis=&#34;575px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;windows&#34;&gt;Windows&lt;/h3&gt;
+&lt;p&gt;Windows 底下除了透過 &lt;code&gt;ssh -V&lt;/code&gt; 檢查客戶端是否安裝。&lt;/p&gt;
+&lt;p&gt;也可以透過 powershell 檢查並安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查 OpenSSH 安裝狀態&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-WindowsCapability -Online | Where-Object Name &lt;span style=&#34;color:#f92672&#34;&gt;-like&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;OpenSSH*&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Installed 表示已安裝，NotPresent表示尚未安裝&lt;/p&gt;
+&lt;p&gt;目前此 Windows 可以看到 Client 已安裝，表示可以透過 SSH 連線到其他伺服器。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; Get-WindowsCapability -Online | Where-Object Name -like &amp;#39;OpenSSH*&amp;#39;
+
+Name  : OpenSSH.Client~~~~0.0.1.0
+State : Installed
+
+Name  : OpenSSH.Server~~~~0.0.1.0
+State : NotPresent
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;sshd 目前沒有安裝。若要讓其他電腦可以透過 SSH 連線到此電腦，則透過 powershell 進行安裝。&lt;/p&gt;
+&lt;p&gt;以下為 OpenSSH.Client 與 OpenSSH.Server 的安裝指令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 OpenSSH.Client&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Add-WindowsCapability -Online -Name OpenSSH.Client~~~~&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0&lt;/span&gt;.1.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 OpenSSH.Server&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Add-WindowsCapability -Online -Name OpenSSH.Server~~~~&lt;span style=&#34;color:#ae81ff&#34;&gt;0.0&lt;/span&gt;.1.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝 OpenSSH.Server 需要一段時間，安裝好後會出現 &lt;code&gt;RestartNeeded: True&lt;/code&gt;，請先重開機。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/install_ssh_server.png&#34;
+	width=&#34;738&#34;
+	height=&#34;111&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/install_ssh_server_hu8647fad26835361edeb81911b88f4522_3586_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/install_ssh_server_hu8647fad26835361edeb81911b88f4522_3586_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Windows 安裝 SSH server&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;664&#34;
+		data-flex-basis=&#34;1595px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;使用 Microsoft Defender 防火牆，對私人網路打開&lt;code&gt;端口 22&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;如果有防毒軟體進行管理，此行不需要。但需要檢查防毒軟體的防火牆是否開啟端口 22。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;netsh advfirewall firewall add rule name=&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Allow SSH from private network&amp;#34;&lt;/span&gt; dir=&lt;span style=&#34;color:#66d9ef&#34;&gt;in&lt;/span&gt; action=allow protocol=TCP localport=&lt;span style=&#34;color:#ae81ff&#34;&gt;22&lt;/span&gt; profile=private
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;接著，啟用 SSH 服務與開機自動啟用：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 設定每次電腦開機，自動啟動 sshd 服務&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Set-Service -Name sshd -StartupType &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Automatic&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查 SSH 服務&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Start-Service sshd
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到 sshd 的狀態，應該為 Running 狀態&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; Get-Service sshd
+
+Status   Name               DisplayName
+------   ----               -----------
+Running  sshd               OpenSSH SSH Server
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;至此，透過另一台電腦嘗試連線，便可以成功連線上伺服器終端&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells_nodeA&amp;gt;ssh wells@nodeB
+
+ECDSA key fingerprint is SHA256:eaAI46GIucGkcFEeSAwO2GWsTOgr1919FyDoXsJKYG1.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+wells@nodeB&amp;#39;s password: xxxxxx
+Warning: Permanently added &amp;#39;nodeB,100.100.120.16&amp;#39; (ECDSA) to the list of known hosts.
+
+wells@nodeB C:\Users\wells_nodeB&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;連線除錯方式&#34;&gt;連線除錯方式&lt;/h3&gt;
+&lt;p&gt;如果進行遠端連線失敗的話，可在連線時加入 &lt;code&gt;-vvvv&lt;/code&gt;，進行排錯，例如：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells_nodeA&amp;gt;ssh -vvvv wells@nodeB
+
+OpenSSH_for_Windows_8.6p1, LibreSSL 3.4.3
+debug1: Reading configuration data C:\\Users\\wells_nodeA/.ssh/config
+debug3: Failed to open file:C:/ProgramData/ssh/ssh_config error:2
+debug3: expanded UserKnownHostsFile &amp;#39;~/.ssh/known_hosts&amp;#39; -&amp;gt; &amp;#39;C:\\Users\\wells_nodeA/.ssh/known_hosts&amp;#39;
+debug1: Authenticator provider $SSH_SK_PROVIDER did not resolve; disabling
+debug2: resolving &amp;#34;server&amp;#34; port 22
+debug3: ssh_connect_direct: entering
+debug1: Connecting to server [100.100.120.16] port 22.
+debug3: finish_connect - ERROR: async io completed with error: 10060, io:00000299F796C380
+debug1: connect to address 100.100.120.16 port 22: Connection timed out
+ssh: connect to host server port 22: Connection timed out
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;可以看到 &lt;code&gt;Connection timed out&lt;/code&gt;，表示可能的原因有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;伺服器端的防火牆阻擋連線（電腦、防毒軟體、路由器）。&lt;/li&gt;
+&lt;li&gt;sshd 沒打開。&lt;/li&gt;
+&lt;li&gt;客戶端的 port 22 被阻擋。&lt;/li&gt;
+&lt;li&gt;DNS 解析錯誤。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;這些問題需要一步一步進 debug，更進一步的操作可以參照 Google 大神尋求協助。&lt;/p&gt;
+&lt;h2 id=&#34;建立金鑰&#34;&gt;建立金鑰&lt;/h2&gt;
+&lt;p&gt;由上述的 SSH 連線行為，可以發現目前尚未設定金鑰，所以預設登入是使用密碼進行登入。&lt;/p&gt;
+&lt;p&gt;建立金鑰非常簡單，由客戶端或伺服器端上執行皆可進行。&lt;/p&gt;
+&lt;p&gt;這裡 Windows 與 Linux 產生金鑰的指令都是透過 ssh-keygen。&lt;/p&gt;
+&lt;p&gt;其中參數的部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-t ed25519&lt;/code&gt; 為產生一對 ed25519 金鑰。或將其改為&lt;code&gt;-t rsa -b 4096&lt;/code&gt;，表示使用 RSA，長度為 4096 位元。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-C &amp;quot;xxx&amp;quot;&lt;/code&gt; 裡面的參數為任意值，主要是添加備註，幫助辨識金鑰是由誰建立的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-keygen -t ed25519 -C &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;your_email@example.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;產金鑰的過程，會看到 &lt;code&gt;Enter file in which to save the key&lt;/code&gt; 的路徑，預設是在個人目錄底下的 .ssh 資料夾底下。&lt;/p&gt;
+&lt;p&gt;決定好路徑後，會再詢問 passphrase（金鑰密碼），若為空值，未來在使用金鑰進行驗證時不需要密碼。若駭客取得到私鑰，還有第二道牆需要突破。&lt;/p&gt;
+&lt;p&gt;金鑰是儲存在個人電腦、個人帳戶，一般來說外洩的機會有難度。若害怕金鑰外洩的，可以輸入非空的數值。如此未來在使用金鑰驗證，還會額外要求輸入密碼以進行驗證。但相對又麻煩了&amp;hellip;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;passphrase 可以透過 ssh-agent 來實現快取，而在快取時間內不用輸入 passphrase。&lt;/p&gt;
+&lt;p&gt;此部分建議設定金鑰密碼以提高安全性。並使用 &lt;a class=&#34;link&#34; href=&#34;#%e9%87%91%e9%91%b0%e5%af%86%e7%a2%bc%e6%90%ad%e9%85%8d-ssh-agent&#34; &gt;金鑰密碼搭配 ssh-agent&lt;/a&gt; 進行快取。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells_nodeA&amp;gt;ssh-keygen -t ed25519 -C &amp;#34;admin@wellstsai.com&amp;#34;
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (C:\Users\wells_nodeA/.ssh/id_ed25519): C:\Users\wells_nodeA/.ssh/nodeA_ed25519
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in nodeA_ed25519
+Your public key has been saved in nodeA_ed25519.pub
+The key fingerprint is:
+SHA256:hCRwfElJDbYaaG1JgyDTs4Mqn4tQpIiPhmTwMWIMRO0 admin@wellstsai.com
+The key&amp;#39;s randomart image is:
++--[ED25519 256]--+
+|E=oo.o.+B=.      |
+|o=+.+ +o*o+.     |
+|=o+.  o ooo      |
+|.+..     .       |
+|*    S           |
+|*oo..            |
+|=Xo+             |
+|*oo              |
+|o.               |
++----[SHA256]-----+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;於 nodeA 產出公私鑰後，可以到個人 .ssh 目錄下檢查：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;##### Windows #####
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C:\Users&amp;gt;ls C:\Users\wells_nodeA\.ssh\
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;authorized_keys    config    nodeA_ed25519    nodeA_ed25519.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;##### Linux #####
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wells@nodeA:~$ ls ~/.ssh/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;authorized_keys  config  nodeA_ed25519  nodeA_ed25519.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中，私鑰沒有副檔名（nodeA_ed25519），公鑰（nodeA_ed25519.pub）附檔名為 &lt;code&gt;.pub&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;產完金鑰對後，便可以開始部署金鑰。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;⚠️ 注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;私鑰在本機（Local），公鑰在伺服器（Server）上。若在 node B 產出公私鑰，私鑰複製到 nodeA 後記得在 nodeB 上刪除私鑰。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;私鑰確定只有自己能夠存取，在 Linux 上，若權限為 777，請透過 chmod 改為 400。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;chmod &lt;span style=&#34;color:#ae81ff&#34;&gt;400&lt;/span&gt; ~/.ssh/nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;使用-ssh-金鑰建立兩台電腦連線&#34;&gt;使用 SSH 金鑰建立兩台電腦連線&lt;/h2&gt;
+&lt;p&gt;我們要把公鑰（nodeA_ed25519.pub）複製到伺服器上。可以透過 scp 這個程式。&lt;/p&gt;
+&lt;p&gt;用法為：&lt;code&gt;scp 本地檔案路徑 使用者名稱@伺服器:伺服器路徑&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Windows 複製公鑰到 Windows&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:C:\Users\wells_nodeB\.ssh\nodeA_ed25519.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Windows 複製到 Linux&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:~/.ssh/nodeA_ed25519.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;輸入完密碼後，便可以把公鑰透過 scp 複製到伺服器上。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users&amp;gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:C:\Users\wells_nodeB\.ssh\nodeA_ed25519.pub
+wells@nodeB&amp;#39;s password:
+nodeA_ed25519.pub                                                                                  100%  102     1.1KB/s   00:00
+
+C:\Users&amp;gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:~/.ssh/nodeA_ed25519.pub
+wells@nodeB&amp;#39;s password:
+nodeA_ed25519.pub                                                                                  100%  102     1.2KB/s   00:00
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;複製後，在 nodeB 上（伺服器端），新增檔案並填入公鑰內容。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用者為根據 nodeB 的使用者&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows 一般使用者：&lt;code&gt;C:\Users\wells_nodeA\.ssh\authorized_keys&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;⚠️ Windows 系統使用者：&lt;code&gt;C:\ProgramData\ssh\administrators_authorized_keys&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux 一般使用者/root：&lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;記事本開啟公鑰 (nodeA_ed25519.pub)&lt;/li&gt;
+&lt;li&gt;全選複製內容&lt;/li&gt;
+&lt;li&gt;新增上述檔案&lt;/li&gt;
+&lt;li&gt;在上述檔案內，貼上公鑰內容後存檔&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/add_authorized_keys.png&#34;
+	width=&#34;650&#34;
+	height=&#34;475&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/add_authorized_keys_hu91ea7c412258991c6b595f4fb9514810_29691_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/add_authorized_keys_hu91ea7c412258991c6b595f4fb9514810_29691_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;在 authorized_keys 填入公鑰&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;136&#34;
+		data-flex-basis=&#34;328px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;最後，本地端 nodeA 新增 config 設定檔後儲存：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows：&lt;code&gt;C:\Users\wells_nodeA\.ssh\config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux：&lt;code&gt;~/.ssh/config&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Host nodeB_wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    User wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    HostName nodeB
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    IdentityFile ~/.ssh/nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;設定檔內容說明&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Host 為個人可辨識的名稱&lt;/li&gt;
+&lt;li&gt;User 是伺服器上的使用者名稱&lt;/li&gt;
+&lt;li&gt;HostName 為伺服器的 IP 或 host 名稱&lt;/li&gt;
+&lt;li&gt;IdentityFile 為私鑰路徑，Windows 與 Linux 上都可以使用 &lt;code&gt;~/&lt;/code&gt; 表示個人目錄&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;儲存後，就可以實現以金鑰進行登入，若登入失敗要求輸入密碼，可以檢查&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;金鑰是否正確&lt;/li&gt;
+&lt;li&gt;authorized_keys 路徑是否正確&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;進行 SSH 連線，此時不會要求輸入密碼&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells_nodeA&amp;gt;ssh wells@nodeB
+
+Microsoft Windows [版本 10.0.22631.2861]
+(c) Microsoft Corporation. 著作權所有，並保留一切權利。
+
+wells@NODEB C:\Users\wells&amp;gt;exit
+Connection to nodeB closed.
+
+C:\Users\wells_nodeA&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;使用-ssh-金鑰存取位於-synology-上的-git-伺服器&#34;&gt;使用 SSH 金鑰存取位於 Synology 上的 Git 伺服器&lt;/h2&gt;
+&lt;p&gt;在本地端 Windows/Linux 上建立好金鑰後，將公鑰放置 Synology 的個人使用者目錄下的 .ssh 資料夾，沒有目錄的話需要自行建立。並新增 authorized_keys 並填入公鑰內容。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/add_pubkey_synology.png&#34;
+	width=&#34;1348&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/add_pubkey_synology_hu62014adb1811ed3d149649c6a550fa69_95934_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/add_pubkey_synology_hu62014adb1811ed3d149649c6a550fa69_95934_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;把公鑰放到個人目錄下的 .ssh 資料夾&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;210&#34;
+		data-flex-basis=&#34;505px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/add_authorized_keys_synology.png&#34;
+	width=&#34;1348&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/add_authorized_keys_synology_hua5cf89d08361869cbdd2a5cff1f7e5d9_87544_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/add_authorized_keys_synology_hua5cf89d08361869cbdd2a5cff1f7e5d9_87544_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;在 .ssh 目錄新增 authorized_keys 並填入公鑰內容&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;210&#34;
+		data-flex-basis=&#34;505px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在本地端上的 config 設定檔，填入主機資訊：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows：&lt;code&gt;C:\Users\wells\.ssh\config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux：&lt;code&gt;~\.ssh\config&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Host NAS
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    User wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    HostName 192.168.50.12
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    IdentityFile ~/.ssh/nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;設定檔內容說明&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Host 為辨識名稱&lt;/li&gt;
+&lt;li&gt;User 為 NAS 登入帳號&lt;/li&gt;
+&lt;li&gt;HostName 為 NAS IP&lt;/li&gt;
+&lt;li&gt;IdentityFile 為私鑰路徑&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;執行 git remote 相關指令時，則會優先使用金鑰進行認證，而不用輸入密碼。&lt;/p&gt;
+&lt;h2 id=&#34;使用-ssh-金鑰存取-github&#34;&gt;使用 SSH 金鑰存取 Github&lt;/h2&gt;
+&lt;p&gt;首先在 Github 建立新的 repo，若已經有 repo 的可略過此步驟。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/create_new_repo.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;1154&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/create_new_repo_hucaff2837d5311d685a905e2dc0c57fcc_53849_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/create_new_repo_hucaff2837d5311d685a905e2dc0c57fcc_53849_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;建立新的 repo&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;104&#34;
+		data-flex-basis=&#34;250px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;建立後，github 會提供 SSH 的連結&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git@github.com:WellWells/TEST_REPO.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/repo_init_page.png&#34;
+	width=&#34;2076&#34;
+	height=&#34;1047&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/repo_init_page_hu0937035d31ecb543a3a4fa12be964a40_57171_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/repo_init_page_hu0937035d31ecb543a3a4fa12be964a40_57171_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;空的 repo 頁面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;475px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果在本地端直接進行 clone，會跳出沒有權限：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wells@server:~$ git clone git@github.com:WellWells/TEST_REPO.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cloning into &amp;#39;TEST_REPO&amp;#39;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git@github.com: Permission denied (publickey).
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;fatal: Could not read from remote repository.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Please make sure you have the correct access rights
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;and the repository exists.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;點擊右上方的個人圖示叫出選單，點選 Setting 進入設定頁面&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/github_profile_click_menu.png&#34;
+	width=&#34;505&#34;
+	height=&#34;1217&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/github_profile_click_menu_hu60cfd4cd21b44ecf7e36d8f39da4732b_24752_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/github_profile_click_menu_hu60cfd4cd21b44ecf7e36d8f39da4732b_24752_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;點選右上方的個人圖示，叫出選單&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;41&#34;
+		data-flex-basis=&#34;99px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;左邊選擇 SSH and GPG keys，進入 SSH Key 頁面後，點擊 New SSH key 新增公鑰。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/github_setting_SSH.png&#34;
+	width=&#34;1465&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/github_setting_SSH_hu737ead4ea9f5995b9bc9688fc8e26360_48823_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/github_setting_SSH_hu737ead4ea9f5995b9bc9688fc8e26360_48823_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;新增 SSH Key&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;228&#34;
+		data-flex-basis=&#34;549px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/ssh-connection/add_new_ssh_key.png&#34;
+	width=&#34;1489&#34;
+	height=&#34;640&#34;
+	srcset=&#34;https://wellstsai.com/post/ssh-connection/add_new_ssh_key_hu6b7fa2dd08c3a295469f6fff8a7d349c_40304_480x0_resize_box_3.png 480w, https://wellstsai.com/post/ssh-connection/add_new_ssh_key_hu6b7fa2dd08c3a295469f6fff8a7d349c_40304_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;貼上公鑰內容&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;558px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在本地端上的 config 設定檔，填入主機資訊：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows：&lt;code&gt;C:\Users\wells\.ssh\config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux：&lt;code&gt;~\.ssh\config&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Host github_wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    HostName github.com
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    IdentityFile ~/.ssh/nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;設定檔內容說明&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Host&lt;/code&gt; 為辨識名稱&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HostName&lt;/code&gt; 固定為 &lt;code&gt;github.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IdentityFile&lt;/code&gt; 為私鑰路徑&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;在 clone 一次就可以正常使用金鑰存取 Github repo。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wells@server:~$ git clone git@github.com:WellWells/TEST_REPO.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cloning into &amp;#39;TEST_REPO&amp;#39;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;warning: You appear to have cloned an empty repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;進階安全設定&#34;&gt;進階安全設定&lt;/h2&gt;
+&lt;p&gt;此章節適用於對安全性敏感的使用者，也建議設定以下相關 config 以達到更高的安全性。&lt;/p&gt;
+&lt;h3 id=&#34;關閉密碼認證&#34;&gt;關閉密碼認證&lt;/h3&gt;
+&lt;p&gt;如果預設遠端伺服器 (nodeB) 走的是密碼認證，確定金鑰可以成功登入後，可以關閉密碼認證提高安全性。&lt;/p&gt;
+&lt;p&gt;設定檔路徑：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows：&lt;code&gt;C:\ProgramData\ssh\sshd_config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Linux：&lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;找到約 50 行附近，並將 PasswordAuthentication 改為 no，記得移除前面的 &lt;code&gt;#&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;---#PasswordAuthentication yes
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;+++PasswordAuthentication no
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;修改後，重啟 sshd 後，&lt;code&gt;下次登入僅使用金鑰進行，若金鑰遺失則無法登入&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;透過 PowerShell 重啟 sshd&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Restart-Service sshd
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Linux 重啟 sshd&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo service ssh restart
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;金鑰密碼搭配-ssh-agent&#34;&gt;金鑰密碼搭配 ssh-agent&lt;/h3&gt;
+&lt;p&gt;在&lt;a class=&#34;link&#34; href=&#34;#%e5%bb%ba%e7%ab%8b%e9%87%91%e9%91%b0&#34; &gt;建立金鑰&lt;/a&gt;章節有說明 passphrase 預設可為空值，在進行 SSH 時不需要密碼。然而私鑰如果外洩，駭客可以直接透過此私鑰進行 SSH 連線。&lt;/p&gt;
+&lt;p&gt;在此，建立金鑰時可以加入 passphrase，並透過 ssh-agent 快取私鑰在記憶體中，只要輸入一次密碼後，都會透過此快取進行金鑰驗證。&lt;/p&gt;
+&lt;p&gt;以下操作使用 Windows 為範例，Linux 的操作基本相同一致。&lt;/p&gt;
+&lt;p&gt;其主要差異在 Windows 底下 SSH 執行檔分為兩包，分別為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;OpenSSH 底下的 &lt;code&gt;C:\Windows\System32\OpenSSH&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Git 目錄底下的 &lt;code&gt;C:\Program Files\Git\usr\bin&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;故需要將 Git 的 sshCommand 更改為 OpenSSH 的路徑。&lt;/p&gt;
+&lt;p&gt;Windows：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更改 git 的 ssh.exe 為 OpenSSH 底下的路徑，若未更改，則無法使用儲存在 OpenSSH 記憶體的私鑰&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git config --global core.sshCommand C:/Windows/System32/OpenSSH/ssh.exe
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 開機自動執行 ssh-agent&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-Service ssh-agent | Set-Service -StartupType Automatic
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 啟動 ssh-agent&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Start-Service ssh-agent
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查 ssh-agent 的狀態&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-Service ssh-agent
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 使用 ssh-add 把私鑰加入 ssh-agent，此時會要求輸入 passphrase&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-add C:\Users\wells\.ssh\nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 列出當前 ssh-agent 中已載入的金鑰&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-add -l
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 刪除所有金鑰&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# ssh-add -D&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Linux：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 若預設為 bash，則在 ~/.bashrc 末端加入以下行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;eval &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;ssh-agent -s&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 新增私鑰到 ssh-agent，並輸入 passphrase&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-add ~/.ssh/nodeA_ed25519
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;macOS 指令可能有些不同，請參閱&lt;a class=&#34;link&#34; href=&#34;https://apple.stackexchange.com/questions/48502/how-can-i-permanently-add-my-ssh-private-key-to-keychain-so-it-is-automatically&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;解法&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;確定 ssh-agent 已載入私鑰，私鑰可以備份至安全的地方，並在此電腦上移除。&lt;/p&gt;
+&lt;p&gt;只要 ssh-agent 有成功啟動，預設都會透過 agent 進行金鑰認證。&lt;/p&gt;
+&lt;p&gt;最終，本地端 nodeA 的 .ssh 資料夾，應該只有 known_hosts 與 config。&lt;/p&gt;
+&lt;p&gt;config 裡面的 IdentityFile 路徑也可以移除。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Host nodeB_wells
+    User wells
+    HostName nodeB
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ssh-agent 預設時間是永久，若要提高安全性可以設定快取時間。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-agent -t 1h
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;使用-ssh-agent-轉發&#34;&gt;使用 SSH agent 轉發&lt;/h3&gt;
+&lt;p&gt;Github 與 nodeB 上已經填入公鑰，本地端 nodeA 已經透過 ssh-add 新增私鑰到 ssh-agent。&lt;/p&gt;
+&lt;p&gt;所以本地端可以 SSH 到 nodeB，或透過進行 git 相關指令把 Github 的程式碼 clone 下來至 nodeA。&lt;/p&gt;
+&lt;p&gt;現在，若要在 nodeB 上進行 git clone 把 Github 的程式碼抓下來，私鑰不需要放到 nodeB。&lt;/p&gt;
+&lt;p&gt;可以透過 SSH agent 轉發實現私鑰轉發。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 添加 -A 可以啟用 SSH 代理轉發。允許在遠端伺服器上使用本地的 SSH 金鑰。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh -A wells@nodeB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果每次 SSH 都要帶參數覺得麻煩，也可以在 config 內新增 ForwardAgent&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Host nodeB_wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    User wells
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    HostName nodeB
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    ForwardAgent yes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;連線後，遠端伺服器可以使用 &lt;code&gt;ssh-add -l&lt;/code&gt; 檢查是否已經載入私鑰。&lt;/p&gt;
+&lt;p&gt;若已載入私鑰，此時便可透過該金鑰，在 nodeB 上進行 git clone。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Windows 預設自帶版本為 8.6p1，進行 agent 轉發後檢查伺服器上的私鑰是有載入的。&lt;/p&gt;
+&lt;p&gt;然而進行 git clone 會出現公鑰認證失敗，此部分為 OpenSSH Bug。&lt;/p&gt;
+&lt;p&gt;Windows 使用者可以到微軟 &lt;a class=&#34;link&#34; href=&#34;https://github.com/PowerShell/Win32-OpenSSH/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OpenSSH Release&lt;/a&gt; 手動安裝_8.9p1 後，進行 git 相關操作是正常的。&lt;/p&gt;
+&lt;p&gt;另外，如果遠端伺服器的信任度不高，可考慮改用 Proxyjump 進行跳板。其基本原理是私鑰儲存在 NodeA 上，當在 NodeB 存取 Github 時，可設定 NodeA 為跳板。&lt;/p&gt;
+&lt;p&gt;使用 Proxy 的好處是不從 NodeA 轉發金鑰到 NodeB 上，而是直接在 NodeA 上進行 SSH 操作，並把結果回傳至 NodeB。&lt;/p&gt;
+&lt;p&gt;如果 NodeB 的信任度較低（例如有其他使用者擁有更高的 root 權限），則應考慮使用 Proxyjump 進行代理操作。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://support.apple.com/zh-tw/guide/mac-help/mchlp1066/mac&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;允許遠端電腦取用你的 Mac&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows-server/administration/openssh/openssh_install_firstuse&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;開始使用 OpenSSH for Windows&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ubuntu.com/server/docs/service-openssh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OpenSSH Server&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.miniasp.com/post/2021/12/11/How-to-setup-OpenSSH-Server-in-Windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;如何在 Windows 正確的安裝與設定 OpenSSH Server 服務&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/security/operating-system-security/network-security/windows-firewall/configure-with-command-line?tabs=powershell&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;使用命令列管理 Windows 防火牆&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/azure/devops/repos/git/gcm-ssh-passphrase&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SSH 複雜密碼&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Adding a new SSH key to your GitHub account&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://superuser.com/questions/1327633/how-to-maintain-ssh-agent-login-session-with-windows-10s-new-openssh-and-powers&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How to maintain ssh-agent login session with Windows 10&amp;rsquo;s new OpenSSH and PowerShell&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://dmtavt.com/post/2020-08-03-ssh-agent-powershell/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Automatically starting ssh-agent when powershell or git-bash are started&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows-server/administration/openssh/openssh_keymanagement&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;適用于 Windows 的 OpenSSH 中的金鑰型驗證&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/en/authentication/connecting-to-github-with-ssh/using-ssh-agent-forwarding&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Using SSH agent forwarding&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://stackoverflow.com/questions/71399334/ssh-fails-to-use-private-key-from-ssh-agent-communication-with-agent-failed&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Ssh fails to use private key from ssh-agent: communication with agent failed&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://heipei.github.io/2015/02/26/SSH-Agent-Forwarding-considered-harmful/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SSH Agent Forwarding considered harmful&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

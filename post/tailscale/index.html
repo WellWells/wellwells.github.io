@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='輕鬆在任何裝置上訪問私網裝置'>
+
+<title>使用 Tailscale 輕鬆建立安全且私密的通道 - WellWells</title>
+
+
+<link rel='canonical' href='https://wellstsai.com/post/tailscale/'>
+
+<link rel="stylesheet" href="/scss/style.min.6f97a446ffede30c6e468103f6f619d741887c25a3b7ed2ff0286e373820a699.css"><meta property='og:title' content='使用 Tailscale 輕鬆建立安全且私密的通道'>
+<meta property='og:description' content='輕鬆在任何裝置上訪問私網裝置'>
+<meta property='og:url' content='https://wellstsai.com/post/tailscale/'>
+<meta property='og:site_name' content='WellWells'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='教學' /><meta property='article:tag' content='軟體' /><meta property='article:tag' content='生產力' /><meta property='article:tag' content='Tailscale' /><meta property='article:tag' content='VPN' /><meta property='article:tag' content='SSH' /><meta property='article:published_time' content='2023-11-29T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2024-03-06T00:00:00&#43;00:00'/><meta property='og:image' content='https://wellstsai.com/post/tailscale/cover.jpg' />
+<meta name="twitter:title" content="使用 Tailscale 輕鬆建立安全且私密的通道">
+<meta name="twitter:description" content="輕鬆在任何裝置上訪問私網裝置"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://wellstsai.com/post/tailscale/cover.jpg' /><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.min.css" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JKC4KZLT26"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-JKC4KZLT26', { 'anonymize_ip': false });
+}
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        <img src="/mimi.png" width="300px"
+                            height="300px" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">✨</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">WellWells</a></h1>
+            <h2 class="site-description">井裡總有一些意想不到的東西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首頁</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>關於 Wells</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>歷史文章</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+                <li id="i18n-switch">  
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                    <select name="language" onchange="window.location.href = this.selectedOptions[0].value">
+                        
+                            <option value="https://wellstsai.com/" selected></option>
+                        
+                    </select>
+                </li>
+            
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>深色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目錄</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#寫給對電腦不清楚的人">寫給對電腦不清楚的人</a></li>
+    <li><a href="#如何遠端存取裝置">如何遠端存取裝置？</a></li>
+    <li><a href="#建立虛擬私人網路vpn">建立虛擬私人網路（VPN）</a></li>
+    <li><a href="#常見的-vpn-協定">常見的 VPN 協定</a></li>
+    <li><a href="#什麼是-tailscale">什麼是 Tailscale？</a></li>
+    <li><a href="#tailscale-的競爭品">Tailscale 的競爭品</a></li>
+    <li><a href="#如何安裝-tailscale">如何安裝 Tailscale</a></li>
+    <li><a href="#裝置重新命名">裝置重新命名</a></li>
+    <li><a href="#tailscale-相關指令cli">Tailscale 相關指令（CLI）</a></li>
+    <li><a href="#結論">結論</a></li>
+    <li><a href="#參考文獻">參考文獻</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/tailscale/">
+                <img src="/post/tailscale/cover_hu5a1df5d6cca77f0876c4c8749db3d7d6_149294_800x0_resize_q75_box.jpg"
+                        srcset="/post/tailscale/cover_hu5a1df5d6cca77f0876c4c8749db3d7d6_149294_800x0_resize_q75_box.jpg 800w, /post/tailscale/cover_hu5a1df5d6cca77f0876c4c8749db3d7d6_149294_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="這是一張有關標題為 使用 Tailscale 輕鬆建立安全且私密的通道 的圖片" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/tailscale/">使用 Tailscale 輕鬆建立安全且私密的通道</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            輕鬆在任何裝置上訪問私網裝置
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2023/11/29</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 9 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="引言">引言</h2>
+<p>當今天人在外時，如何遠端連線到家裡的電腦、工作電腦、或是家中的 NAS？</p>
+<p>本篇文章會一步一步教你如何使用 Tailscale 與內網裝置進行連線。</p>
+<h2 id="寫給對電腦不清楚的人">寫給對電腦不清楚的人</h2>
+<p>要讓裝置能夠互通，裝置首先要確定能夠連上網路。後續藉由 Tailscale 實現裝置的互通。</p>
+<p>首先在<a class="link" href="https://login.tailscale.com/start"  target="_blank" rel="noopener"
+    >官方網站註冊</a>，並於電腦 A、電腦 B、手機、NAS 或其他待組網裝置，安裝 Tailscale 並登入帳號。</p>
+<p>登入帳號後，等同於登入 tailnet。這些裝置會取得到彼此的內網 tailnet IP。</p>
+<p>並可以透過裝置名稱進行連線，像是遠端桌面連線、列印、存取 NAS 等&hellip;</p>
+<p><img src="/post/tailscale/mstsc_connection.png"
+	width="475"
+	height="287"
+	srcset="/post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_480x0_resize_box_3.png 480w, /post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="透過裝置名稱進行遠端桌面連線"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="165"
+		data-flex-basis="397px"
+	
+></p>
+<p><img src="/post/tailscale/ssh_connection.png"
+	width="466"
+	height="172"
+	srcset="/post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_480x0_resize_box_3.png 480w, /post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="透過裝置名稱進行 SSH 連線"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="270"
+		data-flex-basis="650px"
+	
+></p>
+<p>不想知道 VPN 背景的可直接跳到<a class="link" href="#%e5%a6%82%e4%bd%95%e5%ae%89%e8%a3%9d-tailscale" >如何安裝 Tailscale</a>、<a class="link" href="#%e8%a3%9d%e7%bd%ae%e9%87%8d%e6%96%b0%e5%91%bd%e5%90%8d" >裝置重新命名</a>與<a class="link" href="#%e7%b5%90%e8%ab%96" >結論</a></p>
+<h2 id="如何遠端存取裝置">如何遠端存取裝置？</h2>
+<p>在標準的情境應用中，例如：</p>
+<ol>
+<li>自己架設的網頁伺服器（localhost:80）</li>
+<li>NAS 本身提供 Web GUI（localhost:5000）</li>
+<li>Windows 遠端桌面連線（localhost:3389）</li>
+<li>DNS 伺服器（localhost:53）</li>
+<li>其他服務&hellip;</li>
+</ol>
+<p>如果我們想讓外網的人存取這台伺服器，首先有個<strong>對外 IP (WAN IP)</strong> （<a class="link" href="https://whatismyipaddress.com/"  target="_blank" rel="noopener"
+    >IP 查詢</a>）。我們可以透過這個對外 IP，從外部輸入 IP 進行連線。</p>
+<p>連線後會找到我們的路由器（router），設定此路由器把對外的 port 導到對應的應用。</p>
+<p>以 OpenWRT 的路由器介面為例，以下是路由器的設定，會在外網 IP 連線時進行通訊埠轉發（Port Forwarding）到區網 IP (LAN IP)：</p>
+<p><img src="/post/tailscale/port_forwards.png"
+	width="800"
+	height="414"
+	srcset="/post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_480x0_resize_box_3.png 480w, /post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="OpenWRT 通訊埠轉發設定"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="193"
+		data-flex-basis="463px"
+	
+></p>
+<p>其目的在於把 <code>外網 IP:Port</code> 導向至 <code>內網 IP:Port</code>。</p>
+<p>由上圖可得知：</p>
+<ol>
+<li>
+<p>192.168.1.2 為 DNS 伺服器，負責處理 Port 53, 853, 784 服務。</p>
+</li>
+<li>
+<p>192.168.1.3 為 網頁伺服器，負責處理網頁相關的內容。</p>
+</li>
+<li>
+<p>192.168.6.4 為 遠端伺服器，由外網 Port 82 導到 內網的 Port 3389。</p>
+</li>
+</ol>
+<p>設定好後通訊埠轉發後，便可由外部存取 DNS、網頁或是進行遠端桌面連線了。然而，上述通訊埠轉發的方式，是讓外網 IP 直接存取內網的相關資源，也意味者任何人是可以連線的。如果想要讓特定使用者存取，則必須自己建立虛擬私人網路（virtual network，VPN）。</p>
+<h2 id="建立虛擬私人網路vpn">建立虛擬私人網路（VPN）</h2>
+<p>VPN 是一種服務，它可以建立一個安全的加密通道，將用戶與遠端伺服器建立連接。這樣可以隱藏用戶的真實IP位址和加密數據傳輸。</p>
+<p>以 Windows 為例，根據<a class="link" href="https://support.microsoft.com/zh-tw/windows/%E5%9C%A8-windows-%E4%B8%AD%E9%80%A3%E7%B7%9A%E5%88%B0-vpn-3d29aeb1-f497-f6b7-7633-115722c1009c"  target="_blank" rel="noopener"
+    >微軟官網教學</a>於 A 電腦上建立 IKEv2、L2TP 或是 IPsec 協定的 VPN 後。在另外一台 B 電腦就可以嘗試連線了。</p>
+<p>連線成功後，B 電腦便等同於 A 電腦一樣，可以存取 NAS 服務、印表機等內網資源。</p>
+<p>要確定的是路由器與電腦是否有防火牆阻擋 UDP Port 500, 1701, 4500。</p>
+<p>若防火牆阻擋，會造成 VPN 連線失敗。</p>
+<h2 id="常見的-vpn-協定">常見的 VPN 協定</h2>
+<ol>
+<li>
+<p><a class="link" href="https://openvpn.net/"  target="_blank" rel="noopener"
+    >OpenVpn</a> − 提供多種驗證方式（金鑰、憑證、帳號密碼）進行驗證，可以在不同設備上使用，為開源專案。整理來說開源、安全、易用、兼容性好。</p>
+</li>
+<li>
+<p><a class="link" href="https://www.wireguard.com/"  target="_blank" rel="noopener"
+    >WireGuard</a> − 於 2020 年整合於 Linux，較為新興的 VPN 協定。其特點為：使用 UDP 傳輸、比 IPsec、OpenVPN 更快、性能更好、並支持跨平台。較新的路由器有些會整合 WireGuard 伺服器。</p>
+</li>
+<li>
+<p>L2TP/IPSec，專有協定（Cisco &amp; Microsoft），已經內建於系統中。不需要安裝軟體就可以架設與連線。</p>
+</li>
+<li>
+<p>PPTP，已淘汰的點對點協定。</p>
+</li>
+</ol>
+<h2 id="什麼是-tailscale">什麼是 Tailscale？</h2>
+<p>Tailscale 是一個基於 WireGuard 協定的 VPN 軟體。可以將多個設備連接，實現虛擬內部網路。</p>
+<p>傳統上設定 WireGuard 較為繁瑣，無論是在架設、或是維護上都有一定困難。例如在各個裝置先透過 <a class="link" href="https://manpages.debian.org/unstable/wireguard-tools/wg-quick.8.en.html"  target="_blank" rel="noopener"
+    >wg-quick</a> 產生公鑰與私鑰，然後在該裝置上安裝 WireGuard後，設定相關的文件，文件內容需要填寫監聽的埠、專用 IP、私鑰，對等公鑰。</p>
+<blockquote>
+<p>例如一台伺服器（Server）與兩台客戶端（Client），公私鑰設定如下：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>裝置</th>
+<th>私鑰</th>
+<th>公鑰</th>
+<th>設定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>伺服器</td>
+<td>A</td>
+<td>B</td>
+<td>填入自己的私鑰 A、客戶端的公鑰 D、公鑰 F</td>
+</tr>
+<tr>
+<td>客戶端 1</td>
+<td>C</td>
+<td>D</td>
+<td>填入自己的私鑰 C、伺服器的公鑰 B</td>
+</tr>
+<tr>
+<td>客戶端 2</td>
+<td>E</td>
+<td>F</td>
+<td>填入自己的私鑰 E、伺服器的公鑰 B</td>
+</tr>
+</tbody>
+</table></div>
+<p>若往後有更多客戶端、伺服器需要重新設定，且以上情況僅為 1 個伺服器的例子，多個伺服器設定起來會更加複雜。</p>
+</blockquote>
+<p>若使用 Tailscale，基本上可以無腦架設私人 VPN，並提供一個完整的 Web GUI 顯示連線的裝置。</p>
+<p>其中 Tailscale 基於 WireGuard，但有以下特點：</p>
+<ol>
+<li>不使用輻射狀網絡（Hub-and-spoke networks），而是使用網狀網路（Mesh networks）改善裝置通訊的交換。當然這也是 WireGuard相較於其他 VPN 協定的不同之處。</li>
+<li>支持 NAT 打洞（NAT Hole Punching）[*] ，允許位於不同 NAT 後網路的兩個節點直接通訊，而不需要中央伺服器。從而實現 peer-to-peer (P2P) 直連。</li>
+<li>若 NAT 打洞失敗，fallback 到中繼模式 （relay server mode），並基於 <a class="link" href="https://tailscale.com/blog/how-tailscale-works/#encrypted-tcp-relays-derp"  target="_blank" rel="noopener"
+    >DERP（Detour Encrypted Routing Protocol）伺服器</a>來建立連結。</li>
+<li>連入 Tailscale 時，會使用協調伺服器（coordination servers / DERP Servers）進行用戶的資訊交換，如 IP、Port、裝置狀態。</li>
+<li>簡易的 Web GUI 管理介面，可以管理各個裝置彼此間的訪問程度。</li>
+<li>提供 MagicDNS、TailDrop、Tailscale Funnel 等功能，可以更方便的存取裝置。[**]</li>
+</ol>
+<blockquote>
+<p>* 網路地址轉換（Network Address Translation，NAT），IP 封包標頭中的IP位址轉換為另一個 IP 位址，從而實現地址重用，讓所有內網都可以使用同一個 IP 連接到外部網路。</p>
+<p>** MagicDNS 提供使用裝置名稱存取裝置而不用記住 IP。TailDrop 實現了類似 AirDrop 的功能，可以直接對其他裝置傳送傳檔案。Tailscale Funnel 實現反向代理的功能，可以讓外網存取指定內網裝置。</p>
+</blockquote>
+<h2 id="tailscale-的競爭品">Tailscale 的競爭品</h2>
+<p>異地建立網路的相似產品有：</p>
+<ol>
+<li><a class="link" href="https://www.zerotier.com/"  target="_blank" rel="noopener"
+    >Zerotier</a></li>
+<li><a class="link" href="https://www.cloudflare.com/zh-tw/products/tunnel/"  target="_blank" rel="noopener"
+    >Cloudflare Tunnel</a></li>
+<li><a class="link" href="https://www.netmaker.io/"  target="_blank" rel="noopener"
+    >Netmaker</a></li>
+<li><a class="link" href="https://ngrok.com/"  target="_blank" rel="noopener"
+    >Ngrok</a></li>
+<li><a class="link" href="https://www.twingate.com/"  target="_blank" rel="noopener"
+    >Twingate</a></li>
+<li>等&hellip;</li>
+</ol>
+<p>我有使用過的是 Zerotier，使用的是自己的<a class="link" href="https://docs.zerotier.com/protocol/"  target="_blank" rel="noopener"
+    >協定</a>而非 WireGuard。個人使用心得是裝置連線 Zerotier 私人網域後，會有一組內網 IP，這組內網 IP 由於沒有 DNS 去解析，所以要存取該裝置，必須直接輸入 IP。雖然提供 <a class="link" href="https://github.com/zerotier/zeronsd"  target="_blank" rel="noopener"
+    >ZeroNSD</a> ，不過就印象中需要架設，也就退而轉為 TailScale了。</p>
+<h2 id="如何安裝-tailscale">如何安裝 Tailscale</h2>
+<p>首先到官網（https://tailscale.com/）進行註冊，這邊的註冊是透過 Google、Microsoft、Github、Apple 四個身分識別提供者進行註冊（identity provider，IdP），本身 Tailscale 不提供註冊，也因此沒有密碼儲存在 Tailscale 上。</p>
+<p>使用這些 IdP，若要確保安全性，可另外開啟雙重驗證登入。</p>
+<p>基本上是沒有人可以直接存取你的私人網路的。</p>
+<p><img src="/post/tailscale/sign_up_tailscale.png"
+	width="564"
+	height="676"
+	srcset="/post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_480x0_resize_box_3.png 480w, /post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; width:60%;"
+	loading="lazy"
+	
+		alt="註冊 Tailscale 帳號"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="83"
+		data-flex-basis="200px"
+	
+></p>
+<p>登入後，由於沒有任何裝置，Tailscale 預設會提供下列不同的安裝方式，照著官方進行安裝與下載即可。這邊雖然只列出 Synology 有提供官方安裝包，不過也可以使用 Docker 進行安裝在其他 NAS 上。</p>
+<p><img src="/post/tailscale/download_tailscale.png"
+	width="654"
+	height="658"
+	srcset="/post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_480x0_resize_box_3.png 480w, /post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; width:60%;"
+	loading="lazy"
+	
+		alt="下載 Tailscale"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="99"
+		data-flex-basis="238px"
+	
+></p>
+<p>下載並安裝後，電腦右下角會出現 Tailscale 的圖示，右鍵選擇 Log in&hellip; 會跳出登入介面。登入後，點選 Connect 即可加入私人網路 (tailnet) 。</p>
+<p><img src="/post/tailscale/connect_tailscale.png"
+	width="498"
+	height="245"
+	srcset="/post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_480x0_resize_box_3.png 480w, /post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; width:40%;"
+	loading="lazy"
+	
+		alt="將裝置加入 tailnet"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="203"
+		data-flex-basis="487px"
+	
+></p>
+<p>重複步驟，<a class="link" href="https://apps.apple.com/tw/app/tailscale/id1470499037"  target="_blank" rel="noopener"
+    >iOS</a> 或 <a class="link" href="https://play.google.com/store/apps/details?id=com.tailscale.ipn"  target="_blank" rel="noopener"
+    >Android</a> 下載 Tailscale，登入後點選 Connect，裝置可能會要求加入 VPN，點選新增 VPN 後，也成功加入私人網路中。</p>
+<p>可以於 Web GUI 中即時看到裝置的新增。</p>
+<p><img src="/post/tailscale/two_devices_joined.png"
+	width="800"
+	height="446"
+	srcset="/post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_480x0_resize_box_3.png 480w, /post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="手機加入 tailnet"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="179"
+		data-flex-basis="430px"
+	
+></p>
+<p>Linux 的部分也是一樣，只不過從 UI 介面改為命令列形式，根據<a class="link" href="https://tailscale.com/kb/1031/install-linux/"  target="_blank" rel="noopener"
+    >官方 Linux 安裝教學</a>，整體過程也是一致的。在登入過程中，系統會彈出一個網址，要求使用者在瀏覽器中輸入此網址進行登入。當使用者完成登入後，終端機將顯示 Success。</p>
+<p><img src="/post/tailscale/linux_tailscale_login.png"
+	width="520"
+	height="175"
+	srcset="/post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_480x0_resize_box_3.png 480w, /post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="於 Linux 登入 tailnet"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="297"
+		data-flex-basis="713px"
+	
+></p>
+<p>至此，安裝 Tailscale 並讓設備能夠互相連線也就完成了。此時可以於 cmd 中，輸入 tailscale status 或是 tailscale ping IP 來查看連線的狀態。</p>
+<p>如果是 active; direct 表示走的是直連，ping通常在 10 − 15 ms；反之，如果是active; relay &ldquo;xxx&rdquo; 表示走的是 中繼伺服器，延遲約為 80 ~ 300 ms 附近。</p>
+<p>走中繼伺服器的原因可能是防火牆阻擋了 UDP port，導致 tailscale 只能走中繼，但比起不能直接連線，至少提供了中繼伺服器的解決方案來解決直連無法連線的問題。</p>
+<p>若要改善 ping 延遲，可檢查路由器相關設定或防火牆來達成直連：</p>
+<ol>
+<li>例如開啟 UPnP 與 NAT-PMP （<a class="link" href="https://www.quora.com/What-does-disabling-UPnP-on-a-router-do"  target="_blank" rel="noopener"
+    >較不安全</a>，但無腦自動設定好）。</li>
+<li><a class="link" href="https://tailscale.com/kb/1082/firewall-ports/"  target="_blank" rel="noopener"
+    >修改防火牆設定</a>，關閉 UPnP，並允許防火牆內部裝置使用UDP通訊，並指定通訊端口為 41641，目標端口則是任意（不同廠家路由器有不同設定）。</li>
+<li>Linux 中可能阻擋到端口，開啟終端機並輸入 sudo ufw allow 41641/udp 以開啟 UDP 端口。</li>
+</ol>
+<pre tabindex="0"><code>PS C:\Users\wells&gt; tailscale ping nas
+pong from nas (100.105.151.221) via 142.251.43.14:41642 in 12ms
+
+PS C:\Users\wells&gt; tailscale ping work
+pong from work (100.122.114.19) via DERP(tok) in 190ms
+pong from work (100.122.114.19) via DERP(tok) in 86ms
+pong from work (100.122.114.19) via DERP(tok) in 88ms
+
+PS C:\Users\wells&gt; tailscale status
+100.105.151.221  nas          wells@  windows active; direct 142.251.43.14:41642
+100.122.114.19   work         wells@  linux   active; relay &#34;tok&#34;
+100.206.21.12    server1      wells@  linux   idle, tx 22416 rx 28304
+100.95.142.53    server2      wells@  linux   -
+100.111.59.11    home-1       wells@  windows active; direct 142.251.43.14:41641, tx 10684092 rx 110457924
+100.92.116.28    home-2       wells@  windows -
+100.154.231.41   wells-iphone wells@  iOS     offline
+</code></pre><p>最後，可以對著右下角的圖示右鍵 → Preferences → Run unattended 讓開機的時候<a class="link" href="https://tailscale.com/kb/1088/run-unattended/"  target="_blank" rel="noopener"
+    >自動連線 tailnet</a>。</p>
+<p><img src="/post/tailscale/run_unattended.png"
+	width="750"
+	height="321"
+	srcset="/post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_480x0_resize_box_3.png 480w, /post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="開機自動連線 tailnet"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="233"
+		data-flex-basis="560px"
+	
+></p>
+<h2 id="裝置重新命名">裝置重新命名</h2>
+<p>Tailnet 內建 DNS 功能，此功能可以把 hostname 或是裝置名稱轉為 IP（當然你是 IP 愛好者的話記 IP 也是可以的🙃）。</p>
+<p>對著右下角的圖示，進入到 Admin console</p>
+<p><img src="/post/tailscale/admin_console.png"
+	width="750"
+	height="330"
+	srcset="/post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_480x0_resize_box_3.png 480w, /post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="開啟 Admin console"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="227"
+		data-flex-basis="545px"
+	
+></p>
+<p>裝置名稱預設是使用 hostname，若想要<a class="link" href="https://tailscale.com/kb/1098/machine-names/"  target="_blank" rel="noopener"
+    >自訂裝置名稱</a>，可以點選裝置右邊的 &hellip; 的按鈕，並重新命名裝置。</p>
+<p><img src="/post/tailscale/rename_device.png"
+	width="550"
+	height="423"
+	srcset="/post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_480x0_resize_box_3.png 480w, /post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="重新命名裝置"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="130"
+		data-flex-basis="312px"
+	
+></p>
+<p>後續在裝置連線上，便可以直接透過裝置名稱進行連線</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh wells@build-server
+</span></span></code></pre></div><h2 id="tailscale-相關指令cli">Tailscale 相關指令（CLI）</h2>
+<p><a class="link" href="https://tailscale.com/kb/1080/cli/?tab=windows"  target="_blank" rel="noopener"
+    >Tailscale CLI</a> 提供在 Linux 環境下，開啟或關閉相關設定，在 Windows 上有圖示可以點選，也因此大部分的指令用不到（部分進階功能例外，需透過 CLI 進行設定），不過用來檢查相關連線狀態，用一張表格來說明我自己常用的指令，更多詳細的說明可以參照官網。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Commands</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tailscale status</td>
+<td>檢查當前網路狀態，可以檢查是否透過中繼還是直連</td>
+</tr>
+<tr>
+<td>tailscale ping [IP/device]</td>
+<td>檢查該裝置是否直連，若看到 DERP 表示走的是中繼</td>
+</tr>
+<tr>
+<td>tailscale up [flags]</td>
+<td>連線至 tailnet，可以帶有不同的flags</td>
+</tr>
+<tr>
+<td>tailscale netcheck</td>
+<td>檢查當前 DERP 的狀態</td>
+</tr>
+<tr>
+<td>tailscale update</td>
+<td>更新本裝置 tailscale 的版本</td>
+</tr>
+</tbody>
+</table></div>
+<p>自己常用的就幾個，比較進階的可能等未來用到再說吧。</p>
+<p>以下是我使用過的 tailscale up 設定：</p>
+<ul>
+<li>--advertise-exit-node：假設 A 電腦有開啟這個 flag，那麼 B 電腦的流量可以使用 A 電腦做為出口，此時 B 電腦上網的 IP就變為 A 電腦的 IP。</li>
+<li>--advertise-routes=<!-- raw HTML omitted -->：公開子網域，例如 A 電腦有內網 192.168.1.50，B 電腦若想直接訪問 192.168.1.xx 的網段，可以設定此設置。</li>
+</ul>
+<p>詳細的設定可以再參考官網詳細的說明。</p>
+<h2 id="結論">結論</h2>
+<p>本身 Tailscale 的安裝上非常簡單。且防火牆、NAT 穿透等複雜事情都幫你處理好了。</p>
+<p>註冊完後，每個裝置下載 tailscale，並登入帳號即可加入 tailnet。並實現裝置之間的互連。</p>
+<p>每個裝置都有主機名稱，可以透過 Admin console 修改，或是查看各個裝置的狀態。</p>
+<p>另外也可以將以加入 tailnet 的裝置進行子網域組網，並且在 tailnet 中廣播該網段。</p>
+<p>甚至今天加入 tailnet 裡的裝置，還可以單獨分享該裝置節點（<a class="link" href="https://tailscale.com/kb/1084/sharing/"  target="_blank" rel="noopener"
+    >Sharing nodes</a>）給其他帳號進行組網，實現更複雜的網路應用。</p>
+<p>其他更進階的設定可以參照<a class="link" href="https://tailscale.com/kb/start/"  target="_blank" rel="noopener"
+    >官方網站</a>的說明獲取更進一步的原理與資料。</p>
+<h2 id="參考文獻">參考文獻</h2>
+<ol>
+<li><a class="link" href="https://zhuanlan.zhihu.com/p/546382535"  target="_blank" rel="noopener"
+    >什麼是 VPN 協議？</a></li>
+<li><a class="link" href="https://www.wireguard.com/"  target="_blank" rel="noopener"
+    >WireGuard: fast, modern, secure VPN tunnel</a></li>
+<li><a class="link" href="https://docs.zerotier.com/protocol/"  target="_blank" rel="noopener"
+    >ZeroTier Documentation - The Protocol</a></li>
+<li><a class="link" href="https://tailscale.com/blog/how-nat-traversal-works/"  target="_blank" rel="noopener"
+    >How NAT traversal works</a></li>
+<li><a class="link" href="https://tailscale.com/blog/how-tailscale-works/"  target="_blank" rel="noopener"
+    >How Tailscale works</a></li>
+<li><a class="link" href="https://tailscale.com/kb/1080/cli/"  target="_blank" rel="noopener"
+    >Tailscale CLI</a></li>
+<li><a class="link" href="https://tailscale.com/kb/1054/dns/"  target="_blank" rel="noopener"
+    >DNS in Tailscale</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+        
+            <a href="/tags/%E8%BB%9F%E9%AB%94/">軟體</a>
+        
+            <a href="/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/">生產力</a>
+        
+            <a href="/tags/tailscale/">Tailscale</a>
+        
+            <a href="/tags/vpn/">VPN</a>
+        
+            <a href="/tags/ssh/">SSH</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"  target="_blank" rel="noopener"
+    >創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最後更新 2024/03/06
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相關文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/build-hugo/">
+        
+        
+            <div class="article-image">
+                <img src="/post/build-hugo/cover.1eb3e6ffde9413d096cd346a99bdc42e_hu92d7f691ce1ddbb942bb8a77e99b31e5_158426_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Hugo 建站筆記"
+                        
+                        data-hash="md5-HrPm/96UE9CWzTRqmb3ELg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hugo 建站筆記</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="wellwells/wellwells.github.io"
+    data-repo-id="R_kgDOKRvukA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOKRvukM4Cban9"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-TW"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 WellWells
+    </section>
+    
+    <section class="powerby">
+        主題 Stack 由 Jimmy 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption" style="display: flex; justify-content: center;">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

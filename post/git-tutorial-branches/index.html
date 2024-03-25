@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='學習如何在 VSCode 上進行分支的建立、切換、刪除分支。'>
+
+<title>Git 分支的建立與切換與刪除 - WellWells</title>
+
+
+<link rel='canonical' href='https://wellstsai.com/post/git-tutorial-branches/'>
+
+<link rel="stylesheet" href="/scss/style.min.6f97a446ffede30c6e468103f6f619d741887c25a3b7ed2ff0286e373820a699.css"><meta property='og:title' content='Git 分支的建立與切換與刪除'>
+<meta property='og:description' content='學習如何在 VSCode 上進行分支的建立、切換、刪除分支。'>
+<meta property='og:url' content='https://wellstsai.com/post/git-tutorial-branches/'>
+<meta property='og:site_name' content='WellWells'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Git' /><meta property='article:tag' content='軟體' /><meta property='article:tag' content='教學' /><meta property='article:published_time' content='2024-03-25T22:50:00&#43;08:00'/><meta property='article:modified_time' content='2024-03-25T00:00:00&#43;00:00'/><meta property='og:image' content='https://wellstsai.com/post/git-tutorial-branches/cover.jpg' />
+<meta name="twitter:title" content="Git 分支的建立與切換與刪除">
+<meta name="twitter:description" content="學習如何在 VSCode 上進行分支的建立、切換、刪除分支。"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://wellstsai.com/post/git-tutorial-branches/cover.jpg' /><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.min.css" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JKC4KZLT26"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-JKC4KZLT26', { 'anonymize_ip': false });
+}
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        <img src="/mimi.png" width="300px"
+                            height="300px" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">✨</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">WellWells</a></h1>
+            <h2 class="site-description">井裡總有一些意想不到的東西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首頁</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>關於 Wells</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>歷史文章</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+                <li id="i18n-switch">  
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                    <select name="language" onchange="window.location.href = this.selectedOptions[0].value">
+                        
+                            <option value="https://wellstsai.com/" selected></option>
+                        
+                    </select>
+                </li>
+            
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>深色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目錄</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#什麼是分支">什麼是分支？</a></li>
+    <li><a href="#複製一個遠端儲存庫git-clone">複製一個遠端儲存庫（git clone）</a></li>
+    <li><a href="#分支的切換git-checkout">分支的切換（git checkout）</a>
+      <ul>
+        <li><a href="#切換到現有分支">切換到現有分支</a></li>
+        <li><a href="#分離指標detached-head">分離指標（detached HEAD）</a></li>
+      </ul>
+    </li>
+    <li><a href="#建立新分支git-branch">建立新分支（git branch）</a></li>
+    <li><a href="#刪除分支">刪除分支</a></li>
+    <li><a href="#結論">結論</a></li>
+    <li><a href="#參考文獻">參考文獻</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/git-tutorial-branches/">
+                <img src="/post/git-tutorial-branches/cover_hued530971dee35542191f34227004ccb6_234260_800x0_resize_q75_box.jpg"
+                        srcset="/post/git-tutorial-branches/cover_hued530971dee35542191f34227004ccb6_234260_800x0_resize_q75_box.jpg 800w, /post/git-tutorial-branches/cover_hued530971dee35542191f34227004ccb6_234260_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="這是一張有關標題為 Git 分支的建立與切換與刪除 的圖片" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/git-tutorial-branches/">Git 分支的建立與切換與刪除</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            學習如何在 VSCode 上進行分支的建立、切換、刪除分支。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024/03/25</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 6 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="前言">前言</h2>
+<p>接續前篇 <a class="link" href="/post/git-tutorial-init" >開始使用 Git 管理專案</a>，我們學習了如何透過 Git 與 VSCode 建立儲存庫、新增檔案至暫存區，並提交至本地端的儲存庫。</p>
+<p>本篇將著重在分支（branch）的操作上。並藉由 VSCode 與 Git Graph 說明分支的切換、新增、刪除。</p>
+<h2 id="什麼是分支">什麼是分支？</h2>
+<p>分支在 Git 中扮演著重要的角色。舉例來說，當我們需要開發一個新功能時，可以在不影響主分支（例如 main/master）的情況下，建立一個新的分支（例如 feature/user-login）。待新功能開發完成後，再將其與主分支整合。</p>
+<p>以 GitHub 上 <a class="link" href="https://github.com/AdguardTeam/AdGuardHome"  target="_blank" rel="noopener"
+    >AdGuardHome</a> 專案為例：</p>
+<p>master 分支藍色為 v108 的新版本開發，現有正式版本為紅色 v107，每釋出一版 beta 或是 release 就會開一個新的分支進行記錄。</p>
+<p><img src="/post/git-tutorial-branches/adguardhome_branches.png"
+	width="911"
+	height="911"
+	srcset="/post/git-tutorial-branches/adguardhome_branches_hu2748a17507c3758dbab78fd123749172_41941_480x0_resize_box_3.png 480w, /post/git-tutorial-branches/adguardhome_branches_hu2748a17507c3758dbab78fd123749172_41941_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="AdGuardHome 的分支結構"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="100"
+		data-flex-basis="240px"
+	
+></p>
+<p>建立分支的好處有以下幾點：</p>
+<ol>
+<li>允許團隊成員進行多個獨立的工作，而彼此之間不會互相干擾，並能夠輕鬆地同步工作進度。</li>
+<li>在不影響主分支的情況下，可以進行修改和測試，確保主分支的穩定性。</li>
+<li>可以自由切換不同分支版本，以便確認各版本之間的差異，進而更好地掌握整個開發流程。</li>
+<li>當操作出錯時，可以更直觀地還原到原本的狀態，進行修復。此外，雖然也可以透過 reflog 來進行還原，但相較之下較為複雜不直觀。</li>
+</ol>
+<p>何時應該建立分支？</p>
+<ol>
+<li>在開發新功能或修復 Bug 時。</li>
+<li>當不確定操作 Git 會如何影響時，或進行複雜操作時。</li>
+<li>當要針對里程碑進行新分支建立時，確保每個版本都是獨立且可控的。</li>
+<li>🚩當在本地複製遠端儲存庫後，進行新功能修改時。🚩</li>
+</ol>
+<p>👉 其中第 4 點與第 1 點類似，但值得特別提出來討論的是：</p>
+<p>在初學 Git 時，若忽略了此步驟，往後在提交時很容易發生因主分支改變而引發的衝突。</p>
+<p>此外，在多人共同開發的情況下，通常會希望由單一負責人進行主分支的整合與確認。因此建議在不影響主分支的情況下開啟新分支進行推送，然後由負責人進行整合（merge 或 cherry-pick）。</p>
+<h2 id="複製一個遠端儲存庫git-clone">複製一個遠端儲存庫（git clone）</h2>
+<p>首先，我們先從 GitHub 上複製既有的遠端儲存庫，在此我選用的是 <a class="link" href="https://github.com/AdguardTeam/AdGuardHome"  target="_blank" rel="noopener"
+    >AdGuardHome</a> 這個專案，專案選用是不限定的，也可以使用自己的新增專案，或是其它相關的專案都可以。</p>
+<p>我們到專案頁面下，有一個藍色的 <code>Code</code> 按鈕，在 Local 標籤下，找到 Clone 選項內的 HTTPS 的儲存庫網址：<code>https://github.com/AdguardTeam/AdGuardHome.git</code>。</p>
+<p>若使用 SSH 的話，需要配置一組金鑰給 GitHub，可以參照先前文章：<a class="link" href="/post/ssh-connection/#%e4%bd%bf%e7%94%a8-ssh-%e9%87%91%e9%91%b0%e5%ad%98%e5%8f%96-github" >使用 SSH 金鑰進行無密碼遠端連線</a> 進行金鑰配置。</p>
+<p><img src="/post/git-tutorial-branches/adguardhome_github.png"
+	width="1544"
+	height="578"
+	srcset="/post/git-tutorial-branches/adguardhome_github_hudc2245f858d0bc7da074ea0607e7439a_50988_480x0_resize_box_3.png 480w, /post/git-tutorial-branches/adguardhome_github_hudc2245f858d0bc7da074ea0607e7439a_50988_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="找到 GitHub 上的專案進行 clone"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="267"
+		data-flex-basis="641px"
+	
+></p>
+<p>到 VSCode 中，<code>Ctrl + `</code> 叫出終端介面，輸入 git clone 網址，便可以進行複製：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PS C:<span style="color:#ae81ff">\U</span>sers<span style="color:#ae81ff">\W</span>ells&gt; git clone https://github.com/AdguardTeam/AdGuardHome.git
+</span></span><span style="display:flex;"><span>Cloning into <span style="color:#e6db74">&#39;AdGuardHome&#39;</span>...
+</span></span><span style="display:flex;"><span>remote: Enumerating objects: 35971, <span style="color:#66d9ef">done</span>.
+</span></span><span style="display:flex;"><span>remote: Counting objects: 100% <span style="color:#f92672">(</span>3588/3588<span style="color:#f92672">)</span>, <span style="color:#66d9ef">done</span>.
+</span></span><span style="display:flex;"><span>remote: Compressing objects: 100% <span style="color:#f92672">(</span>689/689<span style="color:#f92672">)</span>, <span style="color:#66d9ef">done</span>.
+</span></span><span style="display:flex;"><span>remote: Total <span style="color:#ae81ff">35971</span> <span style="color:#f92672">(</span>delta 3101<span style="color:#f92672">)</span>, reused <span style="color:#ae81ff">3014</span> <span style="color:#f92672">(</span>delta 2898<span style="color:#f92672">)</span>, pack-reused <span style="color:#ae81ff">32383</span>
+</span></span><span style="display:flex;"><span>Receiving objects: 100% <span style="color:#f92672">(</span>35971/35971<span style="color:#f92672">)</span>, 18.10 MiB | 16.05 MiB/s, <span style="color:#66d9ef">done</span>.
+</span></span><span style="display:flex;"><span>Resolving deltas: 100% <span style="color:#f92672">(</span>27165/27165<span style="color:#f92672">)</span>, <span style="color:#66d9ef">done</span>.
+</span></span></code></pre></div><p>也可以在 VSCode 中，按 F1 叫出指令視窗，輸入 <code>git clone</code> 後 enter，並在提供網址後，選擇儲存庫的路徑。不過這我幾乎沒有用過。畢竟直接在終端機輸入 git clone 打指令快速多了。</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-branches/git_clone_in_vscode.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="在 VSCode 中使用 git clone 介面"
+	
+>
+</div></p>
+<p>之後，透過可以於終端機輸入 <code>code AdGuardHome</code> 或是 <code>Ctrl+K, Ctrl+O</code> 以開啟資料夾，選擇 AdGuardHome 這個資料夾。便可開啟 AdGuardHome 的專案資料夾。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>code 專案資料夾
+</span></span></code></pre></div><h2 id="分支的切換git-checkout">分支的切換（git checkout）</h2>
+<h3 id="切換到現有分支">切換到現有分支</h3>
+<p>打開 Git Graph，可以看到：</p>
+<ul>
+<li>空心的藍點為本地端的指標，為我們目前所操作的位置。目前是指到的對應提交 ID 為 2611534d。</li>
+<li>粗體表示選中的分支，目前是選中 <code>master/origin</code>。同時本地端也有一個 master 分支。</li>
+<li>遠端指標（origin/HEAD）指向 master/origin，意思是預設的主分支。指標就是指標，是不能進行 checkout 的。</li>
+</ul>
+<p><img src="/post/git-tutorial-branches/adguardhome_branch_example.png"
+	width="1099"
+	height="199"
+	srcset="/post/git-tutorial-branches/adguardhome_branch_example_hua4bc6b7440ff28a8e7a3acb3f373a286_13863_480x0_resize_box_3.png 480w, /post/git-tutorial-branches/adguardhome_branch_example_hua4bc6b7440ff28a8e7a3acb3f373a286_13863_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="AdGuardHome 的 Git Graph"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="552"
+		data-flex-basis="1325px"
+	
+></p>
+<p>進行 checkout 切換時，就是把 HEAD 指標指到某個分支或是提交上。</p>
+<p>我們對著分支的框框雙點兩下，或是右鍵 → Checkout Branch…，就可以切換到對應的分支。此時原本的分支有的 A 檔案、B 檔案，如果切換的分支沒有。則會自動刪除。（沒有忽略的情況下。）</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-branches/checkout_branch.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="切換 Git 分支"
+	
+>
+</div></p>
+<h3 id="分離指標detached-head">分離指標（detached HEAD）</h3>
+<p>切換是可以切換到提交（commit）上的，對著任何一個提交（commit）右鍵進行 checkout，會出現 detached HEAD （分離指標）的狀態，此狀態的意思是目前 HEAD 沒有指在分支上，若未來在推送時，由於 HEAD 沒有指向分支所以沒辦法成功推送。</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-branches/checkout_branch_detached.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="checkout 至提交"
+	
+>
+</div></p>
+<p>此外在分離指標狀態下進行提交後，未來在切分支時，若沒有先建立分支，原本所提交的內容由於沒有分支，所以會不見變成孤立的提交（orphan commit），此時要透過 <code>git reflog --all</code> 進行查找。</p>
+<p>⚠️ detached 狀態下 → 新增 2 筆提交 → 推送失敗 → 切換至某個存在分支 → 原本提交的 2 筆變為孤立的提交</p>
+<p>✅ 所以請確定進行切換時是切換到分支上而不是提交上。否則會造成很多不必要的麻煩與處理。另外，孤立的提交會在 git 某些觸發條件下被清除。</p>
+<h2 id="建立新分支git-branch">建立新分支（git branch）</h2>
+<p>假設要在某個提交後長出新的功能或是嘗試性的錯誤修復。對著該提交（73ad1f95）右鍵 → Create Branch…。中間有個 check out 的選項，打勾會自動切換到該分支，不勾選的話就單純的新增一個分支。</p>
+<p>圖中建立新分支時有勾選 checkout，所以可以看到 HEAD 會指向新建立的分支。</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-branches/create_new_branch.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="建立新的分支"
+	
+>
+</div></p>
+<h2 id="刪除分支">刪除分支</h2>
+<p>假設要刪除我們剛剛建立的分支，由於我們目前是在該分支上，所以是沒辦法刪除的。可以先切換到其它分支上，然後對著原本的分支右鍵 → Delete branch。</p>
+<p>刪除的選項中有個 Force Delete 的選項，在刪除時會先檢查該分支中的提交有沒有被應用到其它分支上。例如：新增了一個 feature/test 分支，然後提交了 3 個新的內容，在刪除 feature/test 分支就會多了一個確認提醒這 3 個新內容沒有合併到其它分支上。如果還是堅持要刪除，則會跳出額外的 Force Delete 視窗，點選即可強制刪除該分支。</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-branches/delete_branch.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="刪除分支"
+	
+>
+</div></p>
+<h2 id="結論">結論</h2>
+<p>我們學習了如何從 GitHub 中進行複製遠端儲存庫，並且在不同分支之間進行切換、新增分支、刪除分支等操作。在這個過程中，我們也學會了處理可能導致分離指標狀態的情況。</p>
+<p>若不小心切換到提交而非分支，就會進入分離指標狀態，從而導致推送失敗。若直接切換到現有分支上，則會導致新提交變成孤立提交，只能透過 git reflog 查找。因此建議的做法是，在切換前先建立一個暫存分支，然後進行切換。在暫存分支上進行操作後，再進行 cherry-pick，最後刪除暫存分支。</p>
+<p>分離指標狀態 → 提交新的 2 筆 → 推送失敗 → 建立暫存分支 → 切換到既有分支 → cherry-pick 這 2 筆提交 → 推送 → 刪除暫存分支。</p>
+<p>在開始複製遠端儲存庫時，建立新的分支是第一要務，以確保主分支不受影響。不過當功能確認是正常的情況下或僅有單人操作時，建立新的分支可能就不是必要的。然而，無論在操作、整理、或是存在不確定因素時，都建議開新的分支進行操作，如此一來操作錯誤可以直接切回正常的分支，然後刪除操作失敗的分支。</p>
+<p>熟悉分支的切換、新增、刪除後，就可以開始學習 git rebase 整理好已經提交的內容了。</p>
+<h2 id="參考文獻">參考文獻</h2>
+<ol>
+<li><a class="link" href="https://github.com/mhutchie/vscode-git-graph"  target="_blank" rel="noopener"
+    >GitHub - mhutchie/vscode-git-graph</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/git/">Git</a>
+        
+            <a href="/tags/%E8%BB%9F%E9%AB%94/">軟體</a>
+        
+            <a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"  target="_blank" rel="noopener"
+    >創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最後更新 2024/03/25
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相關文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/git-tutorial-init/">
+        
+        
+            <div class="article-image">
+                <img src="/post/git-tutorial-init/cover.d5ceb6ba1414d3055fbfc3cd7cda9325_hu1d6c6e3de26ddd79b007c8451395a77f_90136_250x150_fill_box_smart1_3.png" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 開始使用 Git 管理專案"
+                        
+                        data-hash="md5-1c62uhQU0wVfv8PNfNqTJQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">開始使用 Git 管理專案</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/git-tutorial-introduction/">
+        
+        
+            <div class="article-image">
+                <img src="/post/git-tutorial-introduction/cover.e891c63ab7319b5bda84d75f8005e3ec_hua77a28c2b5a5a614a6a1ece286d27b68_228739_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 什麼是 Git 與版本控制？"
+                        
+                        data-hash="md5-6JHGOrcxm1vahNdfgAXj7A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">什麼是 Git 與版本控制？</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/iperf3/">
+        
+        
+            <div class="article-image">
+                <img src="/post/iperf3/cover.ae03e604a1559ccb722c04aa82c0aab1_hue1d73ec6af284376bcb13e4bfb180fe3_117568_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 安裝並使用 iPerf3 進行網路速度測試"
+                        
+                        data-hash="md5-rgPmBKFVnMtyLASqgsCqsQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安裝並使用 iPerf3 進行網路速度測試</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/tailscale-synology/">
+        
+        
+            <div class="article-image">
+                <img src="/post/tailscale-synology/cover.a064d94c55af71e965559ceb73941aca_hub0c52d4e5b287e589c8d4ab51a4e4223_212794_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale"
+                        
+                        data-hash="md5-oGTZTFWvcellVZzrc5Qayg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/ssh-connection/">
+        
+        
+            <div class="article-image">
+                <img src="/post/ssh-connection/cover.90d9eebf082eea99c5f883e95a4caef6_hu008f9935e91088f0fcd36d9134ad0b3c_252783_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 SSH 金鑰進行無密碼遠端連線"
+                        
+                        data-hash="md5-kNnuvwgu6pnF&#43;IPpWkyu9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 SSH 金鑰進行無密碼遠端連線</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="wellwells/wellwells.github.io"
+    data-repo-id="R_kgDOKRvukA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOKRvukM4Cban9"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-TW"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 WellWells
+    </section>
+    
+    <section class="powerby">
+        主題 Stack 由 Jimmy 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption" style="display: flex; justify-content: center;">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>系統 on WellWells</title>
+        <link>https://wellstsai.com/tags/%E7%B3%BB%E7%B5%B1/</link>
+        <description>Recent content in 系統 on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Wed, 06 Dec 2023 12:00:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/%E7%B3%BB%E7%B5%B1/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Awesome Windows - 必備生產力軟體安裝與說明</title>
+        <link>https://wellstsai.com/post/awesome-windows/</link>
+        <pubDate>Wed, 06 Dec 2023 12:00:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/awesome-windows/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/awesome-windows/cover.jpg" alt="Featured image of post Awesome Windows - 必備生產力軟體安裝與說明" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;這篇文章會介紹我在 Windows 上常用到的開發工具，並說明為什麼要安裝以及好用在哪。&lt;/p&gt;
+&lt;p&gt;在 Windows 上進行開發，除了內建的記事本、小畫家、命令提示字元（cmd）之外。&lt;/p&gt;
+&lt;p&gt;使用其他工具能夠更有效率地進行開發工作。雖然主要著重於 Windows 開發過程中的工具，但其中一些技巧也可應用在 Linux 環境中。&lt;/p&gt;
+&lt;p&gt;值得特別注意的是，隨時準備好左手。左手在快速完成某些事情時是不可或缺的，大多數的情況下負責的是快速鍵的呼叫。&lt;/p&gt;
+&lt;h2 id=&#34;快捷鍵&#34;&gt;快捷鍵&lt;/h2&gt;
+&lt;p&gt;Windows 上提供非常多快捷鍵，基本的快捷鍵有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt;：開啟執行視窗（可用 &lt;a class=&#34;link&#34; href=&#34;#powertoys&#34; &gt;PowerToys Run&lt;/a&gt; 或 &lt;a class=&#34;link&#34; href=&#34;#everything&#34; &gt;Everything&lt;/a&gt; 取代）&lt;/p&gt;
+&lt;p&gt;輸入 &lt;code&gt;cmd&lt;/code&gt;、&lt;code&gt;calc&lt;/code&gt;（小算盤）、&lt;code&gt;notepad&lt;/code&gt;（記事本）、&lt;code&gt;regedit&lt;/code&gt;（登錄編輯程式）、&lt;code&gt;mstsc&lt;/code&gt;（遠端桌面連線）、&lt;code&gt;mspaint&lt;/code&gt;（小畫家）可快速開啟相對應的應用程式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;D&lt;/code&gt;：快速回到桌面，再一次會回復全部視窗&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;S&lt;/code&gt;：自由截圖 （可用 &lt;a class=&#34;link&#34; href=&#34;#sharex&#34; &gt;ShareX&lt;/a&gt; 取代）&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Print Screen&lt;/code&gt;：視窗截圖&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;L&lt;/code&gt; ：鎖定電腦不登出&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;;&lt;/code&gt; ：&lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/windows/windows%E9%8D%B5%E7%9B%A4%E7%A7%98%E8%A8%A3%E5%92%8C%E6%8A%80%E5%B7%A7-588e0b72-0fff-6d3f-aeee-6e5116097942&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Emoji 面板&lt;/a&gt;打表情符號（分號鍵位於英文字母 L 的右邊）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;Esc&lt;/code&gt;：直接開啟工作管理員，對比於&lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Del&lt;/code&gt;只需要左手就可以完成，而且也不用先叫出 menu 後，再用滑鼠點工作管理員。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;部分像是 Emoji 面板為 Windows 10 以上內建，其他快捷鍵大多數在 XP 時代就存在了。&lt;/p&gt;
+&lt;p&gt;另外像是 &lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;X&lt;/code&gt; / &lt;code&gt;V&lt;/code&gt; / &lt;code&gt;Z&lt;/code&gt; / &lt;code&gt;F&lt;/code&gt; / &lt;code&gt;S&lt;/code&gt; / &lt;code&gt;A&lt;/code&gt; 為標準指令，對應 剪下、貼上、復原輸入、搜尋、儲存、全選，大多古老的 Ctrl 指令就不再此贅述。&lt;/p&gt;
+&lt;h2 id=&#34;安裝-winget&#34;&gt;安裝 winget&lt;/h2&gt;
+&lt;p&gt;Windows 程式包管理器（&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;winget&lt;/a&gt;）是微軟為 Windows 10 及 Windows 11 所提供的應用程式，提供搜尋、安裝、移除、更新所需軟體。&lt;/p&gt;
+&lt;p&gt;透過 winget，我們可以快速且統一的安裝相關軟體，避免多餘的行為（尋找軟體的官方網站→找到下載連結→下載→執行→安裝→刪除安裝檔）&lt;/p&gt;
+&lt;p&gt;若要檢查系統是否支援，可以打開命令列（鍵盤上的 &lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt;，並輸入 cmd 後點確定），輸入以下指令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;回傳結果為版本 v1.6.3133：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells&amp;gt;winget --version
+v1.6.3133
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;倘若找不到版本表示尚未安裝，可以到 &lt;a class=&#34;link&#34; href=&#34;https://apps.microsoft.com/detail/9NBLGGH4NNS1?rtc=1&amp;amp;hl=zh-tw&amp;amp;gl=TW#activetab=pivot:overviewtab&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Microsoft Store&lt;/a&gt; 安裝 winget。&lt;/p&gt;
+&lt;p&gt;安裝後，記得&lt;strong&gt;重啟 cmd 再檢查版本&lt;/strong&gt;，如果安裝成功，就可以看到版本號。&lt;/p&gt;
+&lt;h2 id=&#34;推薦軟體&#34;&gt;推薦軟體&lt;/h2&gt;
+&lt;p&gt;以下介紹那些軟體可以幫助我們快速完成任務，順序依照名稱進行排序。&lt;/p&gt;
+&lt;h3 id=&#34;everything&#34;&gt;Everything&lt;/h3&gt;
+&lt;p&gt;基於 C 語言的 Windows 桌面搜尋引擎，可以在 NTFS 磁碟中快速搜尋檔案名稱或內文。&lt;/p&gt;
+&lt;p&gt;基本上是可以取代 Windows 內建的檔案搜尋功能作為日常使用，其最大特點是即時的檔案搜尋。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/forum/viewtopic.php?t=9463&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;工作原理&lt;/a&gt;是對電腦上所有的檔案與資料夾從主要檔案資料表（mater file table，MFT）建立資料庫索引，在打開 Everything 時，資料庫中載入至記憶體提供即時搜尋。同時在背景下追蹤 Windows 中的 Update Sequence Number 日誌 （USN Journal）持續更新資料庫。&lt;/p&gt;
+&lt;p&gt;Everything 可透過 winget 於 cmd 中完成安裝，或是&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/zh-cn/downloads/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網&lt;/a&gt;自行下載。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id voidtools.Everything
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝過程由於要存取 USN 日誌，所以會需要系統管理員權限。這邊採預設安裝為服務，日後開機自動在背景執行。&lt;/p&gt;
+&lt;p&gt;安裝後，第一次打開會針對電腦進行索引，索引後便可以開始搜尋檔案。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything.png&#34;
+	width=&#34;500&#34;
+	height=&#34;218&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_hudfbcbcdf3b39e2aa7e1204d2276ee447_26337_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_hudfbcbcdf3b39e2aa7e1204d2276ee447_26337_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;搜尋檔名為 host 且 路徑包含 \etc&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;229&#34;
+		data-flex-basis=&#34;550px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;預設空格為 and 運算，所以要找檔名有 ABC 的 png 圖片可以搜尋：&lt;code&gt;ABC .png&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;若要搜尋檔名有 abc，且副檔名為 png 或是 txt 可以搜尋：&lt;code&gt;abc .png|.txt&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在搜尋上可以使用正規表示式語法來實現更複雜的搜尋。&lt;/p&gt;
+&lt;p&gt;更多的規則可以參考說明 → 搜尋語法。裡面也有說明如何針對文件內容進行搜尋。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything_rules.png&#34;
+	width=&#34;642&#34;
+	height=&#34;512&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_rules_hucea713ba9169f06752628257791d3e9d_10687_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_rules_hucea713ba9169f06752628257791d3e9d_10687_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Everything 搜尋規則&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;125&#34;
+		data-flex-basis=&#34;300px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;此外，可以到設定配置快捷鍵。我個人喜歡用 &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;X&lt;/code&gt; 叫出 Everything 視窗，或是可以自行決定來配置 Everything 視窗的快捷鍵。&lt;/p&gt;
+&lt;p&gt;另外也可以手動指定伺服器上的資料路徑夾供  Everything 進行索引。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything_setting.png&#34;
+	width=&#34;800&#34;
+	height=&#34;387&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_setting_hu5c76489f367960e95eb3cc57c2ecb14b_40676_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_setting_hu5c76489f367960e95eb3cc57c2ecb14b_40676_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Everything 配置快捷鍵與新增索引資料夾&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;206&#34;
+		data-flex-basis=&#34;496px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;git&#34;&gt;Git&lt;/h3&gt;
+&lt;p&gt;當我尚未接觸到 Git 時（年幼時期），定時備份程式碼的方式是將所有檔案進行壓縮，然後加上時間標記。這種方式不高效、效率低，也無法追蹤歷史紀錄。甚至過了幾個月，單靠檔案名稱也根本不知道改了什麼。&lt;/p&gt;
+&lt;p&gt;Git 是一個免費的開源分散式版本控制系統，使用 Git 來管理檔案，能夠記錄檔案間的差異，並提供回溯歷史版本或整合，提供快速可靠的追蹤檔案的狀態。&lt;/p&gt;
+&lt;p&gt;操作 Git 可以很簡單也可以很複雜。大部分的情況不外乎就是提交（commit）與合併（merge）的行為，最終的目的是確保檔案能夠準確被紀錄、程式能夠正常工作。&lt;/p&gt;
+&lt;p&gt;Git 可透過 winget 於 cmd 中完成安裝。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install --id Git.Git -e --source winget
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;想要確定電腦是否成功安裝 Git，開啟 cmd 並輸入：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;回傳結果版本號為 2.43.0.windows.1：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells&amp;gt;git --version
+git version 2.43.0.windows.1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;後續更詳細的 git 操作，後續有機會再開新的議題討論與分享。&lt;/p&gt;
+&lt;h3 id=&#34;notion&#34;&gt;Notion&lt;/h3&gt;
+&lt;p&gt;Notion 是一款多功能的筆記軟體，對於個人用戶來說基本上免費就很夠用了。我覺得他能夠快速、井然有序地建立表格、貼圖、多欄位等功能，就勝過很多筆記軟體了。並且還能夠直接分享筆記書出為公開網址、轉存為 PDF 或是 Markdown。&lt;/p&gt;
+&lt;p&gt;先前我整理筆記的方式是開 Word 搭配 Microsoft 365 的雲端進行同步，但 Word 基本為制式格式，並且鎖在 A4 等標準紙張，常常有像表格過長超過一頁，或是要靈活的在一個頁面分多欄，在 Word 上實現要使用分節或表格 + 隱藏框線等技巧也非常麻煩。&lt;/p&gt;
+&lt;p&gt;反之，Notion 這些問題都解決了。最大的缺點應該是免費版不提供歷史回朔。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我有試探性的使用 Microsoft OneNote 進行筆記撰寫，但邏輯上沒辦法接受。&lt;/p&gt;
+&lt;p&gt;一個筆記檔案，赤裸裸的儲存在 OneDrive 上，檔案可任意移動。&lt;/p&gt;
+&lt;p&gt;筆記本打開後，分了節與頁面，筆記的部分可以任意排位置，與 iOS 的&lt;a class=&#34;link&#34; href=&#34;https://www.apple.com/tw/newsroom/2022/12/apple-launches-freeform-a-powerful-new-app-designed-for-creative-collaboration/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;無邊記&lt;/a&gt;類似。基本上是沒有順序的邏輯。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/onenote.png&#34;
+	width=&#34;800&#34;
+	height=&#34;275&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/onenote_hu2dd8ab6822b7583574366201dae36e7f_9527_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/onenote_hu2dd8ab6822b7583574366201dae36e7f_9527_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;OneNote 筆記介面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;290&#34;
+		data-flex-basis=&#34;698px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;與 Notion 對打的有像是微軟的 &lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/loop&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Loop&lt;/a&gt;，不過目前是 beta 版本。&lt;/p&gt;
+&lt;p&gt;微軟最大的優勢在於一推出就有繁體中文，相較於 Notion 對於繁體中文的支援程度非常差。&lt;/p&gt;
+&lt;p&gt;不過 Loop 在 iOS 端我個人的體驗沒有很好，目前可能還要等待微軟的優化吧。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/notion.png&#34;
+	width=&#34;800&#34;
+	height=&#34;418&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/notion_hu5aa444a2501ab696161ee107968c201b_27275_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/notion_hu5aa444a2501ab696161ee107968c201b_27275_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Notion 撰寫筆記&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;459px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;安裝方式可以透過 winget 於 cmd 中完成安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id Notion.Notion
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，於 Notion 進行註冊後就可以開始撰寫了。手機與電腦版的體驗一致性蠻高的。&lt;/p&gt;
+&lt;h3 id=&#34;powershell-7&#34;&gt;Powershell 7&lt;/h3&gt;
+&lt;p&gt;在 Windows 系統中，除了內建的命令提示字元（cmd），其實還內建了 Powershell，只不過內建的版本是 PowerShell 5.1，並基於 .NET Framework，於執行中輸入 &lt;code&gt;powershell&lt;/code&gt; 便可開啟。&lt;/p&gt;
+&lt;p&gt;而 Powershell 7 是基於 .NET Core 來實現更好的跨平台，可透過執行輸入 &lt;code&gt;pwsh&lt;/code&gt; 開啟，除了支援新的指令（Cmdlet），也支援跨平台與新的模組的擴充與安裝，還有自動完成打過的指令（cmd 可透過 clink 實現）。為微軟目前積極更新的軟體之一。也建議每個開發者進行安裝。&lt;/p&gt;
+&lt;p&gt;Powershell 7 可透過 winget 於 cmd 中完成安裝，亦可&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/powershell/scripting/install/installing-powershell-on-windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;參照其他方式&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install --id Microsoft.Powershell --source winget 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/powershell.png&#34;
+	width=&#34;694&#34;
+	height=&#34;233&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/powershell_hu4cd64ba35832574fee79b7c1fd80c838_4686_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/powershell_hu4cd64ba35832574fee79b7c1fd80c838_4686_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:50%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Powershell 7 的執行介面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;297&#34;
+		data-flex-basis=&#34;714px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;powertoys&#34;&gt;PowerToys&lt;/h3&gt;
+&lt;p&gt;微軟開發的公用程式，裡面包含許多工具，工具都是綑綁在 PowerToys 裡面。&lt;/p&gt;
+&lt;p&gt;以下列出我覺得蠻常用的工具：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;工具名&lt;/th&gt;
+&lt;th&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/always-on-top&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Always on Top&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可讓您使用快速鍵捷徑 (&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;T&lt;/code&gt;) 將視窗釘選到其他視窗上面。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/awake&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys Awake&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可以讓電腦保持永遠喚醒狀態。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/color-picker&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;色彩選擇器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;是一種全系統的色彩挑選公用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/fancyzones&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;FancyZones&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;是一個視窗管理器，可讓您輕鬆地建立複雜的視窗版面配置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/file-explorer&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;File Explorer 附加元件&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可在 File Explorer 中啟用預覽窗格和縮圖轉譯。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/image-resizer&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;圖像大小調整器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;對著圖片右鍵就可快速調整影像大小。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/mouse-utilities&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;尋找我的滑鼠&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;按鍵盤&lt;code&gt;左 Ctrl&lt;/code&gt; 兩下可以快速定位滑鼠位置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/mouse-without-borders&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;無框線的滑鼠&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可讓您從相同的鍵盤和滑鼠與多部電腦互動。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/run&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys Run&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可協助您立即搜尋並啟動應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/text-extractor&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;文字擷取器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可以對圖片進行 OCR 識別文字。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;各個工具的介紹可以參考&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟 PowerToys 官方說明&lt;/a&gt;寫得非常清楚，並且在安裝後也會有 intro 介紹各個功能該如何使用。&lt;/p&gt;
+&lt;p&gt;PowerToys 可透過 winget 於 cmd 中完成安裝。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.PowerToys --source winget
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我們原先藉由 &lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt; 叫出執行視窗，如果輸入錯誤會無法正確啟動程式。&lt;/p&gt;
+&lt;p&gt;安裝好後，PowerToys 內建 PowerToys Run，可透過鍵盤上的 &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Space&lt;/code&gt;喚醒 Run 視窗，並支持模糊搜尋、中文輸入甚至是簡易計算。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/run_search.png&#34;
+	width=&#34;650&#34;
+	height=&#34;381&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/run_search_hu053f9b83829967e939b20f39ccd5ccbf_12701_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/run_search_hu053f9b83829967e939b20f39ccd5ccbf_12701_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;PowerToys Run 搜尋程式&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;409px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/run_calc.png&#34;
+	width=&#34;650&#34;
+	height=&#34;243&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/run_calc_hue2506d8c26c82b897901156ce9af40bd_11529_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/run_calc_hue2506d8c26c82b897901156ce9af40bd_11529_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;PowerToys Run 簡易計算&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;267&#34;
+		data-flex-basis=&#34;641px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;當然裡面還有一些工具像是抓取顏色（ColorPicker），適合用於網頁開發，快速鍵為&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;C&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;或是針對圖片進行文字 OCR 辨識並擷取文字，快速鍵為&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;T&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;PowerToys 與 Windows 整合性很高，同時也感受不到存在，卻又提供很重要的功能。&lt;/p&gt;
+&lt;h3 id=&#34;sharex&#34;&gt;ShareX&lt;/h3&gt;
+&lt;p&gt;開源的截圖、錄製軟體，可以錄製 mp4 或是 gif 動圖，並整合上傳功能、OCR 或是上浮水印等其他效果，也支援內建編輯器，是一個功能強大、但又輕巧的軟體。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/ShareX/ShareX/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub 下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id ShareX.ShareX
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，右下角會有 ShareX 圖示，可以設定語言、快捷鍵、截圖後要做什麼（開啟資料夾、上傳、列印等&amp;hellip;）等一系列操作。&lt;/p&gt;
+&lt;p&gt;本軟體是支援繁體中文的，但預設語言是英文。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/ShareX.png&#34;
+	width=&#34;436&#34;
+	height=&#34;452&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/ShareX_hu5fd4e9617cf9f5368ad02fc30256f175_23660_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/ShareX_hu5fd4e9617cf9f5368ad02fc30256f175_23660_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;ShareX 右下角圖示&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;96&#34;
+		data-flex-basis=&#34;231px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;對著圖示右鍵，找到應用程式設定（Application Settings） → 一般（General）可以找到語言（Language），把 Automatic 改為繁體中文即可。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/ShareX_setting.png&#34;
+	width=&#34;739&#34;
+	height=&#34;434&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/ShareX_setting_huc87ed29185b66608558cb48d25ad31e7_9256_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/ShareX_setting_huc87ed29185b66608558cb48d25ad31e7_9256_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;ShareX 修改語言&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;408px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;後續使用上應該沒有太多困難。比較龜毛的可以在任務設定 → 擷取底下有一個擷取視窗透明度可以打開，針對 Windows 11 的圓角邊框會處理好而不會有背景色。&lt;/p&gt;
+&lt;h3 id=&#34;tailscale&#34;&gt;Tailscale&lt;/h3&gt;
+&lt;p&gt;Tailscale 可以讓設備不透漏在外網的情況下進行存取。並快速實現個人 VPN，透過多種方式實現防火牆的穿透。&lt;/p&gt;
+&lt;p&gt;使用者不需要了解其中原理，僅需要將多個設備登入至 tailnet。便可實現裝置間的通訊。&lt;/p&gt;
+&lt;p&gt;像是可以實現以下情境：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A 電腦存取 B 電腦的資源，如網路芳鄰共享(Samba)、或是 NAS 資源。&lt;/li&gt;
+&lt;li&gt;點對點的連線，像是 SSH、遠端桌面連線。&lt;/li&gt;
+&lt;li&gt;子網 subnet 路由。例如內網 IP：192.168.6.XX。手機可以在不同網路上使用同個 IP 進行連線。&lt;/li&gt;
+&lt;li&gt;流量代理。可以指定裝置的流量，經由另一個節點出口。&lt;/li&gt;
+&lt;li&gt;公網直連。藉由 &lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1223/funnel/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Funnel&lt;/a&gt; 實現公網對該裝置的存取。&lt;/li&gt;
+&lt;li&gt;點對點傳檔。&lt;/li&gt;
+&lt;li&gt;等&amp;hellip;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;更多的配置與設定，可以參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;visual-studio-code&#34;&gt;Visual Studio Code&lt;/h3&gt;
+&lt;p&gt;微軟開發的跨平台編輯器，擴充性非常強大，對於開發者而言，Visual Studio Code（VS Code）是不可或缺的。&lt;/p&gt;
+&lt;p&gt;基本上裝了 VS Code，其他軟體像是 notepad++、Eclipse，可以有條件式的直接取代。&lt;/p&gt;
+&lt;p&gt;VS Code 特性包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/docs/editor/intellisense&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Intellisense 程式碼完成&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/docs/sourcecontrol/overview#_git-support&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git 版本控制&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;並支援多語言凸顯和語法檢查，例如 JavaScript、TypeScript、Python、C++ 等。&lt;/li&gt;
+&lt;li&gt;跨平台支援（Windows、macOS、Linux）。&lt;/li&gt;
+&lt;li&gt;內建程式碼格式化、重構、偵錯等功能。&lt;/li&gt;
+&lt;li&gt;支持使用 tasks.json 定義任務，如編譯、執行等。&lt;/li&gt;
+&lt;li&gt;豐富的擴充功能生態系統（不支援的語法？裝個擴充就解決了！）&lt;/li&gt;
+&lt;li&gt;SSH 遠端開發，並支援端口轉發（Port Forwarding）。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/tutorials/wsl-vscode&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;搭配 WSL 實現在 Windows 下進行 Linux 開發&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;多樣的主題可以自由更改。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;內容主題繁多，也需要花一些時間學習，但就初學者而言，也是可以當作一般的文字編輯器。&lt;/p&gt;
+&lt;p&gt;後續如果有機會再來說說 VS Code 的一些操作方式。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/download&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟官網下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.VisualStudioCode
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，就可以打開 VS Code，並資料夾（專案）或是單一檔案進行編輯，若開啟資料夾且偵測到 git 相關文件，則 VS Code 會自動解析 git 狀態。&lt;/p&gt;
+&lt;p&gt;這邊以我在 Linux 上撰寫 Hugo 文章為例，在 Windows 上以 SSH 遠端連線到 Linux 伺服器，並開啟 Linux 上的目錄。我切到 VS Code 內建的 Git 管理，可以看到那些檔案新增、編輯、刪除。另外，我有安裝擴充 - &lt;a class=&#34;link&#34; href=&#34;https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git Graph&lt;/a&gt;，可以以圖的方式檢視目前 Git 分支的狀態。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/vscode_remote_hugo.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;537&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/vscode_remote_hugo_hu5d128c35ac7da587b22a5383996469ec_61731_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/vscode_remote_hugo_hu5d128c35ac7da587b22a5383996469ec_61731_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;使用 VS Code 撰寫 Hugo 文章（SSH 遠端）&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;446px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;wincompose&#34;&gt;WinCompose&lt;/h3&gt;
+&lt;p&gt;針對特殊符號，系統不像 macOS 有組合鍵（compose key）。透過開源的 WinCompose 可以實現快速打出特殊符號。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以前我打特殊符號都是記 Unicode 表，甚至還印出了常用的 Unicode 表 XDD。&lt;/p&gt;
+&lt;p&gt;首先先切換到新注音輸入法，輸入 Tab 鍵盤上的前導字元 `，接著按下鍵盤 U 表示 unicode，然後輸入字符的號碼例如2605後按空白鍵，特殊符號就出來了。&lt;/p&gt;
+&lt;p&gt;例如：`u2605 表示 ★  |  `u2606 表示 ☆  |  `u00b0 表示 °&lt;/p&gt;
+&lt;p&gt;&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+	&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/preamble_key.gif&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;前導字元打出特殊符號&#34;
+	
+&gt;
+&lt;/div&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;透過 WinCompose，可以使用組合鍵（右 Alt） + 定義字元，就可以快速打出特殊符號。&lt;/p&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;♥：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入 &amp;lt;3 即可出現愛心（&lt;code&gt;&amp;lt;&lt;/code&gt; 輸入方式為 &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;ㄝ&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;♢：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入&amp;lt;&amp;gt;&lt;/li&gt;
+&lt;li&gt;√：&lt;code&gt;右Alt&lt;/code&gt;按一下，並按下鍵盤的sq（rt這邊省略掉的）&lt;/li&gt;
+&lt;li&gt;★：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入**（* 輸入方式為 &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;數字 8&lt;/code&gt; ）&lt;/li&gt;
+&lt;li&gt;¼：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入14&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+	&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/compose_key.gif&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;使用 compose key 輸入特殊符號&#34;
+	
+&gt;
+&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;安裝方式可或透過 winget 於 cmd 中完成安裝，或是到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/samhocevar/wincompose/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinCompose Release&lt;/a&gt; 下載並安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id SamHocevar.WinCompose
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，右下角會出現 WinCompose 的圖示，右鍵 → 顯示組合鍵可以看到已經定義好的規則。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/wincompose.png&#34;
+	width=&#34;1010&#34;
+	height=&#34;593&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/wincompose_huffa1fb05b37d968322bd000361550f21_31965_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/wincompose_huffa1fb05b37d968322bd000361550f21_31965_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;WinCompose 預定義規則&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;408px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;左下方可以自訂組合鍵，使用上不會太困難。在此不繼續深入討論。&lt;/p&gt;
+&lt;h3 id=&#34;windows-sandbox&#34;&gt;Windows Sandbox&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Sandbox&lt;/a&gt;（沙箱）提供輕量型桌面環境，可安全地隔離執行應用程式。再測試軟體於全新作業系統中是否正常運作、測試檔案是否有病毒或是暫時安裝某個試用版軟體(?)時非常好用。&lt;/p&gt;
+&lt;p&gt;關閉沙箱後，整個資料都會移除。每次開新的沙箱，都像全新的 Windows 一樣乾淨。&lt;/p&gt;
+&lt;p&gt;比較需要注意的是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;需要&lt;code&gt;BIOS 中啟用的虛擬化功能&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;不支援 Windows 家用版（&lt;a class=&#34;link&#34; href=&#34;https://www.tenforums.com/tutorials/131437-enable-windows-sandbox-feature-windows-10-home-edition.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;繞過限制&lt;/a&gt;）&lt;/li&gt;
+&lt;li&gt;至少 4 GB 的 RAM，但建議 8 GB 以上&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;安裝方式於 cmd 中，輸入以下指令開啟 Windows 沙箱功能後，重新開機。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enable-WindowsOptionalFeature -FeatureName &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Containers-DisposableClientVM&amp;#34;&lt;/span&gt; -All -Online
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/search_sandbox.png&#34;
+	width=&#34;350&#34;
+	height=&#34;227&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/search_sandbox_hu370c63aa1b5ca84003c55c8fd8376d7b_21063_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/search_sandbox_hu370c63aa1b5ca84003c55c8fd8376d7b_21063_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開始找到 Sandbox&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;154&#34;
+		data-flex-basis=&#34;370px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;執行後，就可以看到一個乾淨的 Windows。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/sandbox.png&#34;
+	width=&#34;500&#34;
+	height=&#34;271&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/sandbox_hu88d8b2a80db97b99f28f93ff62e223ff_40689_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/sandbox_hu88d8b2a80db97b99f28f93ff62e223ff_40689_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;執行 Sandbox&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;442px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;windows-subsystem-for-linux&#34;&gt;Windows Subsystem for Linux&lt;/h3&gt;
+&lt;p&gt;在 Windows 上開發 Linux 有許多方法，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用虛擬機（virtual machine），透過像是 Windows 內建的 &lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/virtualization/hyper-v-on-windows/about/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Hyper-V&lt;/a&gt;，或是 &lt;a class=&#34;link&#34; href=&#34;https://www.virtualbox.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;VirtualBox&lt;/a&gt; 來進行完整的作業系統安裝&lt;/li&gt;
+&lt;li&gt;雙系統（dual boot），藉由多重引導同時安裝 Windows 與 Linux，開機時可以選擇要以哪個系統開機。（極度不推薦，弄壞整體系統可能性高且複雜）&lt;/li&gt;
+&lt;li&gt;遠端存取（remote development），組一台 Linux 主機，透過遠端的方式進行連線、開發。&lt;/li&gt;
+&lt;li&gt;Windows Subsystem for Linux（&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WSL&lt;/a&gt;），安裝 Linux 子系統，可以不需要安裝虛擬機或是雙系統。便可建立 Linux 開發環境。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;WSL 的特點是占用的資源比虛擬機少，且可以同時使用 Windows 與進行 Linux 開發。此外，可以安裝和執行各種 Linux 發行版，例如 Ubuntu、Debian、Kali 等等。&lt;/p&gt;
+&lt;p&gt;安裝方式分為安裝 WSL 與 安裝 Linux 兩部分。&lt;/p&gt;
+&lt;p&gt;首先於 cmd 中輸入以安裝 wsl：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後重開機，再次進入 cmd 中，輸入 &lt;code&gt;wsl --help&lt;/code&gt; 檢查是否已啟用：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --help
+Copyright (c) Microsoft Corporation。著作權所有，並保留一切權利。
+如需此產品的隱私權資訊，請瀏覽https://aka.ms/privacy。
+
+使用方式: wsl.exe [引數] [選項...][CommandLine]
+
+用於運行 Linux 二進位檔案的引數:
+
+   如果未提供命令列，wsl.exe 會啟動預設殼層。
+
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接著安裝 Linux，可藉由以下指令列出可以安裝的 Linux 版本：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wsl --list --online
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到許多不同的發行版本&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --list --online
+以下是可安裝的有效發佈的清單。
+使用 &amp;#39;wsl.exe --install &amp;lt;Distro&amp;gt;&amp;#39; 安裝。
+
+NAME                                   FRIENDLY NAME
+Ubuntu                                 Ubuntu
+Debian                                 Debian GNU/Linux
+kali-linux                             Kali Linux Rolling
+Ubuntu-18.04                           Ubuntu 18.04 LTS
+Ubuntu-20.04                           Ubuntu 20.04 LTS
+Ubuntu-22.04                           Ubuntu 22.04 LTS
+OracleLinux_7_9                        Oracle Linux 7.9
+OracleLinux_8_7                        Oracle Linux 8.7
+OracleLinux_9_1                        Oracle Linux 9.1
+openSUSE-Leap-15.5                     openSUSE Leap 15.5
+SUSE-Linux-Enterprise-Server-15-SP4    SUSE Linux Enterprise Server 15 SP4
+SUSE-Linux-Enterprise-15-SP5           SUSE Linux Enterprise 15 SP5
+openSUSE-Tumbleweed                    openSUSE Tumbleweed
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我這邊開發環境限定為 Ubuntu 18.04，故安裝對應版本。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wsl --install -d Ubuntu-18.04
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝過程大概 5 分鐘內就結束了，安裝過程中會要求輸入 Linux 使用者與密碼。&lt;/p&gt;
+&lt;p&gt;若安裝過程中出現「無法解析伺服器名稱或位址」，請嘗試更換網路、或透過 VPN 進行嘗試排除。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --install -d Ubuntu-18.04
+安裝: Ubuntu 18.04 LTS
+Ubuntu 18.04 LTS 已安裝。
+正在啟動 Ubuntu 18.04 LTS...
+Installing, this may take a few minutes...
+Please create a default UNIX user account. The username does not need to match your Windows username.
+For more information visit: https://aka.ms/wslusers
+Enter new UNIX username: wells
+Enter new UNIX password:
+Retype new UNIX password:
+passwd: password updated successfully
+Installation successful!
+To run a command as administrator (user &amp;#34;root&amp;#34;), use &amp;#34;sudo &amp;lt;command&amp;gt;&amp;#34;.
+See &amp;#34;man sudo_root&amp;#34; for details.
+
+wells@server:~$
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;至此，已經安裝好 WSL 與對應的 Ubuntu 版本，輸入 wsl 就可以進入 Ubuntu 的 bash 終端。&lt;/p&gt;
+&lt;p&gt;如果有安裝&lt;a class=&#34;link&#34; href=&#34;#windows-terminal&#34; &gt; Windows 終端機&lt;/a&gt;的話，在新增實體時會看到多了新的 Ubuntu 18.04。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/terminal_ubuntu.png&#34;
+	width=&#34;500&#34;
+	height=&#34;331&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/terminal_ubuntu_hudfc5ba100c9adec49331fd975b4da292_15449_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/terminal_ubuntu_hudfc5ba100c9adec49331fd975b4da292_15449_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;終端機中多了新的實體&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;151&#34;
+		data-flex-basis=&#34;362px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果已經安裝 VS Code，可以藉由&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/tutorials/wsl-vscode&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;連接至 WSL&lt;/a&gt;進行存取，VS Code 安裝好 Linux 上所需要的資源後，可以瀏覽 WSL 上的檔案，並整合 bash 終端機。使用上基本與原生 Ubuntu 系統中安裝 VS Code 一致。&lt;/p&gt;
+&lt;h3 id=&#34;windows-terminal&#34;&gt;Windows Terminal&lt;/h3&gt;
+&lt;p&gt;Windows Terminal 是微軟開發的一款跨平台終端機應用程式，簡稱終端機。支援多個 shell 環境包括 cmd、&lt;a class=&#34;link&#34; href=&#34;#powershell-7&#34; &gt;PowerShell&lt;/a&gt; 和 &lt;a class=&#34;link&#34; href=&#34;#windows-subsystem-for-linux&#34; &gt;Windows Subsystem for Linux (WSL)&lt;/a&gt;等&amp;hellip;。同時支援分頁顯示，分割顯示，也支援 Windows 11 的&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/apps/design/style/acrylic&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;壓克力材質&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;ms-windows-store://pdp/?ProductId=9n0dx20hk701&#34; &gt;Windows Store 中下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.WindowsTerminal
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，在開始中找到&lt;code&gt;終端機&lt;/code&gt;並執行就可以開始使用了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/search_terminal.png&#34;
+	width=&#34;350&#34;
+	height=&#34;219&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/search_terminal_hu69ad17c2067b39bc0859c12b6ef02bdc_26760_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/search_terminal_hu69ad17c2067b39bc0859c12b6ef02bdc_26760_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;找到終端機&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;383px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;點選上方視窗的 &lt;code&gt;ˇ&lt;/code&gt; 找到設定，可以修改預設配置，像是終端機預設開啟的實體，我這邊改為 PowerShell，或是也可以設定自己想要的終端實體。&lt;/p&gt;
+&lt;p&gt;預設終端應用程式可改為 &lt;code&gt;Windows 終端機&lt;/code&gt;，未來開啟 cmd 或其他實體時，會直接以終端機開啟。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/windows_terminal.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;541&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/windows_terminal_huef7c58c796b209efac56ac618dc0f1c7_43536_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/windows_terminal_huef7c58c796b209efac56ac618dc0f1c7_43536_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Windows 終端機設定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;443px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其他設定可以參考&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/terminal/customize-settings/startup&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方的詳細文件&lt;/a&gt;，例如更改字體、外觀來實現更好、更美觀的終端機體驗。&lt;/p&gt;
+&lt;p&gt;另外，也可以自定配置檔，實現開新分頁的時候自動連上 SSH 或是其他操作。&lt;/p&gt;
+&lt;h2 id=&#34;其他軟體&#34;&gt;其他軟體&lt;/h2&gt;
+&lt;p&gt;其他軟體被歸類為非必須，但是在某些開發情況下很好用，不過因為並非每個人都需要因此歸類在此。&lt;/p&gt;
+&lt;p&gt;不加以詳細說明下載或安裝過程，僅提供官方連結參照，可以自行下載。&lt;/p&gt;
+&lt;h3 id=&#34;可個人用途&#34;&gt;可個人用途&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;軟體名稱&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.developershome.com/7-zip/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;7-Zip&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費可商用的壓縮軟體。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/sysinternals/downloads/autoruns&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Autoruns&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;檢測 Windows 開機時會自動載入哪些程式項目的工具。並可以刪除或暫時性不啟用。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.copytrans.net/copytransheic/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CopyTransHEICforWindows&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;將 HEIC 圖片右鍵可轉換為更通用的 JPG 格式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nirsoft.net/utils/dll_export_viewer.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DLL Export Viewer&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;查看 DLL 檔案內所 export 的函式名稱、位址和描述。可以快速幫助調適。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/valinet/ExplorerPatcher&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ExplorerPatcher&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在 Windows 11 上，還原部分 Windows 10 功能的開源軟體，例如工具列和工作列的外觀。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://telerik-fiddler.s3.amazonaws.com/fiddler/FiddlerSetup.exe&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Fiddler Classic&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費的HTTP代理工具，可用於記錄和分析網路請求。官網現在都在推訂閱制的 Fiddler Everywhere。在此直接提供官方下載連結。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/esnet/iperf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;測試網路頻寬、延遲、吞吐量等性能參數。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://codecguide.com/download_k-lite_codec_pack_full.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;K-Lite Codec Pack (Full)&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費的多媒體解碼器套件，安裝後可以解決影片無法正常播放的問題。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://nodejs.org/en&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Node.js&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;JavaScript 執行環境，允許在伺服器端使用 JavaScript 語言編寫程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://shortcuttools.com/en/ms-powerpoint-shortcuts.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerPoint Shortcut Tools&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供 PowerPoint 的額外快捷工具。像是兩個物件的對齊、快速插入圖框等&amp;hellip;。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://rufus.ie/zh_TW/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Rufus&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;用於建立USB開機媒體，可以用來安裝和修復作業系統。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/TeraTermProject/teraterm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tera Term&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的終端機通訊軟體。它可以用於連接和控制各種設備。像是微控制器和嵌入式系統。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://windirstat.net/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinDirStat&lt;/a&gt; / &lt;a class=&#34;link&#34; href=&#34;http://www.uderzo.it/main_products/space_sniffer/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpaceSniffer&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;以視覺化的方式顯示各個文件夾佔用空間的狀況。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.highrez.co.uk/downloads/XMouseButtonControl.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;X-Mouse Button Control&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;自定義滑鼠按鍵的功能和設定。像是羅技滑鼠，可以取代肥大的Logitech Options。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://x64dbg.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;x64dbg&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的動態分析工具，並進行反編譯及偵錯。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;付費軟體&#34;&gt;付費軟體&lt;/h3&gt;
+&lt;p&gt;另外也提供付費軟體的選項，大多需要購買授權。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;軟體名稱&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;可商用？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.hwinfo.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;HWiNFO&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;個人非商業使用&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;商用須購買授權，個人用途不用。可以監控電腦硬體參數的軟體，可以查看CPU、記憶體、顯卡等設備的溫度、頻率等資訊。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.internetdownloadmanager.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Internet Download Manager (IDM)&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;正版 IDM 允許商用。是一款下載管理器，可以提高下載速度達5倍，並提供續傳和排程下載功能。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wiris.com/en/mathtype/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Mathtype&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;可以在 Word 文件中輸入數學公式的軟體。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://icons8.com/icons/set/pichon&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Pichon&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;部分免費&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供了超過 13.5 萬個高品質圖示，提供多種尺寸和不同格式。付費後可以解鎖更多圖示。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://typora.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Typora&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;流行的 Markdown 編輯器。它支持多種佈景主題與簡潔的界面。並支援跨平台。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.win-rar.com/start.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinRAR&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;壓縮檔案格式 RAR 的壓縮與解壓軟體。不過 Windows 11 已經可以內建解壓縮，基本上這個軟體的存在感越來越低。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;上述所提及到的推薦軟體，可以快速幫助我們在開發、協作和生產力方面取得更好的效果。&lt;/p&gt;
+&lt;p&gt;下表整理出各個工具的官網，以及針對是否開源、可商用進行說明。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;工具/應用程式&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;開源？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;可商用？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;簡易說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/zh-cn/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Everything&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;基於檔名快速搜尋檔案或資料夾。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;分散式版本控制系統，廣泛應用於軟體開發。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.notion.so/desktop&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Notion&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;跨平台的工作協作工具，支援筆記、任務管理等功能。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/powershell/scripting/install/installing-powershell&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerShell 7&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Windows 的命令列殼層及指令碼語言。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供 Windows 桌面的附加工具，增加系統體驗和生產力。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://getsharex.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ShareX&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的螢幕截圖和錄影工具，支援豐富的功能和自定義設置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Visual Studio Code&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;跨平台的程式碼編輯器，支援多種語言和豐富的擴充、並整合 Git 工具。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/samhocevar/wincompose&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinCompose&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供易於使用的方式輸入特殊字符，支援自定義組合鍵。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Sandbox&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供一個輕量、隔離的環境，用於安全地執行不受信任的應用程式。並在結束時清除虛擬環境。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/install&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Subsystem for Linux&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;可以在同一台機器上同時使用Windows和Linux環境。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/terminal/install&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Terminal&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;結合多個命令列工具、提供分頁和高度可定制外觀的現代化命令列應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Winget&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;O&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;O&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Windows 包管理器，用於快速安裝、升級和管理應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;如果資訊有誤的話，請提醒告知，感謝。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/en-us/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Use the winget tool to install and manage applications&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/support/everything/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Everything support&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/about&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;About - Git&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.notion.so/help/guides/what-is-notion&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;What is Notion?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://developer.microsoft.com/en-us/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Microsoft Developer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://getsharex.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ShareX&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Compose_key&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Compose key&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

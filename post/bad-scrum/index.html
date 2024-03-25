@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='執行敏捷專案管理的現實、瓶頸與批評'>
+
+<title>糟糕的 Scrum 管理 - WellWells</title>
+
+
+<link rel='canonical' href='https://wellstsai.com/post/bad-scrum/'>
+
+<link rel="stylesheet" href="/scss/style.min.6f97a446ffede30c6e468103f6f619d741887c25a3b7ed2ff0286e373820a699.css"><meta property='og:title' content='糟糕的 Scrum 管理'>
+<meta property='og:description' content='執行敏捷專案管理的現實、瓶頸與批評'>
+<meta property='og:url' content='https://wellstsai.com/post/bad-scrum/'>
+<meta property='og:site_name' content='WellWells'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='心得' /><meta property='article:tag' content='管理' /><meta property='article:tag' content='Scrum' /><meta property='article:published_time' content='2024-01-23T16:20:00&#43;08:00'/><meta property='article:modified_time' content='2024-01-23T00:00:00&#43;00:00'/><meta property='og:image' content='https://wellstsai.com/post/bad-scrum/cover.jpg' />
+<meta name="twitter:title" content="糟糕的 Scrum 管理">
+<meta name="twitter:description" content="執行敏捷專案管理的現實、瓶頸與批評"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://wellstsai.com/post/bad-scrum/cover.jpg' /><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.min.css" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JKC4KZLT26"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-JKC4KZLT26', { 'anonymize_ip': false });
+}
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        <img src="/mimi.png" width="300px"
+                            height="300px" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">✨</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">WellWells</a></h1>
+            <h2 class="site-description">井裡總有一些意想不到的東西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首頁</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>關於 Wells</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>歷史文章</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+                <li id="i18n-switch">  
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                    <select name="language" onchange="window.location.href = this.selectedOptions[0].value">
+                        
+                            <option value="https://wellstsai.com/" selected></option>
+                        
+                    </select>
+                </li>
+            
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>深色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目錄</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#什麼是-scrum">什麼是 Scrum?</a></li>
+    <li><a href="#角色定義">角色定義</a>
+      <ul>
+        <li><a href="#敏捷中的角色定義">敏捷中的角色定義</a></li>
+        <li><a href="#公司的角色定義">公司的角色定義</a></li>
+      </ul>
+    </li>
+    <li><a href="#現實職場">現實職場</a></li>
+    <li><a href="#有產出的團隊需要什麼">有產出的團隊需要什麼？</a></li>
+    <li><a href="#目前執行的-scrum">目前執行的 Scrum</a>
+      <ul>
+        <li><a href="#story-point">Story Point</a></li>
+        <li><a href="#daily-stand-up-會議與-sprints">Daily stand-up 會議與 Sprints</a></li>
+        <li><a href="#sprint-review">Sprint Review</a></li>
+        <li><a href="#質問對方">質問對方</a></li>
+        <li><a href="#不斷更換軟體">不斷更換軟體</a></li>
+      </ul>
+    </li>
+    <li><a href="#結論">結論</a></li>
+    <li><a href="#參考資料">參考資料</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/bad-scrum/">
+                <img src="/post/bad-scrum/cover_hufee8f29b6edf1bf13cecb5bf4b74c988_237346_800x0_resize_q75_box.jpg"
+                        srcset="/post/bad-scrum/cover_hufee8f29b6edf1bf13cecb5bf4b74c988_237346_800x0_resize_q75_box.jpg 800w, /post/bad-scrum/cover_hufee8f29b6edf1bf13cecb5bf4b74c988_237346_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="這是一張有關標題為 糟糕的 Scrum 管理 的圖片" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/bad-scrum/">糟糕的 Scrum 管理</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            執行敏捷專案管理的現實、瓶頸與批評
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024/01/23</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 9 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="引言">引言</h2>
+<p>以下內容是基於公司目前使用 Scrum 管理所產生的心得。</p>
+<p>皆為個人主觀感受、抱怨與現實。</p>
+<p>並且沒有問題解決方案，就單純粹發牢騷。</p>
+<p>如果有錯誤、不認同也歡迎在下方討論。</p>
+<p>在網路上以敏捷為關鍵字搜尋，會發現充斥著<code>必看</code>、<code>必學</code>、<code>強大</code>、<code>簡單</code>、<code>靈活</code>、<code>真敏捷</code>等話術。或是<code>XXX 公司都在使用的管理方法</code>等術語吸引學習。</p>
+<p>身為主管的你，怎麼能不學？</p>
+<p>但事實成效不一定比較好，你目前團隊執行的是真正敏捷還是表面上的敏捷？</p>
+<h2 id="什麼是-scrum">什麼是 Scrum?</h2>
+<p>Scrum 是一個敏捷項目管理系統，它「協助人們和團隊以合作的方式逐步提供價值。」</p>
+<p>在 Scrum 管理所構成的團隊合作做模式下，最重要的團隊彼此間的信任（Trust）。</p>
+<p>一旦沒有信任，Scrum 大師所闡述一大堆什麼<code>自主性</code>、<code>高績效</code>都是屁。因為團隊成員的執行都是被動且低效的。</p>
+<p>Scrum 往往牽扯到公司的認知、團隊間的行為、態度與價值觀的問題。而不是找個顧問來，在管理軟體上弄弄看板、清單、執行每日的站立會議就當成是在 Scrum。</p>
+<p>沒有能力點破當前團隊問題的人，往往執行的都是偽敏捷（fake agile）。</p>
+<h2 id="角色定義">角色定義</h2>
+<h3 id="敏捷中的角色定義">敏捷中的角色定義</h3>
+<ul>
+<li>
+<p>Scrum Master（SM）: 為 Scrum 的主持人，確保 Scrum 流程的順利進行，並促進團隊的自我組織和不斷改進。</p>
+</li>
+<li>
+<p>Product Owner（PO）: 又為產品負責人，PO 的主要目標是確保開發團隊優先處理最有價值的工作，以滿足產品的需求和願景。為利害關係人與開發人員之間的橋樑。</p>
+</li>
+<li>
+<p>Developers: 開發人員的主要目標是通過合作和創新，交付高品質的軟體。在 Scrum 框架中，開發人員被鼓勵自我組織，共同決策並確保團隊進展。</p>
+</li>
+</ul>
+<h3 id="公司的角色定義">公司的角色定義</h3>
+<p>根據目前身處的團隊內所看到的角色定義。</p>
+<ul>
+<li>
+<p>Stakeholders: 利害關係人，通常會希望獲得產品資訊，或是參與其中。可能是最終用戶、其他團隊、上級領導，或是是另一家企業。</p>
+</li>
+<li>
+<p>領導-A：整個技術部的領導者，管理多個團隊。需要面對整個公司部門的其他領導，並回報給董事長。對於產品技術不懂。</p>
+</li>
+<li>
+<p>主管-B：團隊內的領導者，與團隊內的成員有密切接觸。目前擔任 PO 並與團隊成員有密切接觸，每兩週回報給領導-A。技術不熟悉但積極學習。</p>
+</li>
+<li>
+<p>冗員-C：就是個冗員。</p>
+<p>冗員的定義是對團隊沒什麼貢獻或是負生產，但又身為團隊一員的人。其中可能有以下特質：</p>
+<ul>
+<li>講得出很多技術，但都不會做。</li>
+<li>著重在耍嘴皮子，常常與事實認知有錯誤。</li>
+<li>什麼事情都要管，最終自己份內的事情沒有完成。</li>
+<li>團隊內的負情緒製造者。</li>
+<li>執行不符合自己職位的事情。</li>
+</ul>
+</li>
+<li>
+<p>成員-D：團隊內的成員，有實戰經驗好的與差的。</p>
+<ul>
+<li>實戰經驗好的，往往能在時間內完成或超出預期的工作內容。其結果往往會被稱讚。</li>
+<li>實戰經驗差的，做出來的東西被評估不足，需要額外訓練或有人合作進行。</li>
+</ul>
+</li>
+</ul>
+<h2 id="現實職場">現實職場</h2>
+<p>在現實職場中，尤其是在傳統產業或大型團隊中，常常面臨著各種人的問題因素，這些因素可能導致開發進度延遲、資源浪費所造成低效率。</p>
+<ul>
+<li>技術負債：為了趕上進度或滿足某些要求，而採取先求有再求好的策略，最終導致技術負債累積。</li>
+<li>重複工作：由於技術負債導致重新開發架構或軟體。</li>
+<li>不平等待遇：你認真做事情，卻可能比資深不做事的錢少。</li>
+<li>能力不足：由於缺乏關鍵的技能或知識，無法有效地完成分配的任務。</li>
+<li>領導力不足：明明某成員執行方向偏離了，領導者未能判斷與指正，導致該成員自由發展，浪費時間。</li>
+<li>缺乏溝通：團隊內部溝通不良，導致訊息傳遞不清晰，任務執行出現偏差。</li>
+<li>倚老賣老：過於依賴過去的經驗，而不願意接受新的觀點或方法。</li>
+<li>多一事不如少一事：害怕承擔風險或額外的負擔，而只選擇較簡單的工作執行。</li>
+<li>混吃等死：僅僅為了生存而工作，在工作缺乏熱情和動力。</li>
+</ul>
+<p>可能還有更多，也歡迎補充遺漏的。</p>
+<p>這些問題只是凸顯現實職場中的情境，並不是要評斷或批評像是倚老賣老或是混吃等死這樣的行為。</p>
+<p>在某些公職體系中，工作可能需要循序漸進，遵循前人的方法執行。這種方式可以確保穩定性和可靠性。</p>
+<p>然而，在私人企業體系中，這些行為會導致 Scrum 的失敗。敏捷開發強調快速反饋、靈活適應和團隊合作，因此需要成員具備主動精神。</p>
+<p>最終的執行結果受到團隊中人文、認知等種種因素的影響，這些因素會導致最終執行結果成效不彰。</p>
+<blockquote>
+<p>✨ 案例 1:</p>
+<p>公司準備設計某產品，外包給 A 廠商製作，他們有能力分析與完成工作內容，並給予回饋。</p>
+<p>然而公司指派給一個沒有能力的冗員負責監督（亦或是冗員搶著說要負責）。</p>
+<p>PO 無法判斷此工作是否適合該冗員。而冗員搶了 A 廠商該做的事情，並表現出這個工作需要他才可以進行。</p>
+<p>最終變任由該冗員自由發展、自由設計。最終，長久下來的合作沒有任何產品產出。</p>
+<p>實際上，該工作若由 A 廠商執行，他們能夠做完全執行、分析，並且，並進行全自動分析會更快（例如參數化設計變數，並執行最佳化分析）。</p>
+<p>PS. 產品為一代名詞。</p>
+</blockquote>
+<blockquote>
+<p>✨ 案例 2:</p>
+<p>公司員工 A 曾獨立開發一款軟體，並獲得好評。</p>
+<p>然而該同事已離職。雖然有留下原始碼，但因為技術負債而導致沒有人能夠接他的程式碼。</p>
+<p>進而指派員工 B 使用全新的軟體架構來實現一樣的軟體。</p>
+</blockquote>
+<p>以上兩個案例（或更多），只是凸顯出傳統團隊內的<code>能力不足</code>、<code>技術負債</code>與<code>重複工作</code>問題。</p>
+<p>實際上的問題，如果更深層來看可能是<code>缺乏溝通</code>、<code>多一事不如少一事</code>或是<code>領導力不足</code>甚至是<code>不平等待遇</code>所導致。</p>
+<h2 id="有產出的團隊需要什麼">有產出的團隊需要什麼？</h2>
+<ol>
+<li>
+<p>專業的人</p>
+<p>在一個團隊中，確保對的團隊成員在擅長領域發揮所長，避免浪費資源。</p>
+<p>還包含像是團隊內要有<code>優秀的領導人</code>，與<code>對應知識的團隊成員</code>。</p>
+<p>沒有專業的人在團隊內只會凸顯團隊的無能與無貢獻。</p>
+</li>
+<li>
+<p>信任</p>
+<p>主管講得天花亂墜，最終又因為許多事情而改變方向。造成成員內部互相矛盾而信任破裂。執行力也會大幅下降。</p>
+<p>亦或是本身團隊內部成員已經有疙瘩了，不信任的情況下只會越來越多衝突。</p>
+</li>
+<li>
+<p>足夠的薪水報酬</p>
+<p>基於信任，相信薪水應該在某個水平。</p>
+<p>一旦被得知薪酬給得不夠，信任也不用談了。</p>
+</li>
+<li>
+<p>愛（❤️）</p>
+<p>有了信任、錢給夠了，愛自然就產生了。</p>
+<p>愛你自己的工作、在工作上獲得成就感，自然而然貢獻整個團隊，整個團隊有了更多資源，向心力也進而提升。</p>
+</li>
+</ol>
+<blockquote>
+<p>✨ 案例:</p>
+<p>曾接觸到的公司制度自由，但缺少了 1, 2, 3。隨著時間的推移，對於工作的愛也就消逝了。</p>
+<p>對於公司主管他們是站在資方面的，秉持著多一事不如少一事的態度，問題沒辦法從根本解決。</p>
+<p>在不願意改善專業人才、信任與薪酬的情況下，Scrum 很難如預期正常運行。</p>
+</blockquote>
+<h2 id="目前執行的-scrum">目前執行的 Scrum</h2>
+<p>考慮到信任的不足，重新審視團隊在執行 Scrum 過程中，發現其中許多情境實在令人感到幽默。</p>
+<h3 id="story-point">Story Point</h3>
+<p>是用來衡量每一項任務的複雜程度，但最終常被成員來評估時間。</p>
+<p>變相的是大家都盡可能的塞滿許多子任務藉此填高分數，塑造自己很忙、貢獻很多。</p>
+<p>最終專注在個人任務而非交付功能。</p>
+<p>此外，Story Point 會給人一種分數就是 KPI 的指標。或是讓人感覺做了很多重要的事情。</p>
+<p>有人將工作拆成很多細小工作，然後給予最低的一分，但有人不是。例如：</p>
+<ul>
+<li>重複工作拆細，並給 1 分，最後分數 20 分。</li>
+<li>工作沒有拆細，但工作很難，給予的分數又不夠高，最後 9 分。</li>
+</ul>
+<p>且一開始在規劃時，曾執行過 Scrum 的<code>大濕</code>又說不能高於 13 分等限制。</p>
+<p>由於工作拆細而分數變高，但有人又限制自己的認知分數，最終結果給人一大堆認知上的錯覺與障礙。</p>
+<p>Story Point 其實還有許多可以值得討論的，但局限於系統有些參數沒有被評估到。例如：</p>
+<ul>
+<li>速度：Story Point / Number of days</li>
+<li>任務執行速度：Tasks / Number of days</li>
+<li>任務負載：Tasks / Story Point</li>
+</ul>
+<h3 id="daily-stand-up-會議與-sprints">Daily stand-up 會議與 Sprints</h3>
+<p>透過快速、短暫的時間內彼此交代昨天做了什麼、今天要做什麼，以及是否遇到任何問題，可以讓大家互相了解情況。</p>
+<p>Scrum 大濕說：自己任務完成可以去看板上找任務來做的。</p>
+<p>我想通常在一個團隊中，有愛才能夠持續下去吧？</p>
+<p>畢竟，即使能夠快速完成任務，如果對團隊沒有信任了，執行的內容也會更偏向個人事務而非公司事務。</p>
+<h3 id="sprint-review">Sprint Review</h3>
+<p>在第一次的會議中，對於Sprint Review的部分並沒有太多共鳴。</p>
+<p>團隊中會有冗員會讓自己看起來很忙。花了半小時講一堆不是他做的東西，但是卻又凸顯自己的貢獻程度。</p>
+<p>討論到最後，我們花了大量時間在會議上討論細節。</p>
+<p>例如：如何壓接頭、如何確認和探討等技術細節。</p>
+<p>結果，第一次的成果展示變得冗長且無趣。</p>
+<h3 id="質問對方">質問對方</h3>
+<p>某個冗員 C 跟成員 D 可能感情還不錯。</p>
+<p>成員 D 說明內容時，C 提出了以下觀點：</p>
+<ul>
+<li>有做這個工作嗎？</li>
+<li>問一個很專業的問題____</li>
+<li>也不知道你這樣對不對</li>
+<li>應該有什麼其他方式來____</li>
+</ul>
+<p>冗員 C 平常常常說些無意義的話，但實際上他也不知道該怎麼做。</p>
+<p>最後，他只是為了表現自己而發表一些言辭，這讓人感到心累。</p>
+<h3 id="不斷更換軟體">不斷更換軟體</h3>
+<p>從一開始的 Jira、Trello 如今到 Asana。</p>
+<p>在上傳資料時，總是擔心資料外洩的問題。</p>
+<p>然而，並且沒有邀請專業人員（例如 MIS）參與會議，以評估是否適合自行架設服務（self-hosting）。</p>
+<p>實際上，這一切都歸結於公司是否願意投資於這種專案管理工具軟體。</p>
+<p>我想，等 Asana 的試用版過期後，過一段時間可能又會考慮更換其他軟體。</p>
+<h2 id="結論">結論</h2>
+<p>其實不管在哪個公司或團隊中，這些人、問題永遠都會存在著。</p>
+<p>唯一能做的就是調整自己的心態，學會看開，並適應這種情況，甚至考慮轉換方向。</p>
+<p>對於主管來說，有些事情是無法處理的。他們可能選擇消極的態度，或者過度友善地默許冗員的存在。</p>
+<p>而在更高層的領導者眼中，則是被底下的 PO 矇著。還產不出實際產品與可能，陪著瞎忙繼續吃老本做代工。</p>
+<p>而對於敏捷執行後的結論往往都是：</p>
+<ul>
+<li>敏捷不會改變現況，只有團隊真正想要改變才能實現進步。</li>
+<li>敏捷運作到最後都不敏捷。</li>
+<li>敏捷只記得每天的站立會議。</li>
+</ul>
+<p>試著想想</p>
+<ol>
+<li>用看板等於敏捷？</li>
+<li>每天站立會議等於敏捷？</li>
+<li>有請顧問來講課就是敏捷？</li>
+</ol>
+<p>許多潛在因素像是：</p>
+<ol>
+<li>團隊之間是否彼此信任？</li>
+<li>SM 有沒有辦法得知開發團隊達成目標的潛在障礙？</li>
+<li>PO 有沒有辦法得知 Stakeholders 的需求？</li>
+<li>團隊成員的專業技能是否能夠獨立完成份內工作？</li>
+<li>團隊成員是否具有高度的自主性？</li>
+<li>Sprint Review 是否為有效會議？</li>
+<li>Daily stand-up 是否每天執行與是否為流水帳？</li>
+<li>Sprint 事項是否為了完成而隨便執行？</li>
+<li>公司的組織文化是否支持敏捷開發方法？</li>
+<li>SM 有沒有因公司組織文化提供客製化敏捷？</li>
+</ol>
+<p>也因為團隊內部太多人擅於找一堆理由來掩飾組織、團隊、個人的問題。</p>
+<p>自主性不高的團隊成員，套用了敏捷也始終不會敏捷。</p>
+<p>反倒是公司主管或領導可以問問自己：</p>
+<ul>
+<li>公司養了多少冗員？</li>
+<li>哪些員工是真正有付出價值與產出的？</li>
+<li>冗員你要如何讓他做事？不干擾其他人？</li>
+<li>沒有能力或能力較差的成員該如何安排？</li>
+<li>公司沒人力，是否主動且積極尋找新員工？</li>
+<li>真正遇到不合適的員工是資遣他還是安排更適合的位置？</li>
+<li>有付出的員工，薪資是否對得起那些不做事的？</li>
+<li>員工內部自我訓練與 SOP 有被建立起來嗎？</li>
+</ul>
+<p>不過對於這些高層領導，公司又不是他們的。</p>
+<p>誰又願意沒事找事做進行人事改革呢？</p>
+<p>頂多把那些冗員的考績打差罷了。問題有因此而解決嗎？</p>
+<h2 id="參考資料">參考資料</h2>
+<ol>
+<li><a class="link" href="https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-Chinese-Traditional.pdf"  target="_blank" rel="noopener"
+    >Scrum 指南</a></li>
+<li><a class="link" href="https://wangterryonagile.blogspot.com/2021/11/scrum-master.html"  target="_blank" rel="noopener"
+    >王泰瑞 - scrum master 的獨白</a></li>
+<li><a class="link" href="https://teddy-chen-tw.blogspot.com/2014/07/blog-post.html"  target="_blank" rel="noopener"
+    >搞笑談軟工 - 說實話，做實事</a></li>
+<li><a class="link" href="https://teddy-chen-tw.blogspot.com/2010/06/blog-post_20.html"  target="_blank" rel="noopener"
+    >搞笑談軟工 - 對症下藥</a></li>
+<li><a class="link" href="http://www.ezproject.tw/2020/09/Scrum-and-Agile-Health-Check.html"  target="_blank" rel="noopener"
+    >敏捷健檢：偽敏捷的三十大症狀，你的團隊或組織中了幾個？</a></li>
+<li><a class="link" href="https://medium.com/@scrumcontents/scrum-does-not-work-here-in-asia-72d7bccccb4d"  target="_blank" rel="noopener"
+    >Scrum does not work here in Asia</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%BF%83%E5%BE%97/">心得</a>
+        
+            <a href="/tags/%E7%AE%A1%E7%90%86/">管理</a>
+        
+            <a href="/tags/scrum/">Scrum</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"  target="_blank" rel="noopener"
+    >創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最後更新 2024/01/23
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="wellwells/wellwells.github.io"
+    data-repo-id="R_kgDOKRvukA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOKRvukM4Cban9"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-TW"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 WellWells
+    </section>
+    
+    <section class="powerby">
+        主題 Stack 由 Jimmy 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption" style="display: flex; justify-content: center;">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

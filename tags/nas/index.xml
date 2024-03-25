@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>NAS on WellWells</title>
+        <link>https://wellstsai.com/tags/nas/</link>
+        <description>Recent content in NAS on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Tue, 30 Jan 2024 16:40:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/nas/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安裝並使用 iPerf3 進行網路速度測試</title>
+        <link>https://wellstsai.com/post/iperf3/</link>
+        <pubDate>Tue, 30 Jan 2024 16:40:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/iperf3/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/iperf3/cover.jpg" alt="Featured image of post 安裝並使用 iPerf3 進行網路速度測試" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在選購無線路由器等網通裝置時，標榜 AC3000、AX6000、以及 BE7000 等規格的路由器規格已經成為現代家庭網路的主流選擇。&lt;/p&gt;
+&lt;p&gt;以某牌為例，其無線速度特性標榜為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Wi-Fi 5 (1024 QAM)：最高 1733 Mbps。&lt;/li&gt;
+&lt;li&gt;Wi-Fi 6 (2.4 GHz)：最高 574 Mbps。&lt;/li&gt;
+&lt;li&gt;Wi-Fi 4：最高 300 Mbps。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;這些傳輸速度代表兩個終端設備如手機或電腦連線上此 Wi-Fi 熱點時。如果兩個設備同時支持 Wi-Fi 5 與 1024 QAM，則其最高傳輸速度可達 1733 Mbps。如此一來內網的兩個端點設備可以更高速的傳輸。&lt;/p&gt;
+&lt;p&gt;這些速度指的是無線路由器在最佳情況下所能提供的理論最高傳輸速度。&lt;/p&gt;
+&lt;p&gt;然而，實際的傳輸速度會受到許多因素影響，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;設備之間的距離。&lt;/li&gt;
+&lt;li&gt;障礙物（牆、轉角）。&lt;/li&gt;
+&lt;li&gt;同頻干擾。&lt;/li&gt;
+&lt;li&gt;網絡擁擠。&lt;/li&gt;
+&lt;li&gt;Quality of Service（QoS）優先權。&lt;/li&gt;
+&lt;li&gt;裝置本身設計不良（熱、天線、EMI）。&lt;/li&gt;
+&lt;li&gt;線材（網路線）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;也因此，若想知道兩設備之間實際傳輸速度，可以透過 iPerf3 進行測速與評估，並且也可以應用在外網、VPN 或是 Tailscale 測速。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;這邊要提及的一點是如果跟電信業者申請例如：300 Mbps/300Mbps (下載/上傳) 的網路。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;設備 A 使用 Wi-Fi 6 網卡走 2.4 GHz 頻段 (547 Mbps) 連線到無線路由器。無線路由器接了一個電信設備對外網 (300 Mbps)，並到客戶端 B 的電信設備 (300 Mbps) 進行接收，其速度會被限制在最高 300 Mbps 的電信設備。若客戶端 B 的是 (100 Mbps)，則速度會被限制在最高 100 Mbps。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設備 A 使用 CAT-5 有線網路 (100 Mbps) 進行上網，手機使用 2.4 GHz 連線到路由器（574 Mbps），兩個終端設備在測速時，其最高速度為 100 Mbps。要改善網路速度，可以讓設備 A 使用無線網卡或是更換網路線。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;網路速度受到終端設備的硬體參數、傳輸協定以及整個通信鏈路（telecommunications link）中&lt;code&gt;最低速度&lt;/code&gt;的影響。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;linux-安裝-iperf3&#34;&gt;Linux 安裝 iPerf3&lt;/h2&gt;
+&lt;p&gt;若為 Arm 架構或其他版本的 Linux，可以到&lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網查詢安裝方式&lt;/a&gt;，或是透過 &lt;a class=&#34;link&#34; href=&#34;https://github.com/userdocs/iperf3-static&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Github 直接下載 Arm 版本的 iPerf3&lt;/a&gt;，甚至是&lt;a class=&#34;link&#34; href=&#34;https://github.com/esnet/iperf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;下載 source code 自行編譯&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;以下說明測試環境為 Ubuntu 20.04 的安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新套件列表&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 iperf3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt install -y iperf3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 顯示 iperf3 的版本&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;iperf3 --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果需要移除 iperf3，可以使用以下命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo apt remove iperf3
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，檢查輸出版本為 iperf 3.9 (cJSON 1.7.13)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wells@server:~$ iperf3 --version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;iperf 3.9 &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;cJSON 1.7.13&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Linux server 5.15.0-91-generic &lt;span style=&#34;color:#75715e&#34;&gt;#101-Ubuntu SMP Tue Nov 14 13:30:08 UTC 2023 x86_64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;windows-安裝-iperf3&#34;&gt;Windows 安裝 iPerf3&lt;/h2&gt;
+&lt;p&gt;Windows 下是已經編譯好的執行檔，下載後即可執行。&lt;/p&gt;
+&lt;p&gt;可以到&lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/iperf-download.php#windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網&lt;/a&gt;進行下載，目前最新版本為 2016 年版的 &lt;a class=&#34;link&#34; href=&#34;https://iperf.fr/download/windows/iperf-3.1.3-win64.zip&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf 3.1.3&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;下載後解壓縮到任何地方，資料夾 iperf-3.1.3-win64 內有執行檔，於該目錄底下，於 cmd 中執行 iperf3.exe 即可。&lt;/p&gt;
+&lt;h2 id=&#34;建立-iperf3-伺服器&#34;&gt;建立 iPerf3 伺服器&lt;/h2&gt;
+&lt;p&gt;測試兩個裝置彼此之間的網路速度，nodeA 運行為伺服器，而另一台 nodeB 模擬上傳或下載的行為。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;開啟 iperf3 的目錄&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/1_win_iperf_location.png&#34;
+	width=&#34;913&#34;
+	height=&#34;453&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/1_win_iperf_location_hu3b8113edffe1514757514f8e7e436982_15462_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/1_win_iperf_location_hu3b8113edffe1514757514f8e7e436982_15462_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開啟 iperf3 的目錄&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;483px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在路徑中輸入 cmd&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/2_type_cmd.png&#34;
+	width=&#34;913&#34;
+	height=&#34;453&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/2_type_cmd_hu917339c2bfdf9964c35c0cff1613e4c5_17351_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/2_type_cmd_hu917339c2bfdf9964c35c0cff1613e4c5_17351_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檔案總管中於路徑輸入 cmd&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;201&#34;
+		data-flex-basis=&#34;483px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;跳出 cmd，確定該路徑為 iperf3 目錄底下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/3_shows_the_cmd.png&#34;
+	width=&#34;904&#34;
+	height=&#34;407&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/3_shows_the_cmd_hufd43d7c766d4ee34a66aacd0ef8cbf2d_15112_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/3_shows_the_cmd_hufd43d7c766d4ee34a66aacd0ef8cbf2d_15112_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;終端視窗&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;222&#34;
+		data-flex-basis=&#34;533px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;輸入 &lt;code&gt;iperf3 -s&lt;/code&gt; 後會建立好 iperf3 伺服器，並打開 port 5201，等待客戶端進行連線。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/iperf3/4_run_iperf_server.png&#34;
+	width=&#34;904&#34;
+	height=&#34;407&#34;
+	srcset=&#34;https://wellstsai.com/post/iperf3/4_run_iperf_server_hud8d9f2b4883851cd514fa8def0ad8b27_19926_480x0_resize_box_3.png 480w, https://wellstsai.com/post/iperf3/4_run_iperf_server_hud8d9f2b4883851cd514fa8def0ad8b27_19926_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;輸入指令 iperf3 -s 建立伺服器&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;222&#34;
+		data-flex-basis=&#34;533px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如果要自行指定 port，可以改為 iperf3 -s -p 5205，往後客戶端在連線需加上對應的端口號碼。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;內網-ip-直連&#34;&gt;內網 IP 直連&lt;/h2&gt;
+&lt;p&gt;硬體配置：兩台電腦透過有線網路進行內網測速，經過數台路由器。其中 nodeA 作為伺服器（192.168.1.30）。&lt;/p&gt;
+&lt;p&gt;nodeA 建立好伺服器後，在 nodeB 輸入 &lt;code&gt;iperf3 -c IP/HOST&lt;/code&gt;，便可以測試 nodeB 的上傳速度。即傳輸方向是從 nodeB 到 nodeA：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30
+Connecting to host 192.168.1.30, port 5201
+[  4] local 192.168.1.20 port 55482 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  85.3 MBytes   715 Mbits/sec    0    219 KBytes
+[  4]   1.00-2.00   sec  78.0 MBytes   655 Mbits/sec    0    219 KBytes
+[  4]   2.00-3.00   sec  86.2 MBytes   723 Mbits/sec    0    219 KBytes
+[  4]   3.00-4.00   sec  88.5 MBytes   742 Mbits/sec    0    219 KBytes
+[  4]   4.00-5.00   sec  86.4 MBytes   725 Mbits/sec    0    219 KBytes
+[  4]   5.00-6.00   sec  90.7 MBytes   761 Mbits/sec    0    219 KBytes
+[  4]   6.00-7.00   sec  85.6 MBytes   718 Mbits/sec    0    219 KBytes
+[  4]   7.00-8.00   sec  85.3 MBytes   715 Mbits/sec    0    219 KBytes
+[  4]   8.00-9.00   sec  78.7 MBytes   660 Mbits/sec    0    219 KBytes
+[  4]   9.00-10.00  sec  82.3 MBytes   691 Mbits/sec    0    219 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-10.00  sec   847 MBytes   711 Mbits/sec    0             sender
+[  4]   0.00-10.00  sec   846 MBytes   710 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表格參數的意義如下，其中著重在 Bandwidth 這個參數：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ID: 通常代表連接的編號。&lt;/li&gt;
+&lt;li&gt;Interval: 測試的時間間隔。&lt;/li&gt;
+&lt;li&gt;Transfer: 這段時間內傳輸的數據量。&lt;/li&gt;
+&lt;li&gt;Bandwidth: 這段時間的平均頻寬，&lt;code&gt;表示為傳輸速度&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;Retr: 重試的次數。&lt;/li&gt;
+&lt;li&gt;Cwnd: 現在的窗口大小。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;由上表可以得知 nodeB 傳資料到 nodeA 的平均速度為 711 Mbps。&lt;/p&gt;
+&lt;p&gt;若要測試 nodeB 的下載速度，即傳輸方向是從 nodeA 到 nodeB，可使用&lt;code&gt;iperf3 -c IP/HOST -R&lt;/code&gt;：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30 -R
+Connecting to host 192.168.1.30, port 5201
+Reverse mode, remote host 192.168.1.30 is sending
+[  4] local 192.168.1.20 port 42550 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec   111 MBytes   930 Mbits/sec
+[  4]   1.00-2.00   sec   106 MBytes   888 Mbits/sec
+[  4]   2.00-3.00   sec  94.4 MBytes   791 Mbits/sec
+[  4]   3.00-4.00   sec   108 MBytes   911 Mbits/sec
+[  4]   4.00-5.00   sec  91.8 MBytes   770 Mbits/sec
+[  4]   5.00-6.00   sec   101 MBytes   844 Mbits/sec
+[  4]   6.00-7.00   sec   101 MBytes   845 Mbits/sec
+[  4]   7.00-8.00   sec   102 MBytes   858 Mbits/sec
+[  4]   8.00-9.00   sec  93.2 MBytes   783 Mbits/sec
+[  4]   9.00-10.00  sec   102 MBytes   859 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec  1011 MBytes   848 Mbits/sec                  sender
+[  4]   0.00-10.00  sec  1011 MBytes   848 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;nodeA 傳資料到 nodeB 的平均速度為 848 Mbps。&lt;/p&gt;
+&lt;h2 id=&#34;內網-ip-經由-tailscale&#34;&gt;內網 IP 經由 Tailscale&lt;/h2&gt;
+&lt;p&gt;經由 Tailscale 組網後，若想要評估兩個節點傳送的速度，可以直接輸入對方的 hostname 進行測試。&lt;/p&gt;
+&lt;p&gt;以下測試為相同的電腦，但改為 Tailscale 的 hostname 進行測試。&lt;/p&gt;
+&lt;p&gt;上傳測試結果：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c nodeA
+Connecting to host nodeA, port 5201
+[  4] local 100.116.123.164 port 43086 connected to 100.110.114.119 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  46.3 MBytes   388 Mbits/sec    0    216 KBytes
+[  4]   1.00-2.00   sec  34.4 MBytes   289 Mbits/sec    0    216 KBytes
+[  4]   2.00-3.00   sec  41.0 MBytes   344 Mbits/sec    0    216 KBytes
+[  4]   3.00-4.00   sec  45.1 MBytes   379 Mbits/sec    0    216 KBytes
+[  4]   4.00-5.00   sec  44.4 MBytes   373 Mbits/sec    0    216 KBytes
+[  4]   5.00-6.00   sec  47.0 MBytes   395 Mbits/sec    0    216 KBytes
+[  4]   6.00-7.00   sec  45.1 MBytes   378 Mbits/sec    0    216 KBytes
+[  4]   7.00-8.00   sec  46.8 MBytes   393 Mbits/sec    0    216 KBytes
+[  4]   8.00-9.00   sec  45.2 MBytes   379 Mbits/sec    0    216 KBytes
+[  4]   9.00-10.00  sec  44.6 MBytes   374 Mbits/sec    0    216 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-10.00  sec   440 MBytes   369 Mbits/sec    0             sender
+[  4]   0.00-10.00  sec   439 MBytes   369 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;下載測試結果：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c nodeA -R
+Connecting to host nodeA, port 5201
+Reverse mode, remote host nodeA is sending
+[  4] local 100.116.123.164 port 32852 connected to 100.110.114.119 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec  95.6 MBytes   802 Mbits/sec
+[  4]   1.00-2.00   sec  86.9 MBytes   729 Mbits/sec
+[  4]   2.00-3.00   sec  90.6 MBytes   760 Mbits/sec
+[  4]   3.00-4.00   sec  72.0 MBytes   604 Mbits/sec
+[  4]   4.00-5.00   sec  81.5 MBytes   684 Mbits/sec
+[  4]   5.00-6.00   sec  73.5 MBytes   616 Mbits/sec
+[  4]   6.00-7.00   sec  78.9 MBytes   662 Mbits/sec
+[  4]   7.00-8.00   sec  87.9 MBytes   738 Mbits/sec
+[  4]   8.00-9.00   sec  90.8 MBytes   761 Mbits/sec
+[  4]   9.00-10.00  sec  70.4 MBytes   590 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec   828 MBytes   695 Mbits/sec                  sender
+[  4]   0.00-10.00  sec   828 MBytes   695 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Tailscale 與 IP 直連對比，上載速度降為原來的 52%，下載速度降為原來的 82%。&lt;/p&gt;
+&lt;h2 id=&#34;多客戶端並行測試multiple-parallel-client-connection&#34;&gt;多客戶端並行測試（multiple parallel client connection）&lt;/h2&gt;
+&lt;p&gt;如果想要測試伺服器的性能，可以使用 &lt;code&gt;iperf3 -c IP/HOST -P client_counts&lt;/code&gt; 進行&lt;/p&gt;
+&lt;p&gt;3 個用戶同時下傳：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;wells@nodeB:~$ iperf3 -c 192.168.1.30 -R -P3
+Connecting to host 192.168.1.30, port 5201
+Reverse mode, remote host 192.168.1.30 is sending
+[  4] local 192.168.1.20 port 60680 connected to 192.168.1.30 port 5201
+[  6] local 192.168.1.20 port 60694 connected to 192.168.1.30 port 5201
+[  8] local 192.168.1.20 port 60704 connected to 192.168.1.30 port 5201
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec  37.2 MBytes   312 Mbits/sec
+[  6]   0.00-1.00   sec  37.2 MBytes   312 Mbits/sec
+[  8]   0.00-1.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   0.00-1.00   sec   112 MBytes   935 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   1.00-2.00   sec  37.1 MBytes   312 Mbits/sec
+[  6]   1.00-2.00   sec  37.1 MBytes   312 Mbits/sec
+[  8]   1.00-2.00   sec  37.0 MBytes   311 Mbits/sec
+[SUM]   1.00-2.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   2.00-3.00   sec  37.2 MBytes   312 Mbits/sec
+[  6]   2.00-3.00   sec  37.0 MBytes   310 Mbits/sec
+[  8]   2.00-3.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   2.00-3.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   3.00-4.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   3.00-4.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   4.00-5.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   4.00-5.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   5.00-6.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   5.00-6.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   6.00-7.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   6.00-7.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   7.00-8.00   sec  37.0 MBytes   311 Mbits/sec
+[  6]   7.00-8.00   sec  37.1 MBytes   312 Mbits/sec
+[  8]   7.00-8.00   sec  37.1 MBytes   312 Mbits/sec
+[SUM]   7.00-8.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[  6]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[  8]   8.00-9.00   sec  37.1 MBytes   311 Mbits/sec
+[SUM]   8.00-9.00   sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[  4]   9.00-10.00  sec  37.2 MBytes   312 Mbits/sec
+[  6]   9.00-10.00  sec  37.1 MBytes   311 Mbits/sec
+[  8]   9.00-10.00  sec  37.0 MBytes   310 Mbits/sec
+[SUM]   9.00-10.00  sec   111 MBytes   934 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  sender
+[  4]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  receiver
+[  6]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  sender
+[  6]   0.00-10.00  sec   372 MBytes   312 Mbits/sec                  receiver
+[  8]   0.00-10.00  sec   371 MBytes   311 Mbits/sec                  sender
+[  8]   0.00-10.00  sec   371 MBytes   311 Mbits/sec                  receiver
+[SUM]   0.00-10.00  sec  1.09 GBytes   935 Mbits/sec                  sender
+[SUM]   0.00-10.00  sec  1.09 GBytes   935 Mbits/sec                  receiver
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;使用 iPerf3 測速後，若網速未達到需求，可進行進一步的除錯。&lt;/p&gt;
+&lt;p&gt;對於家用內部網路來說，線材品質、裝置設定以及協定支援等因素可能是導致網速不佳的主因。&lt;/p&gt;
+&lt;p&gt;甚至有時候重開路由器網速就正常了，遇到這種或許可以重新開始評估一台新的路由器了&amp;hellip;。&lt;/p&gt;
+&lt;p&gt;當遇到 Tailscale 速度過慢的問題時，可以使用 &lt;code&gt;tailscale ping host&lt;/code&gt; 命令評估裝置是否為直接連接或透過 DERP 中繼轉發。&lt;/p&gt;
+&lt;p&gt;我自己在使用 Tailscale 時通常是直接連接的，但有時連接某些 Wi-Fi 後開始使用 DERP 中繼。即使斷開 Wi-Fi 並切回原本的網路，仍無法直接連接。在這種情況下，強制重啟 Tailscale 服務有時會解決問題。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://lindevs.com/install-iperf-on-ubuntu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Install iPerf 3 on Ubuntu 20.04&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.oracle.com/cd/E88353_01/html/E37839/iperf3-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf3 user manual page&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</title>
+        <link>https://wellstsai.com/post/tailscale-synology/</link>
+        <pubDate>Thu, 25 Jan 2024 17:10:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale-synology/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale-synology/cover.jpg" alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在先前文章&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;中，說明如何透過 Tailscale 建立只有自己能夠存取的 VPN（tailnet）。&lt;/p&gt;
+&lt;p&gt;本篇文章將著重如何在 Synology 上如何安裝最新版本的 Tailscale。&lt;/p&gt;
+&lt;p&gt;並實現自動更新等機制。確保 Tailscale 保持在最新版本。&lt;/p&gt;
+&lt;p&gt;以下操作的系統配置：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NAS 裝置：DS220+&lt;/li&gt;
+&lt;li&gt;作業系統：DiskStation Manager 7 (DSM 7)&lt;/li&gt;
+&lt;li&gt;CPU：Intel Celeron J4025&lt;/li&gt;
+&lt;li&gt;Synology Package Arch：Geminilake&lt;/li&gt;
+&lt;li&gt;Generic Arch：&lt;code&gt;x86_64&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，如果要更新到最新版本的 Tailscale，需要知道 NAS 的通用架構（Generic Arch）。&lt;/p&gt;
+&lt;p&gt;這部分會根據不同的通用架構決定要下載哪個 Synology package（spk）檔案進行安裝與更新。&lt;/p&gt;
+&lt;p&gt;如果不知道自己的 NAS 架構，可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;以查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;h2 id=&#34;傳統安裝方式&#34;&gt;傳統安裝方式&lt;/h2&gt;
+&lt;p&gt;傳統安裝方式為透過 Synology 內的套件中心進行安裝，此版本為 Synology 釋出的版本。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選套件中心（Synology package center）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;套件中心&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在所有套件中，最下方找到 Tailscale，並點選安裝套件。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc.png&#34;
+	width=&#34;1899&#34;
+	height=&#34;885&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安裝 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;514px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;至此，安裝好後，點選主選單的 Tailscale 登入後就可以正常使用了。&lt;/p&gt;
+&lt;p&gt;在套件中心，已安裝的頁面中檢查安裝版本，可以看到為官方所提供的 1.38.4-700038004。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version.png&#34;
+	width=&#34;1458&#34;
+	height=&#34;698&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;208&#34;
+		data-flex-basis=&#34;501px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;該版本為 &lt;a class=&#34;link&#34; href=&#34;https://archive.synology.com/download/Package/Tailscale/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 發布&lt;/a&gt; (2023/5/8)。&lt;/p&gt;
+&lt;p&gt;根據 &lt;a class=&#34;link&#34; href=&#34;https://github.com/tailscale/tailscale/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 官方最新釋出版本&lt;/a&gt;為 1.58.2 (2024/1/25)。&lt;/p&gt;
+&lt;h2 id=&#34;從官網安裝最新版本的-tailscale&#34;&gt;從官網安裝最新版本的 Tailscale&lt;/h2&gt;
+&lt;p&gt;Tailscale 每次更新，官方會為 Synology 編譯並發布&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;最新版本的 spk&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;使用者可以自行下載，並在套件中心手動進行安裝。未來有更新，則重複此動作。&lt;/p&gt;
+&lt;p&gt;在此，Wells 已經整合成一個腳本，實現全自動安裝與定時更新。照著以下步驟執行即可。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新 Tailscale&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查更新是否成功&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; $? -eq &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;執行 Tailscale 更新成功&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exit &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 若找不到指令，手動下載指定版本的 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://pkgs.tailscale.com/stable/tailscale-x86_64-1.58.2-7000058002-dsm7.spk&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;basename &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 在使用者的家目錄下建立暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd ~
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下載 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wget &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg install &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$filename&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 啟動 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg start Tailscale
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 移除暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm -rf ~/tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 再次執行 Tailscale 更新&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;複製上述的腳本內容到記事本。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改腳本中 url，&lt;code&gt;需要針對 NAS 通用架構，進行更改&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;p&gt;找到自己的 NAS 型號所對應的 Generic Arch。以 DS220+ 為例，為&lt;code&gt;x86_64&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;到 &lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 釋出穩定版本&lt;/a&gt; 找到對應的 DSM 版本與 Generic Arch。&lt;/p&gt;
+&lt;p&gt;複製其 spk 網址，並取代腳本中 url 那行的網址即可。&lt;/p&gt;
+&lt;p&gt;其中腳本的 spk 網址為適用於 &lt;code&gt;x86_64&lt;/code&gt;，如果為相同的 Generic Arch，則腳本不需要更改。&lt;/p&gt;
+&lt;p&gt;例如：DS224+, DS923+, DS723+, DS423+, DS1621+, DS220+, DS420+, RS820+, RS1219+, FS1018, FS3017 等機種都是 x86_64，所以上述腳本不需修改可以直接使用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選控制台（Control Panel）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;控制台&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選任務排程表（Task Scheduler）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新增一個排程任務（定時執行）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;填寫任務名稱。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;填寫任務名稱，並使用 root 運行此腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定腳本定時執行時間，在此設定每天凌晨 0 點執行此腳本。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;設定腳本執行時間，此時間可自訂&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;任務設定中，在執行指令貼上對應 NAS 的架構，在此可設定是否透過信箱回傳執行結果。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;貼上對應 NAS 架構的腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選確認。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;點選確認後會出現警告訊息，點選確定即可&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第一次可以手動執行更新將 NAS 上的版本更新為最新版本。&lt;/p&gt;
+&lt;p&gt;這邊 Wells 安裝套件中心的版本（1.38），不移除該版本的情況下。&lt;/p&gt;
+&lt;p&gt;是可以直接正常升級到最新版本。所以有沒有先移除在執行腳本應該都沒差。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script.png&#34;
+	width=&#34;363&#34;
+	height=&#34;188&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;對任務點擊右鍵 → 執行&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;套件中心檢查版本，可以看到為 1.58.2，而 Synology的最新版本為 1.38.4&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;454&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本，透過腳本更新為最新版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;293&#34;
+		data-flex-basis=&#34;704px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如此一來，每天 0 點，會自動執行 tailscale update 進行自動更新。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;安裝好後，就可以進入到控制台，並點選 Tailscale 的 APP，此時會打開新的分頁，登入後就可以開始組網了。&lt;/p&gt;
+&lt;p&gt;詳細的組網可參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://kb.synology.com/zh-tw/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;我的 Synology NAS 使用哪種 CPU？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale套件 - 穩定版&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

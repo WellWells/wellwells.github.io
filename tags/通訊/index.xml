@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>通訊 on WellWells</title>
+        <link>https://wellstsai.com/tags/%E9%80%9A%E8%A8%8A/</link>
+        <description>Recent content in 通訊 on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Mon, 25 Dec 2023 16:00:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/%E9%80%9A%E8%A8%8A/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>控制器區域網路（CAN bus）特性與重點</title>
+        <link>https://wellstsai.com/post/can-interface/</link>
+        <pubDate>Mon, 25 Dec 2023 16:00:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/can-interface/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/can-interface/cover.jpg" alt="Featured image of post 控制器區域網路（CAN bus）特性與重點" /&gt;&lt;h2 id=&#34;什麼是控制器區域網路&#34;&gt;什麼是控制器區域網路？&lt;/h2&gt;
+&lt;p&gt;控制器區域網路（controller area network，CAN）為應用於汽車相關領域的資料傳輸協定。允許網路內的多個裝置互相通訊，提供實時可靠的數據傳輸。&lt;/p&gt;
+&lt;p&gt;由 Bosch 在 1983 年提出，並在 1993 年正式通過國際標準組織（ISO），發布標準化的 CAN 協定。&lt;/p&gt;
+&lt;p&gt;目前的 CAN 版本有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/classical-can/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN 2.0&lt;/a&gt; （1993），又稱 Classical-CAN&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/can-fd/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN FD&lt;/a&gt; （2012）&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/can-xl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN XL&lt;/a&gt; （2022）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;主要簡化電子控制器（electronic control units，ECU）或是不同裝置彼此間的通訊，都需要 UART 進行點對點通訊。藉由 CAN 可以大幅降低線路的複雜度。&lt;/p&gt;
+&lt;figure&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/can_intro.svg&#34;
+    alt=&#34;使用 CAN 可以大幅簡化接線並提高可靠性&#34; width=&#34;80%&#34;&gt;&lt;figcaption&gt;
+      &lt;h4&gt;使用 CAN 可以大幅簡化接線並提高可靠性&lt;/h4&gt;
+    &lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;如今的汽機車領域都有使用 CAN 通訊，其特性在於：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;低成本和輕量級網路：通訊使用線性匯流排（linear bus）架構，這種結構降低了實施成本，同時使整個網路保持輕量化。&lt;/li&gt;
+&lt;li&gt;實現多設備直接通訊：允許網路上的多個設備直接互相通訊，無需中央主機控制通訊，提供了系統的靈活性。&lt;/li&gt;
+&lt;li&gt;提供可靠的實時性：可以提供數據傳輸得即時性，特別適用於車輛控制系統場景。&lt;/li&gt;
+&lt;li&gt;抗干擾能力： 透過使用差動訊號（CAN-High / CAN-Low）提高了對電磁干擾的抗性，可以確保在雜訊高的環境中穩定通訊。&lt;/li&gt;
+&lt;li&gt;低功耗與支援網路喚醒：具有低功耗特性，同時支援網路喚醒功能。&lt;/li&gt;
+&lt;li&gt;簡潔的架構：相對於乙太網路架構更為簡單，使得系統設計和維護更加容易。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;其中不足的地方可能在於有限的傳輸速率與節點，在大量資料如影像、影片則是不適合的。&lt;/p&gt;
+&lt;p&gt;另外 CAN 協定不實現加密，有需要時需自行實現安全性。&lt;/p&gt;
+&lt;p&gt;CAN 主要傳輸內容為：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;控制指令&lt;/li&gt;
+&lt;li&gt;感測器數據（車速、轉向角、溫度、檔位）&lt;/li&gt;
+&lt;li&gt;診斷訊息&lt;/li&gt;
+&lt;li&gt;韌體（更新）&lt;/li&gt;
+&lt;li&gt;即時事件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;can-的重點摘要&#34;&gt;CAN 的重點摘要&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;使用 CAN_H(igh) 與 CAN_L(ow) 進行通訊，不需要地（GND）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;差動訊號（differential signal）是通訊訊號，共模訊號（common-mode signal）雜訊。分別代表 Vd 與 Vcm。&lt;/p&gt;
+&lt;p&gt;Vcm 是同時存在於 CAN_H 與 CAN_L，透過相減可以把共模雜訊消除。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Vd = V_CAN_H - V_CAN_L&lt;/code&gt;，&lt;code&gt;Vcm = (V_CAN_H + V_CAN_L) / 2&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN_H 與 CAN_L 為差動訊號。預設輸出準位為 2.5 v（CAN_H/L 對地）。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Recessive 表示位元 1，此時 CAN_H = CAN_L = 2.5 v，Vd 為 0 v。&lt;/p&gt;
+&lt;p&gt;Dominant 表示位元 0：CAN_H = 3.5 v，CAN_L = 1.5 v，Vd 為 2 v。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 傳輸採用仲裁（arbitration）方式，傳輸上 dominant 優先權高於 recessive，因此 CAN ID 越小，優先權越高。在系統設計不佳的情況下，低優先順序的 CAN ID 有可能會遇到無法傳輸的風險。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;仲裁過程若發生碰撞（即 A 節點發 0，B 節點發 1），此時 B 節點會停止傳輸變而接收。並使用載波檢測多重存取／碰撞避免（Carrier Sense Multiple Access with Collision Avoidance，CSMA/CA）等待 CAN 網路可以訪問自動重發以避免碰撞。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;能分別哪些節點是暫時錯誤或是永久錯誤，如果節點有問題會自動停用該節點。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若不知道哪條線是 CAN_H 與 CAN_L，可以透過三用電表的平均值或示波器進行評估，CAN_H 平均電壓會高於 2.5 v，而 CAN_L 平均電壓會低於 2.5 v。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 每次發送稱作數據幀（Frames），一個幀裡面主要有目標 ID、長度、資料內容，細節可參考：&lt;a class=&#34;link&#34; href=&#34;#frame-%e6%a0%bc%e5%bc%8f&#34; &gt;Frame 格式&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN FD 可以向下兼容 CAN 2.0，但 CAN 2.0 不兼容 CAN FD。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;微處理機（microprocessor，MCU）通常會選用支援 CAN 通訊協定的 IC，這類 IC 通常會提供 SDK 進行開發。開發者不會牽扯更加底層的操作實現。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用 CAN 通訊會再搭配一個 CAN 收發 IC 實現電壓準位轉換與差動訊號的轉換。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 網路的終端點會加上終端電阻（termination resistor）120 Ohms 減少傳輸線路上的反射波。可參考：&lt;a class=&#34;link&#34; href=&#34;#%e7%b5%82%e7%ab%af%e9%9b%bb%e9%98%bb%e7%9a%84%e8%a8%ad%e8%a8%88%e8%88%87%e8%80%83%e9%87%8f&#34; &gt;終端電阻的設計與考量&lt;/a&gt;。
+量測其網路中的 CAN_H 與 CAN_L，應為 60 Ohms 附近。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 有機率丟包，評估整體負載率建議不要超過 60-70%（經驗法則）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 2.0 最高速率為 1 Mbps，CAN FD 資料傳輸速率最高可達 8 Mbps。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;傳輸速率分為兩種：名義速率（nominal bit rate，NBR）與資料速率（data bit rate，DBR）。
+CAN 2.0 仲裁階段與資料傳輸階段的速率一致，一般所說的 500 Kbps、1 Mbps 指的是整個 CAN 的通訊速率。
+CAN FD 仲裁階段速率與 CAN 2.0 一致，最高可達 1 Mbps。然而 DBR 最快可達 8 Mbps。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;can-的名詞解釋&#34;&gt;CAN 的名詞解釋&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;名詞&lt;/th&gt;
+&lt;th&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Standard CAN&lt;/td&gt;
+&lt;td&gt;CAN2.0 標準格式，又名 CAN 2.0A，使用 11 個位元表示 ID。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Extended CAN&lt;/td&gt;
+&lt;td&gt;CAN2.0 擴展格式，又名 CAN 2.0B，使用 29 個位元表示 ID。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/can-fd/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN FD&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;具備可彈性資料率（Flexible Data），可使用 11 或 29 個位元表示 ID。並且最多可提高到 64 bytes 資料長度。其特點在於資料傳輸時使用更快的傳輸速率，為 CAN FD 被提出的基本理念。而在一幀內傳輸更多的數據也進而更低的 CAN 負載率。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/can-xl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN XL&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;第三代 CAN 協定，擁有比 CAN FD 更長的資料長度（2048 byte）。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nxp.com.cn/products/nxp-product-information/ip-block-licensing/flexcan-controller:FLEXCAN-CONTROLLER&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;FlexCAN&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;NXP 旗下的 IP 模組，實現了 CAN FD 與 CAN 2.0B 協議，並符合 ISO 11898-1 標準。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/an/spracu9/spracu9.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MCAN&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;TI 旗下的 IP 模組，實現 CAN FD，並符合 ISO 11898-1 標準。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.infineon.com/dgdl/Infineon-AURIX_MCMCAN_1_KIT_TC334_LK-Training-v01_00-EN.pdf?fileId=8ac78c8c7d0d8da4017d0fe4da95308e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MCMCAN&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Infineon 實現的模組，MCMCAN 目前已取代自家的 MultiCAN。支援傳統 CAN 與 CAN FD。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.vector.com/int/en/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Vector&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;德國公司，提供汽車和嵌入式系統領域的解決方案。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.vector.com/int/en/products/products-a-z/software/canoe/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CANoe&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Vector 用於 CAN 軟體開發及測試工具。可以產生訊號、模擬通訊行為。簡化版本為 CANalyzer&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.vector.com/us/en/products/products-a-z/software/canape/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CANape&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;由 Vector 開發的工具，主要用於電子控制單元（electronic control units，ECU）和高級駕駛輔助系統（advanced driver-assistance systems，ADAS）的測量、標定和診斷工具。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.peak-system.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Peak-System（PCAN）&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;德國公司，提供汽車和嵌入式系統領域的解決方案。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/XCP_%28protocol%29&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;XCP&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;通用的測量和校準協定（universal measurement and calibration protocol），允許外部設備（例如校準工具或測量儀器）與嵌入式系統通信，以進行參數調整、性能評估和故障診斷等操作。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Unified_Diagnostic_Services&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;UDS&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;統一診斷服務（unified diagnostic services），用於車輛診斷系統中進行通訊和訊息交換的通訊協定。在汽車行業中用於車輛診斷的標準之一，它定義了統一的服務和診斷協定，以確保不同車輛製造商的診斷工具可以與車輛的控制單元（ECU）進行有效的通訊。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/On-board_diagnostics#OBD-II&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OBD-II&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;為標準協定，允許外部電子設備訪問車輛的內部電腦系統，以進行診斷和排放測試。通常在車上會看到 16-pin（2x8） 的 SAE J1962 母頭連接器&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kvaser.com/developer-blog/an-introduction-j1939-and-dbc-files/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;.dbc&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;Database Container 是由 Vector 所開發的檔案格式，為業界標準。廣泛用於 CAN 相關軟體。描述 CAN 網路上 ID 、名稱、長度等相關內容。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CiA&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;CAN in Automation（CiA）是國際用戶和製造商組織，開發並支持基於 CAN 的高層協定及其國際標準化。以改善 CAN 協定未包含的範疇。像是流量控制、裝置定址、汽車電子控制單元校調（XCP）等&amp;hellip;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/canopen/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CANopen&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;基於 CAN 的通訊協定所實現的高層通訊協定。適用於嵌入式應用。它擴展了 CAN 的能力，支援更大的數據包大小，並提供了豐富的通訊功能，使其適用於更複雜的機械自動化應用。由 CiA 組織開發和維護。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/en/can-knowledge/hlp/devicenet/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DeviceNet&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;基於 CAN 的通訊協定所實現的高層通訊協定。主要用於工廠自動化，作為控制器（PLC）與工業 I/O 裝置（例如限位開關、感應器、驅動器、顯示器和操作界面）之間的通訊。由 Open DeviceNet Vendor Association（ODVA）維護。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;J1939&lt;/td&gt;
+&lt;td&gt;基於 CAN 的通訊協定所實現的高層通訊協定。主要針對車輛應用。它允許在車輛系統中進行廣泛的數據交換，支援消息的無限長度，並支持主/從結構，適用於複雜的車輛通信需求。由國際汽車工程師學會（Society of Automotive Engineers，SAE）制定的標準。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;recessive bit&lt;/td&gt;
+&lt;td&gt;CAN 訊號的位元 1，此時 CAN 的差動電壓標準為 0 v。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;dominant bit&lt;/td&gt;
+&lt;td&gt;CAN 訊號的位元 0，此時 CAN 的差動電壓標準為 2 v。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;資料幀格式data-frame&#34;&gt;資料幀格式（data frame）&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/can_frame.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;608&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/can_frame_hu3a3d294f5f215711191e82155a8a167f_83611_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/can_frame_hu3a3d294f5f215711191e82155a8a167f_83611_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;一個完整的 CAN frame&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;315&#34;
+		data-flex-basis=&#34;757px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;開始旗標（start of frame，SOF），用於表示資料幀開始的旗標。CAN 節點開始之前會檢測有沒有 11 個位元 1，以確定整個網路為閒置狀態。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;仲裁欄位（arbitration field，12 or 32 bit）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;base ID（11 bit）&lt;/li&gt;
+&lt;li&gt;遠程傳輸請求（remote transmission request，RTR），在實際應用中幾乎不使用。&lt;/li&gt;
+&lt;li&gt;擴展 CAN 中，多了遠程請求（substitute remote request，SRR）、IDE 旗標、擴展 ID（extended ID，18 bit）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;控制欄位（control field，6 bit）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ID 擴展（identifier extension，IDE）旗標，若為 CAN 2.0A 則為位元 0。&lt;/li&gt;
+&lt;li&gt;保留位元 (r0)，預設為位元 0。&lt;/li&gt;
+&lt;li&gt;數據長度編碼（data length code，DLC），使用 4 bit 表示後續的資料長度。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;資料（data field），使用 1 ~ 8 個 byte 表示傳遞資料。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CRC 欄位（16 bit），包含 15 bit 的 CRC 序列與 CRC 分隔符。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;確認欄位（acknowledgement field，2 bit），包含了 ACK slot 和 ACK delimiter。如果 CRC 匹配成功，則會在 ACK slot 為位元 0。ACK delimiter 固定為位元 1。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;結束旗標（EOF，7 bit），表示整個幀結束。7 個位元 1 表示幀的結束。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;幀間隔（interframe space，IFS），固定 3 個位元 1，確保相鄰的幀有足夠時間間隔。這段時間可以拿來防止干擾、同步，並為接收下一個幀做準備，以及進行錯誤處理。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;每個訊息幀固定由 11 個位元 1 結尾，分別為 ACK delimiter、EOF、IFS。節點在新的 SOF 旗標，會檢測是否有 11 個位元 1 判斷網路是否為閒置。其中 SOF 為進行節點同步的機制。&lt;/li&gt;
+&lt;li&gt;SOF 到 CRC 內只允許連續 5 個位元相同，如果連續 5 個位元 0 或 1，則會塞入一個相反位元作為填充位元（stuff bit），該填充位元可用於訊號同步、也可藉由此機制確定通訊是否異常以提高可靠性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;can-fd-特點與差異&#34;&gt;CAN FD 特點與差異&lt;/h2&gt;
+&lt;p&gt;CAN FD 的思維在於 CAN 2.0 的改良。其重點為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;在一幀內傳輸更多的資料，以降低 CAN 負載。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;更快的資料速率。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN FD 控制器可向下兼容處理 CAN 2.0 標準。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在既有 CAN 2.0 網路（500 Kbps），傳送 CAN FD （5 Mbps）的幀會造成網路錯誤。必須使全部節點升級，或是使用閘道進行網路分離等&amp;hellip;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支援 11 與 29 位元的 ID。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;移除遠端幀，也因此將資料中的 RTR 替換為 Remote Request Substitution bit （RRS），並始終為位元 0。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CAN 2.0 中的 r0 重新命名為 FD frame (FDF)，固定為位元 1。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用 Bit Rate Switch（BRS）旗標來決定是否以更高的 data baud rate 傳遞資料。&lt;/p&gt;
+&lt;p&gt;若為 0 則和 CAN 2.0 一致使用固定的速率傳輸位元（NBR）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Error Status Indicator（ESI），預設為位元 0 表示正常工作，若為位元 1 則表示錯誤被動模式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Stuff bit count（SBC）為三個格雷碼與一個奇偶位元，提高通訊的可靠性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/can_fd_frame.png&#34;
+	width=&#34;1837&#34;
+	height=&#34;580&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/can_fd_frame_huec669fa98f82810c2afa22c3d80f21b8_33674_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/can_fd_frame_huec669fa98f82810c2afa22c3d80f21b8_33674_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;CAN 2.0 與 CAN FD 的差異&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;316&#34;
+		data-flex-basis=&#34;760px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;上圖可以看到，CAN 2.0 與 CAN FD 在傳送相同資料下，如果未開啟 BRS，位元傳送的速率是走 NBR。&lt;/p&gt;
+&lt;p&gt;開啟 BRS ，資料傳輸率可以最高走 8 Mbps 的速度進行傳輸。圖中所使用的 DBR 分別是 4 倍與 10 倍的 NBR。&lt;/p&gt;
+&lt;h2 id=&#34;位元時間bit-timing&#34;&gt;位元時間（Bit timing）&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/can_bit_timing_formula.png&#34;
+	width=&#34;500&#34;
+	height=&#34;211&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/can_bit_timing_formula_hu6c7bbff31253ec4adad149369342270b_28530_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/can_bit_timing_formula_hu6c7bbff31253ec4adad149369342270b_28530_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;位元時間的相關公式&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;236&#34;
+		data-flex-basis=&#34;568px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;位元結構&#34;&gt;位元結構&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/bit_rate.png&#34;
+	width=&#34;906&#34;
+	height=&#34;398&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/bit_rate_hu5f4ea94c515e1ff4001e7c15979a1b92_19293_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/bit_rate_hu5f4ea94c515e1ff4001e7c15979a1b92_19293_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;一個位元的結構&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;227&#34;
+		data-flex-basis=&#34;546px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;針對 CAN 所配置的速率，如 500 Kbps 的 NBR，表示每秒傳送 500000 的位元。&lt;/p&gt;
+&lt;p&gt;將傳輸速率倒數，可以得到每個位元的時間，稱為位元時間（Tb 或是 Tnbt）。&lt;/p&gt;
+&lt;p&gt;一個位元時間分為 4 段，其中這 4 段分別為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;同步區段 （sync segment）&lt;/li&gt;
+&lt;li&gt;傳輸時間區段 （propagation time segment）&lt;/li&gt;
+&lt;li&gt;相段緩衝區段 1（phase buffer segment 1）&lt;/li&gt;
+&lt;li&gt;相段緩衝區段 2（phase buffer segment 2）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以 500 Kbps 的傳輸速率，表示 Tb = 0.2 us （公式 1）。這四段時間相加為一個 Tb（公式 2）。&lt;/p&gt;
+&lt;p&gt;其中傳輸時間區段需要考慮，Node A 處理時間、傳輸時間、Node B 處理時間。&lt;/p&gt;
+&lt;p&gt;也因此傳輸時間區段至少為：兩倍的物理傳輸延遲 + Node A 處理時間 + Node B 處理時間。Node A 在傳送 SOF 時，才能滿足 CAN 仲裁的優先機制。&lt;/p&gt;
+&lt;h3 id=&#34;time-quantumtq&#34;&gt;Time Quantum（Tq）&lt;/h3&gt;
+&lt;p&gt;位元時間分為 4 段，使用最小的單位時間（Time Quantum，Tq）表示每段的長度。&lt;/p&gt;
+&lt;p&gt;以一個 80 MHz 的裝置時脈，Tq = 1 / 80 MHz = 12.5 ns&lt;/p&gt;
+&lt;p&gt;如果需要將 CAN FD 的資料位元率設定 5000 kbps。&lt;/p&gt;
+&lt;p&gt;配置 Tsync_seg = 1 (固定)，Tseg1 = 13，Tseg1 = 2。整個 Tq 為 16 個單位。&lt;/p&gt;
+&lt;p&gt;12.5 ns × 16 = 0.2 us 表示一個位元為 0.2 us，將其倒數可以得到 5000 Kbps。&lt;/p&gt;
+&lt;h3 id=&#34;預除器baud-rate-prescalerbrp&#34;&gt;預除器（baud rate prescaler，BRP）&lt;/h3&gt;
+&lt;p&gt;一個裝置有不同的時脈，使用裝置內部的 BRP 可以進行除頻，來調整 Tq。&lt;/p&gt;
+&lt;p&gt;80 MHz 裝置時脈，Tq = 12.5 ns&lt;/p&gt;
+&lt;p&gt;若 prescaler 為 2，則除頻變為 40 MHz，此時 Tq = 25 ns。&lt;/p&gt;
+&lt;h3 id=&#34;取樣點sample-point&#34;&gt;取樣點（sample point）&lt;/h3&gt;
+&lt;p&gt;取樣點簡稱 SP。根據主流協定與標準（如 CANopen、DeviceNet），CAN 的取樣點建議使用 87.5%。而 75% 為 ARINC 825 的預設值。&lt;/p&gt;
+&lt;p&gt;在此，選定主流 87.5% 取樣點，在 CAN 通訊上出錯的機率也會比較低。&lt;/p&gt;
+&lt;h3 id=&#34;同步跳躍寬度synchronization-jump-widthsjw&#34;&gt;同步跳躍寬度（Synchronization Jump Width，SJW）&lt;/h3&gt;
+&lt;p&gt;SJW 用來補償振盪器的容忍度。透過同步，SJW 可以被延長或縮短。&lt;/p&gt;
+&lt;p&gt;在 CAN 系統中，振盪器的頻率可能會因溫度變化、電壓波動或元件老化而產生變化。&lt;/p&gt;
+&lt;p&gt;為了確保不同節點之間的通信穩定，使用相位緩衝段和 SJW 這兩個機制，以補償由於振盪器容忍度引起的相位偏移。&lt;/p&gt;
+&lt;p&gt;此數值與 NBR、DBR 無關，主要是提供時脈偏移的容忍度，常態值為 1 ~ 2 個 Tq。&lt;/p&gt;
+&lt;h3 id=&#34;計算區段時間&#34;&gt;計算區段時間&lt;/h3&gt;
+&lt;p&gt;需要考慮&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MCU IC 時脈&lt;/li&gt;
+&lt;li&gt;位元速率（NBR / DBR）&lt;/li&gt;
+&lt;li&gt;傳輸線延遲&lt;/li&gt;
+&lt;li&gt;CAN IC 延遲&lt;/li&gt;
+&lt;li&gt;溫度（不可控）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中已知數值：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;位元時脈（NBR / DBR）&lt;/li&gt;
+&lt;li&gt;系統時脈（MCU 可能為 8 MHz / 20 MHz / 40 MHz / 80 MHz）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;可以透過計算機進行初步評估。根據選定的取樣率（常見為 75 % ~ 90 %，&lt;strong&gt;建議使用 87.5 % 進行評估&lt;/strong&gt;）。&lt;/p&gt;
+&lt;p&gt;便可決定要多少的 prescaler、TSEG1 與 TSEG2。&lt;/p&gt;
+&lt;h2 id=&#34;終端電阻的設計與考量&#34;&gt;終端電阻的設計與考量&lt;/h2&gt;
+&lt;h3 id=&#34;標準終端電阻standard-termination&#34;&gt;標準終端電阻（standard termination）&lt;/h3&gt;
+&lt;p&gt;前面有提到整個 CAN 網路的終端兩點會有各 120 Ohms 的終端電阻，這個 120 Ohms 是依據 ISO 11898-2 所規範。&lt;/p&gt;
+&lt;p&gt;因為頭尾兩端各有電阻，所以看入某個端點的輸入阻抗，並聯後約為 60 Ohms 附近。可以使用電表測量 CAN_H 與 CAN_L，阻抗為 45 ~ 65 Ohms 附近。&lt;/p&gt;
+&lt;p&gt;在 ISO 11898 定義下，最高速度為 1 Mbps、長度不超過 40 m，殘段（stub）長度為 0.3 m，最大節點數 30 個。&lt;/p&gt;
+&lt;p&gt;透過網路設計可以降低訊號反射，使其擁有更長的網路、更長的殘段、更多的設備。&lt;/p&gt;
+&lt;p&gt;例如考慮 10 個節點（2 終端 + 8 裝置），終端以加上 120 Ohms 電阻。&lt;/p&gt;
+&lt;p&gt;若分支 CAN 網路的殘段很長，可以加入 2.6 KOhms 電阻以降低反射。&lt;/p&gt;
+&lt;p&gt;考慮 8 個 2.6 KOhms的終端，其最終的阻抗：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;(2600 / 8) // 120 // 120 ≈ 50.65 Ohms
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;即便只有 1 個端點，2.6 KOhms 與兩個終端電阻並聯，得到阻抗為 58.6 Ohms，也是符合整體線路阻抗，不過實際上傳輸有沒有問題，會需要於通訊中進行測試評估。&lt;/p&gt;
+&lt;p&gt;殘段電阻計算方式為：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;330 Ohms × 殘段數 = 殘段的終端電阻值
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;由 ISO 的規範下，&lt;code&gt;預設 CAN 網路的兩個終端，必須有兩個 120 Ohms 電阻&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;在實驗室中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;僅只有一個終端電阻的情況下可能也是可以正常工作的。但還是建議養成習慣多補一個終端電阻。&lt;/li&gt;
+&lt;li&gt;殘段端的電阻，由於測試距離很短往往訊反品質很好而感受不出其成效。最終會於安裝於整車網路後進行訊號評估。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;分離式電阻split-termination&#34;&gt;分離式電阻（split termination）&lt;/h3&gt;
+&lt;p&gt;使用分離式電路組成的 RC 濾波可以濾除高頻雜訊：&lt;/p&gt;
+&lt;p&gt;即兩個相同電阻（60 Ohms）串接對地，中間並聯一個 4.7 nF 電容對地，其效果為低通濾波器，可以有效提高抗干擾的能力並減少電磁輻射。&lt;/p&gt;
+&lt;p&gt;其截止頻率 fc = 1 / (2πRC)，可計算出約為 1.12 MHz (Rt = 30 Ohms)，即超過該頻率的訊號會被濾除。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/split_resistor.png&#34;
+	width=&#34;598&#34;
+	height=&#34;207&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/split_resistor_huf126207a38023daf8bfd3718d0df8488_10383_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/split_resistor_huf126207a38023daf8bfd3718d0df8488_10383_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;分離式電阻與標準終端的差異 (圖)&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;288&#34;
+		data-flex-basis=&#34;693px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;pcan-view-收發測試&#34;&gt;PCAN-View 收發測試&lt;/h2&gt;
+&lt;p&gt;本節說明 PCAN 的基礎設定，並解釋前章節的參數與其對應介面。&lt;/p&gt;
+&lt;p&gt;開啟 PCAN-View。上方為接收端，下方為傳送端。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_start.png&#34;
+	width=&#34;1654&#34;
+	height=&#34;903&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_start_hud49a7c786506d6c898c046b70953b117_32063_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_start_hud49a7c786506d6c898c046b70953b117_32063_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;初始頁面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;插入硬體後，點選左上方的連接 ICON，可以進入裝置的設定。&lt;/p&gt;
+&lt;p&gt;這邊走的是 CAN FD，NBR 與 DBR 分別為 1000 Kbps 與 5000 Kbps。取樣點設定為 87.5%。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_config_hardware.png&#34;
+	width=&#34;1651&#34;
+	height=&#34;901&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_config_hardware_hubb7331b2e33ca48d8f36acb6429978a8_92926_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_config_hardware_hubb7331b2e33ca48d8f36acb6429978a8_92926_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;配置裝置資訊&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;設定裝置後，MCU 目前固定每 500 ms 傳送一次資料。可以看到 Receive 端出現 0xC0 的 ID。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_received_data.png&#34;
+	width=&#34;1654&#34;
+	height=&#34;903&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_received_data_hu8dc300fad4e4b38a1199d0d8edba1224_55357_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_received_data_hu8dc300fad4e4b38a1199d0d8edba1224_55357_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;收到 MCU 的訊號&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;若要送資料給 MCU，在 Transmit 空白處右鍵，點 New message&amp;hellip;。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_add_transmit_msg.png&#34;
+	width=&#34;1651&#34;
+	height=&#34;901&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_add_transmit_msg_huf5c3e022de2547c4d55afe4844f958a1_67346_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_add_transmit_msg_huf5c3e022de2547c4d55afe4844f958a1_67346_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;新增發送 message&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;傳送資料類型為 CAN FD，並開啟 BRS 加快資料的傳輸。資料長度為 64 個 byte。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_config_msg.png&#34;
+	width=&#34;1651&#34;
+	height=&#34;901&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_config_msg_hua9f4fa7f1558fb0b4417e353354f81fa_85718_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_config_msg_hua9f4fa7f1558fb0b4417e353354f81fa_85718_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;發送 msg 的設定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;新增後，選中 Transmit 底下的 msg，點選空白鍵發送 msg。MCU收到資料後回傳 0x777。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/can-interface/PcanView_send_and_received.png&#34;
+	width=&#34;1654&#34;
+	height=&#34;903&#34;
+	srcset=&#34;https://wellstsai.com/post/can-interface/PcanView_send_and_received_hue53cf22f3f6f1f0c550883d40baf5fb4_71053_480x0_resize_box_3.png 480w, https://wellstsai.com/post/can-interface/PcanView_send_and_received_hue53cf22f3f6f1f0c550883d40baf5fb4_71053_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;測試傳送 msg&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;439px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.can-cia.org/can-knowledge/can/can-history/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;History of CAN technology&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nxp.com.cn/products/nxp-product-information/ip-block-licensing/flexcan-controller:FLEXCAN-CONTROLLER&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;FlexCAN控制器&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/an/spracu9/spracu9.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Getting Started with the MCAN (CAN FD) Module&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/an/sloa101b/sloa101b.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Introduction to the Controller Area Network (CAN)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/an/slyt529/slyt529.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Basics of debugging the controller area network (CAN) physical layer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nxp.com/docs/en/application-note/AN10211.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TJA1040 high speed CAN transceiver&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kmpdrivetrain.com/paddleshift/practical-tips-can-bus/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Practical tips: CAN-Bus&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/ds/symlink/sn65hvd233.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SN65HVD23x 3.3-V CAN Bus Transceivers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.iso.org/standard/63648.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ISO 11898-1:2015 - Road vehicles&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.iso.org/standard/67244.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ISO 11898-2:2016 - Road vehicles&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/XCP_%28protocol%29&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;XCP (protocol)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Unified_Diagnostic_Services&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Unified Diagnostic Services&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/CAN_bus&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN bus&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://elearning.vector.com/mod/page/view.php?id=333&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Learning Module CAN&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.csselectronics.com/pages/can-fd-flexible-data-rate-intro#how-does-can-fd-work&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN FD Explained&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.ti.com/lit/an/sprac35/sprac35.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Calculator for CAN Bit Timing Parameters&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.oertel-halle.de/files/cia99paper.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;The Configuration of the CAN Bit Timing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nxp.com/docs/en/application-note/AN1798.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CAN Bit Timing Requirements&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

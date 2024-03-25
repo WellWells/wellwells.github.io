@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='在 Synology NAS 上一鍵安裝最新版 Tailscale'>
+
+<title>在 Synology NAS (DSM) 上安裝最新版本的 Tailscale - WellWells</title>
+
+
+<link rel='canonical' href='https://wellstsai.com/post/tailscale-synology/'>
+
+<link rel="stylesheet" href="/scss/style.min.6f97a446ffede30c6e468103f6f619d741887c25a3b7ed2ff0286e373820a699.css"><meta property='og:title' content='在 Synology NAS (DSM) 上安裝最新版本的 Tailscale'>
+<meta property='og:description' content='在 Synology NAS 上一鍵安裝最新版 Tailscale'>
+<meta property='og:url' content='https://wellstsai.com/post/tailscale-synology/'>
+<meta property='og:site_name' content='WellWells'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='教學' /><meta property='article:tag' content='軟體' /><meta property='article:tag' content='生產力' /><meta property='article:tag' content='Tailscale' /><meta property='article:tag' content='VPN' /><meta property='article:tag' content='NAS' /><meta property='article:tag' content='Synology' /><meta property='article:published_time' content='2024-01-25T17:10:00&#43;08:00'/><meta property='article:modified_time' content='2024-01-29T00:00:00&#43;00:00'/><meta property='og:image' content='https://wellstsai.com/post/tailscale-synology/cover.jpg' />
+<meta name="twitter:title" content="在 Synology NAS (DSM) 上安裝最新版本的 Tailscale">
+<meta name="twitter:description" content="在 Synology NAS 上一鍵安裝最新版 Tailscale"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://wellstsai.com/post/tailscale-synology/cover.jpg' /><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.min.css" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JKC4KZLT26"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-JKC4KZLT26', { 'anonymize_ip': false });
+}
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        <img src="/mimi.png" width="300px"
+                            height="300px" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">✨</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">WellWells</a></h1>
+            <h2 class="site-description">井裡總有一些意想不到的東西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首頁</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>關於 Wells</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>歷史文章</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+                <li id="i18n-switch">  
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                    <select name="language" onchange="window.location.href = this.selectedOptions[0].value">
+                        
+                            <option value="https://wellstsai.com/" selected></option>
+                        
+                    </select>
+                </li>
+            
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>深色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目錄</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#傳統安裝方式">傳統安裝方式</a></li>
+    <li><a href="#從官網安裝最新版本的-tailscale">從官網安裝最新版本的 Tailscale</a></li>
+    <li><a href="#結論">結論</a></li>
+    <li><a href="#參考文獻">參考文獻</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/tailscale-synology/">
+                <img src="/post/tailscale-synology/cover_hub0c52d4e5b287e589c8d4ab51a4e4223_212794_800x0_resize_q75_box.jpg"
+                        srcset="/post/tailscale-synology/cover_hub0c52d4e5b287e589c8d4ab51a4e4223_212794_800x0_resize_q75_box.jpg 800w, /post/tailscale-synology/cover_hub0c52d4e5b287e589c8d4ab51a4e4223_212794_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="這是一張有關標題為 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale 的圖片" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/tailscale-synology/">在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            在 Synology NAS 上一鍵安裝最新版 Tailscale
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024/01/25</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 3 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="引言">引言</h2>
+<p>在先前文章<a class="link" href="/post/tailscale/" >使用 Tailscale 輕鬆建立安全且私密的通道</a>中，說明如何透過 Tailscale 建立只有自己能夠存取的 VPN（tailnet）。</p>
+<p>本篇文章將著重如何在 Synology 上如何安裝最新版本的 Tailscale。</p>
+<p>並實現自動更新等機制。確保 Tailscale 保持在最新版本。</p>
+<p>以下操作的系統配置：</p>
+<ul>
+<li>NAS 裝置：DS220+</li>
+<li>作業系統：DiskStation Manager 7 (DSM 7)</li>
+<li>CPU：Intel Celeron J4025</li>
+<li>Synology Package Arch：Geminilake</li>
+<li>Generic Arch：<code>x86_64</code></li>
+</ul>
+<p>其中，如果要更新到最新版本的 Tailscale，需要知道 NAS 的通用架構（Generic Arch）。</p>
+<p>這部分會根據不同的通用架構決定要下載哪個 Synology package（spk）檔案進行安裝與更新。</p>
+<p>如果不知道自己的 NAS 架構，可以到 <a class="link" href="https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures"  target="_blank" rel="noopener"
+    >Synology 和 SynoCommunity 套件架構</a>以查詢 NAS 的通用架構。</p>
+<h2 id="傳統安裝方式">傳統安裝方式</h2>
+<p>傳統安裝方式為透過 Synology 內的套件中心進行安裝，此版本為 Synology 釋出的版本。</p>
+<ol>
+<li>
+<p>點選左上方的主選單按鈕。</p>
+<p><img src="/post/tailscale-synology/1_button.png"
+	width="118"
+	height="48"
+	srcset="/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, /post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="主選單按鈕"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="245"
+		data-flex-basis="590px"
+	
+></p>
+</li>
+<li>
+<p>點選套件中心（Synology package center）。</p>
+<p><img src="/post/tailscale-synology/2_click_spc.png"
+	width="1285"
+	height="373"
+	srcset="/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_480x0_resize_box_3.png 480w, /post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="套件中心"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="344"
+		data-flex-basis="826px"
+	
+></p>
+</li>
+<li>
+<p>在所有套件中，最下方找到 Tailscale，並點選安裝套件。</p>
+<p><img src="/post/tailscale-synology/3_install_tailscale_from_spc.png"
+	width="1899"
+	height="885"
+	srcset="/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_480x0_resize_box_3.png 480w, /post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="安裝 Tailscale"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="514px"
+	
+></p>
+</li>
+<li>
+<p>至此，安裝好後，點選主選單的 Tailscale 登入後就可以正常使用了。</p>
+<p>在套件中心，已安裝的頁面中檢查安裝版本，可以看到為官方所提供的 1.38.4-700038004。</p>
+<p><img src="/post/tailscale-synology/4_check_tailscale_version.png"
+	width="1458"
+	height="698"
+	srcset="/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_480x0_resize_box_3.png 480w, /post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="檢查 Tailscale 版本"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="208"
+		data-flex-basis="501px"
+	
+></p>
+</li>
+</ol>
+<p>該版本為 <a class="link" href="https://archive.synology.com/download/Package/Tailscale/"  target="_blank" rel="noopener"
+    >Synology 發布</a> (2023/5/8)。</p>
+<p>根據 <a class="link" href="https://github.com/tailscale/tailscale/releases"  target="_blank" rel="noopener"
+    >Tailscale 官方最新釋出版本</a>為 1.58.2 (2024/1/25)。</p>
+<h2 id="從官網安裝最新版本的-tailscale">從官網安裝最新版本的 Tailscale</h2>
+<p>Tailscale 每次更新，官方會為 Synology 編譯並發布<a class="link" href="https://pkgs.tailscale.com/stable/#spks"  target="_blank" rel="noopener"
+    >最新版本的 spk</a>。</p>
+<p>使用者可以自行下載，並在套件中心手動進行安裝。未來有更新，則重複此動作。</p>
+<p>在此，Wells 已經整合成一個腳本，實現全自動安裝與定時更新。照著以下步驟執行即可。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 更新 Tailscale</span>
+</span></span><span style="display:flex;"><span>tailscale update --yes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 檢查更新是否成功</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $? -eq <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;執行 Tailscale 更新成功&#34;</span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 若找不到指令，手動下載指定版本的 Tailscale 安裝包</span>
+</span></span><span style="display:flex;"><span>url<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://pkgs.tailscale.com/stable/tailscale-x86_64-1.58.2-7000058002-dsm7.spk&#34;</span>
+</span></span><span style="display:flex;"><span>filename<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>basename <span style="color:#e6db74">&#34;</span>$url<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在使用者的家目錄下建立暫存資料夾</span>
+</span></span><span style="display:flex;"><span>cd ~
+</span></span><span style="display:flex;"><span>mkdir tmp_synology
+</span></span><span style="display:flex;"><span>cd tmp_synology
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 下載 Tailscale 安裝包</span>
+</span></span><span style="display:flex;"><span>wget <span style="color:#e6db74">&#34;</span>$url<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 安裝 Tailscale Synology 套件</span>
+</span></span><span style="display:flex;"><span>sudo synopkg install <span style="color:#e6db74">&#34;</span>$filename<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 啟動 Tailscale Synology 套件</span>
+</span></span><span style="display:flex;"><span>sudo synopkg start Tailscale
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 移除暫存資料夾</span>
+</span></span><span style="display:flex;"><span>rm -rf ~/tmp_synology
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 再次執行 Tailscale 更新</span>
+</span></span><span style="display:flex;"><span>tailscale update --yes
+</span></span></code></pre></div><ol>
+<li>
+<p>複製上述的腳本內容到記事本。</p>
+</li>
+<li>
+<p>修改腳本中 url，<code>需要針對 NAS 通用架構，進行更改</code>。</p>
+<p>可以到 <a class="link" href="https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures"  target="_blank" rel="noopener"
+    >Synology 和 SynoCommunity 套件架構</a>查詢 NAS 的通用架構。</p>
+<p>找到自己的 NAS 型號所對應的 Generic Arch。以 DS220+ 為例，為<code>x86_64</code>。</p>
+<p>到 <a class="link" href="https://pkgs.tailscale.com/stable/#spks"  target="_blank" rel="noopener"
+    >Tailscale 釋出穩定版本</a> 找到對應的 DSM 版本與 Generic Arch。</p>
+<p>複製其 spk 網址，並取代腳本中 url 那行的網址即可。</p>
+<p>其中腳本的 spk 網址為適用於 <code>x86_64</code>，如果為相同的 Generic Arch，則腳本不需要更改。</p>
+<p>例如：DS224+, DS923+, DS723+, DS423+, DS1621+, DS220+, DS420+, RS820+, RS1219+, FS1018, FS3017 等機種都是 x86_64，所以上述腳本不需修改可以直接使用。</p>
+</li>
+<li>
+<p>點選左上方的主選單按鈕。</p>
+<p><img src="/post/tailscale-synology/1_button.png"
+	width="118"
+	height="48"
+	srcset="/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, /post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="主選單按鈕"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="245"
+		data-flex-basis="590px"
+	
+></p>
+</li>
+<li>
+<p>點選控制台（Control Panel）。</p>
+<p><img src="/post/tailscale-synology/5_click_control.png"
+	width="1285"
+	height="373"
+	srcset="/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_480x0_resize_box_3.png 480w, /post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="控制台"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="344"
+		data-flex-basis="826px"
+	
+></p>
+</li>
+<li>
+<p>點選任務排程表（Task Scheduler）。</p>
+<p><img src="/post/tailscale-synology/6_click_task.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_480x0_resize_box_3.png 480w, /post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="任務排程表"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>新增一個排程任務（定時執行）。</p>
+<p><img src="/post/tailscale-synology/7_add_new_script.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_480x0_resize_box_3.png 480w, /post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="任務排程表"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>填寫任務名稱。</p>
+<p><img src="/post/tailscale-synology/8_task_name.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_480x0_resize_box_3.png 480w, /post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="填寫任務名稱，並使用 root 運行此腳本"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>設定腳本定時執行時間，在此設定每天凌晨 0 點執行此腳本。</p>
+<p><img src="/post/tailscale-synology/9_task_time.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_480x0_resize_box_3.png 480w, /post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="設定腳本執行時間，此時間可自訂"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>任務設定中，在執行指令貼上對應 NAS 的架構，在此可設定是否透過信箱回傳執行結果。</p>
+<p><img src="/post/tailscale-synology/10_task_script.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_480x0_resize_box_3.png 480w, /post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="貼上對應 NAS 架構的腳本"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>點選確認。</p>
+<p><img src="/post/tailscale-synology/11_task_add.png"
+	width="1115"
+	height="680"
+	srcset="/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_480x0_resize_box_3.png 480w, /post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="點選確認後會出現警告訊息，點選確定即可"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="163"
+		data-flex-basis="393px"
+	
+></p>
+</li>
+<li>
+<p>第一次可以手動執行更新將 NAS 上的版本更新為最新版本。</p>
+<p>這邊 Wells 安裝套件中心的版本（1.38），不移除該版本的情況下。</p>
+<p>是可以直接正常升級到最新版本。所以有沒有先移除在執行腳本應該都沒差。</p>
+<p><img src="/post/tailscale-synology/12_run_script.png"
+	width="363"
+	height="188"
+	srcset="/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_480x0_resize_box_3.png 480w, /post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="對任務點擊右鍵 → 執行"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="193"
+		data-flex-basis="463px"
+	
+></p>
+</li>
+<li>
+<p>套件中心檢查版本，可以看到為 1.58.2，而 Synology的最新版本為 1.38.4</p>
+<p><img src="/post/tailscale-synology/13_check_version_latest.png"
+	width="1332"
+	height="454"
+	srcset="/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_480x0_resize_box_3.png 480w, /post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="檢查 Tailscale 版本，透過腳本更新為最新版本"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="293"
+		data-flex-basis="704px"
+	
+></p>
+</li>
+</ol>
+<p>如此一來，每天 0 點，會自動執行 tailscale update 進行自動更新。</p>
+<h2 id="結論">結論</h2>
+<p>安裝好後，就可以進入到控制台，並點選 Tailscale 的 APP，此時會打開新的分頁，登入後就可以開始組網了。</p>
+<p>詳細的組網可參考<a class="link" href="/post/tailscale/" >使用 Tailscale 輕鬆建立安全且私密的通道</a>。</p>
+<h2 id="參考文獻">參考文獻</h2>
+<ol>
+<li><a class="link" href="https://kb.synology.com/zh-tw/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have"  target="_blank" rel="noopener"
+    >我的 Synology NAS 使用哪種 CPU？</a></li>
+<li><a class="link" href="https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures"  target="_blank" rel="noopener"
+    >Synology 和 SynoCommunity 套件架構</a></li>
+<li><a class="link" href="/post/tailscale/" >使用 Tailscale 輕鬆建立安全且私密的通道</a></li>
+<li><a class="link" href="https://pkgs.tailscale.com/stable/#spks"  target="_blank" rel="noopener"
+    >Tailscale套件 - 穩定版</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+        
+            <a href="/tags/%E8%BB%9F%E9%AB%94/">軟體</a>
+        
+            <a href="/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/">生產力</a>
+        
+            <a href="/tags/tailscale/">Tailscale</a>
+        
+            <a href="/tags/vpn/">VPN</a>
+        
+            <a href="/tags/nas/">NAS</a>
+        
+            <a href="/tags/synology/">Synology</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"  target="_blank" rel="noopener"
+    >創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最後更新 2024/01/29
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相關文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/tailscale/">
+        
+        
+            <div class="article-image">
+                <img src="/post/tailscale/cover.efa8a6427b80d0a9999fed6382f8e77b_hu5a1df5d6cca77f0876c4c8749db3d7d6_149294_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 Tailscale 輕鬆建立安全且私密的通道"
+                        
+                        data-hash="md5-76imQnuA0KmZn&#43;1jgvjnew==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 Tailscale 輕鬆建立安全且私密的通道</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/ssh-connection/">
+        
+        
+            <div class="article-image">
+                <img src="/post/ssh-connection/cover.90d9eebf082eea99c5f883e95a4caef6_hu008f9935e91088f0fcd36d9134ad0b3c_252783_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 SSH 金鑰進行無密碼遠端連線"
+                        
+                        data-hash="md5-kNnuvwgu6pnF&#43;IPpWkyu9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 SSH 金鑰進行無密碼遠端連線</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/awesome-windows/">
+        
+        
+            <div class="article-image">
+                <img src="/post/awesome-windows/cover.d1796bc2505f363fe6fda6ae070dcdac_huf677ab5284dc3059c291ae31652dfe1d_203353_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Awesome Windows - 必備生產力軟體安裝與說明"
+                        
+                        data-hash="md5-0XlrwlBfNj/m/aauBw3NrA==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Awesome Windows - 必備生產力軟體安裝與說明</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/chatgpt-key/">
+        
+        
+            <div class="article-image">
+                <img src="/post/chatgpt-key/cover.d86e70132b2224a85a65a3606785a56e_huf8a182652f213945c8af6f740ccc4084_91881_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 免費申請 ChatGPT API 金鑰"
+                        
+                        data-hash="md5-2G5wEysiJKhaZaNgZ4Wlbg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">免費申請 ChatGPT API 金鑰</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/build-hugo/">
+        
+        
+            <div class="article-image">
+                <img src="/post/build-hugo/cover.1eb3e6ffde9413d096cd346a99bdc42e_hu92d7f691ce1ddbb942bb8a77e99b31e5_158426_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post Hugo 建站筆記"
+                        
+                        data-hash="md5-HrPm/96UE9CWzTRqmb3ELg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hugo 建站筆記</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="wellwells/wellwells.github.io"
+    data-repo-id="R_kgDOKRvukA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOKRvukM4Cban9"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-TW"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 WellWells
+    </section>
+    
+    <section class="powerby">
+        主題 Stack 由 Jimmy 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption" style="display: flex; justify-content: center;">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

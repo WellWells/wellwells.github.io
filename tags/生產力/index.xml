@@ -1,0 +1,1661 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>生產力 on WellWells</title>
+        <link>https://wellstsai.com/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/</link>
+        <description>Recent content in 生產力 on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Thu, 25 Jan 2024 17:10:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</title>
+        <link>https://wellstsai.com/post/tailscale-synology/</link>
+        <pubDate>Thu, 25 Jan 2024 17:10:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale-synology/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale-synology/cover.jpg" alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在先前文章&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;中，說明如何透過 Tailscale 建立只有自己能夠存取的 VPN（tailnet）。&lt;/p&gt;
+&lt;p&gt;本篇文章將著重如何在 Synology 上如何安裝最新版本的 Tailscale。&lt;/p&gt;
+&lt;p&gt;並實現自動更新等機制。確保 Tailscale 保持在最新版本。&lt;/p&gt;
+&lt;p&gt;以下操作的系統配置：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NAS 裝置：DS220+&lt;/li&gt;
+&lt;li&gt;作業系統：DiskStation Manager 7 (DSM 7)&lt;/li&gt;
+&lt;li&gt;CPU：Intel Celeron J4025&lt;/li&gt;
+&lt;li&gt;Synology Package Arch：Geminilake&lt;/li&gt;
+&lt;li&gt;Generic Arch：&lt;code&gt;x86_64&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，如果要更新到最新版本的 Tailscale，需要知道 NAS 的通用架構（Generic Arch）。&lt;/p&gt;
+&lt;p&gt;這部分會根據不同的通用架構決定要下載哪個 Synology package（spk）檔案進行安裝與更新。&lt;/p&gt;
+&lt;p&gt;如果不知道自己的 NAS 架構，可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;以查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;h2 id=&#34;傳統安裝方式&#34;&gt;傳統安裝方式&lt;/h2&gt;
+&lt;p&gt;傳統安裝方式為透過 Synology 內的套件中心進行安裝，此版本為 Synology 釋出的版本。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選套件中心（Synology package center）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;套件中心&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在所有套件中，最下方找到 Tailscale，並點選安裝套件。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc.png&#34;
+	width=&#34;1899&#34;
+	height=&#34;885&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安裝 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;514px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;至此，安裝好後，點選主選單的 Tailscale 登入後就可以正常使用了。&lt;/p&gt;
+&lt;p&gt;在套件中心，已安裝的頁面中檢查安裝版本，可以看到為官方所提供的 1.38.4-700038004。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version.png&#34;
+	width=&#34;1458&#34;
+	height=&#34;698&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;208&#34;
+		data-flex-basis=&#34;501px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;該版本為 &lt;a class=&#34;link&#34; href=&#34;https://archive.synology.com/download/Package/Tailscale/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 發布&lt;/a&gt; (2023/5/8)。&lt;/p&gt;
+&lt;p&gt;根據 &lt;a class=&#34;link&#34; href=&#34;https://github.com/tailscale/tailscale/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 官方最新釋出版本&lt;/a&gt;為 1.58.2 (2024/1/25)。&lt;/p&gt;
+&lt;h2 id=&#34;從官網安裝最新版本的-tailscale&#34;&gt;從官網安裝最新版本的 Tailscale&lt;/h2&gt;
+&lt;p&gt;Tailscale 每次更新，官方會為 Synology 編譯並發布&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;最新版本的 spk&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;使用者可以自行下載，並在套件中心手動進行安裝。未來有更新，則重複此動作。&lt;/p&gt;
+&lt;p&gt;在此，Wells 已經整合成一個腳本，實現全自動安裝與定時更新。照著以下步驟執行即可。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新 Tailscale&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查更新是否成功&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; $? -eq &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;執行 Tailscale 更新成功&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exit &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 若找不到指令，手動下載指定版本的 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://pkgs.tailscale.com/stable/tailscale-x86_64-1.58.2-7000058002-dsm7.spk&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;basename &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 在使用者的家目錄下建立暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd ~
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下載 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wget &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg install &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$filename&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 啟動 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg start Tailscale
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 移除暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm -rf ~/tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 再次執行 Tailscale 更新&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;複製上述的腳本內容到記事本。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改腳本中 url，&lt;code&gt;需要針對 NAS 通用架構，進行更改&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;p&gt;找到自己的 NAS 型號所對應的 Generic Arch。以 DS220+ 為例，為&lt;code&gt;x86_64&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;到 &lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 釋出穩定版本&lt;/a&gt; 找到對應的 DSM 版本與 Generic Arch。&lt;/p&gt;
+&lt;p&gt;複製其 spk 網址，並取代腳本中 url 那行的網址即可。&lt;/p&gt;
+&lt;p&gt;其中腳本的 spk 網址為適用於 &lt;code&gt;x86_64&lt;/code&gt;，如果為相同的 Generic Arch，則腳本不需要更改。&lt;/p&gt;
+&lt;p&gt;例如：DS224+, DS923+, DS723+, DS423+, DS1621+, DS220+, DS420+, RS820+, RS1219+, FS1018, FS3017 等機種都是 x86_64，所以上述腳本不需修改可以直接使用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選控制台（Control Panel）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;控制台&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選任務排程表（Task Scheduler）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新增一個排程任務（定時執行）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;填寫任務名稱。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;填寫任務名稱，並使用 root 運行此腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定腳本定時執行時間，在此設定每天凌晨 0 點執行此腳本。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;設定腳本執行時間，此時間可自訂&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;任務設定中，在執行指令貼上對應 NAS 的架構，在此可設定是否透過信箱回傳執行結果。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;貼上對應 NAS 架構的腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選確認。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;點選確認後會出現警告訊息，點選確定即可&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第一次可以手動執行更新將 NAS 上的版本更新為最新版本。&lt;/p&gt;
+&lt;p&gt;這邊 Wells 安裝套件中心的版本（1.38），不移除該版本的情況下。&lt;/p&gt;
+&lt;p&gt;是可以直接正常升級到最新版本。所以有沒有先移除在執行腳本應該都沒差。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script.png&#34;
+	width=&#34;363&#34;
+	height=&#34;188&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;對任務點擊右鍵 → 執行&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;套件中心檢查版本，可以看到為 1.58.2，而 Synology的最新版本為 1.38.4&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;454&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本，透過腳本更新為最新版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;293&#34;
+		data-flex-basis=&#34;704px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如此一來，每天 0 點，會自動執行 tailscale update 進行自動更新。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;安裝好後，就可以進入到控制台，並點選 Tailscale 的 APP，此時會打開新的分頁，登入後就可以開始組網了。&lt;/p&gt;
+&lt;p&gt;詳細的組網可參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://kb.synology.com/zh-tw/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;我的 Synology NAS 使用哪種 CPU？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale套件 - 穩定版&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>Awesome Windows - 必備生產力軟體安裝與說明</title>
+        <link>https://wellstsai.com/post/awesome-windows/</link>
+        <pubDate>Wed, 06 Dec 2023 12:00:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/awesome-windows/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/awesome-windows/cover.jpg" alt="Featured image of post Awesome Windows - 必備生產力軟體安裝與說明" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;這篇文章會介紹我在 Windows 上常用到的開發工具，並說明為什麼要安裝以及好用在哪。&lt;/p&gt;
+&lt;p&gt;在 Windows 上進行開發，除了內建的記事本、小畫家、命令提示字元（cmd）之外。&lt;/p&gt;
+&lt;p&gt;使用其他工具能夠更有效率地進行開發工作。雖然主要著重於 Windows 開發過程中的工具，但其中一些技巧也可應用在 Linux 環境中。&lt;/p&gt;
+&lt;p&gt;值得特別注意的是，隨時準備好左手。左手在快速完成某些事情時是不可或缺的，大多數的情況下負責的是快速鍵的呼叫。&lt;/p&gt;
+&lt;h2 id=&#34;快捷鍵&#34;&gt;快捷鍵&lt;/h2&gt;
+&lt;p&gt;Windows 上提供非常多快捷鍵，基本的快捷鍵有：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt;：開啟執行視窗（可用 &lt;a class=&#34;link&#34; href=&#34;#powertoys&#34; &gt;PowerToys Run&lt;/a&gt; 或 &lt;a class=&#34;link&#34; href=&#34;#everything&#34; &gt;Everything&lt;/a&gt; 取代）&lt;/p&gt;
+&lt;p&gt;輸入 &lt;code&gt;cmd&lt;/code&gt;、&lt;code&gt;calc&lt;/code&gt;（小算盤）、&lt;code&gt;notepad&lt;/code&gt;（記事本）、&lt;code&gt;regedit&lt;/code&gt;（登錄編輯程式）、&lt;code&gt;mstsc&lt;/code&gt;（遠端桌面連線）、&lt;code&gt;mspaint&lt;/code&gt;（小畫家）可快速開啟相對應的應用程式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;D&lt;/code&gt;：快速回到桌面，再一次會回復全部視窗&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;S&lt;/code&gt;：自由截圖 （可用 &lt;a class=&#34;link&#34; href=&#34;#sharex&#34; &gt;ShareX&lt;/a&gt; 取代）&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Print Screen&lt;/code&gt;：視窗截圖&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;L&lt;/code&gt; ：鎖定電腦不登出&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;;&lt;/code&gt; ：&lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/windows/windows%E9%8D%B5%E7%9B%A4%E7%A7%98%E8%A8%A3%E5%92%8C%E6%8A%80%E5%B7%A7-588e0b72-0fff-6d3f-aeee-6e5116097942&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Emoji 面板&lt;/a&gt;打表情符號（分號鍵位於英文字母 L 的右邊）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;Esc&lt;/code&gt;：直接開啟工作管理員，對比於&lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Del&lt;/code&gt;只需要左手就可以完成，而且也不用先叫出 menu 後，再用滑鼠點工作管理員。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;部分像是 Emoji 面板為 Windows 10 以上內建，其他快捷鍵大多數在 XP 時代就存在了。&lt;/p&gt;
+&lt;p&gt;另外像是 &lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;X&lt;/code&gt; / &lt;code&gt;V&lt;/code&gt; / &lt;code&gt;Z&lt;/code&gt; / &lt;code&gt;F&lt;/code&gt; / &lt;code&gt;S&lt;/code&gt; / &lt;code&gt;A&lt;/code&gt; 為標準指令，對應 剪下、貼上、復原輸入、搜尋、儲存、全選，大多古老的 Ctrl 指令就不再此贅述。&lt;/p&gt;
+&lt;h2 id=&#34;安裝-winget&#34;&gt;安裝 winget&lt;/h2&gt;
+&lt;p&gt;Windows 程式包管理器（&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;winget&lt;/a&gt;）是微軟為 Windows 10 及 Windows 11 所提供的應用程式，提供搜尋、安裝、移除、更新所需軟體。&lt;/p&gt;
+&lt;p&gt;透過 winget，我們可以快速且統一的安裝相關軟體，避免多餘的行為（尋找軟體的官方網站→找到下載連結→下載→執行→安裝→刪除安裝檔）&lt;/p&gt;
+&lt;p&gt;若要檢查系統是否支援，可以打開命令列（鍵盤上的 &lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt;，並輸入 cmd 後點確定），輸入以下指令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;回傳結果為版本 v1.6.3133：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells&amp;gt;winget --version
+v1.6.3133
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;倘若找不到版本表示尚未安裝，可以到 &lt;a class=&#34;link&#34; href=&#34;https://apps.microsoft.com/detail/9NBLGGH4NNS1?rtc=1&amp;amp;hl=zh-tw&amp;amp;gl=TW#activetab=pivot:overviewtab&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Microsoft Store&lt;/a&gt; 安裝 winget。&lt;/p&gt;
+&lt;p&gt;安裝後，記得&lt;strong&gt;重啟 cmd 再檢查版本&lt;/strong&gt;，如果安裝成功，就可以看到版本號。&lt;/p&gt;
+&lt;h2 id=&#34;推薦軟體&#34;&gt;推薦軟體&lt;/h2&gt;
+&lt;p&gt;以下介紹那些軟體可以幫助我們快速完成任務，順序依照名稱進行排序。&lt;/p&gt;
+&lt;h3 id=&#34;everything&#34;&gt;Everything&lt;/h3&gt;
+&lt;p&gt;基於 C 語言的 Windows 桌面搜尋引擎，可以在 NTFS 磁碟中快速搜尋檔案名稱或內文。&lt;/p&gt;
+&lt;p&gt;基本上是可以取代 Windows 內建的檔案搜尋功能作為日常使用，其最大特點是即時的檔案搜尋。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/forum/viewtopic.php?t=9463&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;工作原理&lt;/a&gt;是對電腦上所有的檔案與資料夾從主要檔案資料表（mater file table，MFT）建立資料庫索引，在打開 Everything 時，資料庫中載入至記憶體提供即時搜尋。同時在背景下追蹤 Windows 中的 Update Sequence Number 日誌 （USN Journal）持續更新資料庫。&lt;/p&gt;
+&lt;p&gt;Everything 可透過 winget 於 cmd 中完成安裝，或是&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/zh-cn/downloads/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網&lt;/a&gt;自行下載。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id voidtools.Everything
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝過程由於要存取 USN 日誌，所以會需要系統管理員權限。這邊採預設安裝為服務，日後開機自動在背景執行。&lt;/p&gt;
+&lt;p&gt;安裝後，第一次打開會針對電腦進行索引，索引後便可以開始搜尋檔案。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything.png&#34;
+	width=&#34;500&#34;
+	height=&#34;218&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_hudfbcbcdf3b39e2aa7e1204d2276ee447_26337_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_hudfbcbcdf3b39e2aa7e1204d2276ee447_26337_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;搜尋檔名為 host 且 路徑包含 \etc&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;229&#34;
+		data-flex-basis=&#34;550px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;預設空格為 and 運算，所以要找檔名有 ABC 的 png 圖片可以搜尋：&lt;code&gt;ABC .png&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;若要搜尋檔名有 abc，且副檔名為 png 或是 txt 可以搜尋：&lt;code&gt;abc .png|.txt&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;在搜尋上可以使用正規表示式語法來實現更複雜的搜尋。&lt;/p&gt;
+&lt;p&gt;更多的規則可以參考說明 → 搜尋語法。裡面也有說明如何針對文件內容進行搜尋。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything_rules.png&#34;
+	width=&#34;642&#34;
+	height=&#34;512&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_rules_hucea713ba9169f06752628257791d3e9d_10687_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_rules_hucea713ba9169f06752628257791d3e9d_10687_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Everything 搜尋規則&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;125&#34;
+		data-flex-basis=&#34;300px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;此外，可以到設定配置快捷鍵。我個人喜歡用 &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;X&lt;/code&gt; 叫出 Everything 視窗，或是可以自行決定來配置 Everything 視窗的快捷鍵。&lt;/p&gt;
+&lt;p&gt;另外也可以手動指定伺服器上的資料路徑夾供  Everything 進行索引。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/everything_setting.png&#34;
+	width=&#34;800&#34;
+	height=&#34;387&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/everything_setting_hu5c76489f367960e95eb3cc57c2ecb14b_40676_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/everything_setting_hu5c76489f367960e95eb3cc57c2ecb14b_40676_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Everything 配置快捷鍵與新增索引資料夾&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;206&#34;
+		data-flex-basis=&#34;496px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;git&#34;&gt;Git&lt;/h3&gt;
+&lt;p&gt;當我尚未接觸到 Git 時（年幼時期），定時備份程式碼的方式是將所有檔案進行壓縮，然後加上時間標記。這種方式不高效、效率低，也無法追蹤歷史紀錄。甚至過了幾個月，單靠檔案名稱也根本不知道改了什麼。&lt;/p&gt;
+&lt;p&gt;Git 是一個免費的開源分散式版本控制系統，使用 Git 來管理檔案，能夠記錄檔案間的差異，並提供回溯歷史版本或整合，提供快速可靠的追蹤檔案的狀態。&lt;/p&gt;
+&lt;p&gt;操作 Git 可以很簡單也可以很複雜。大部分的情況不外乎就是提交（commit）與合併（merge）的行為，最終的目的是確保檔案能夠準確被紀錄、程式能夠正常工作。&lt;/p&gt;
+&lt;p&gt;Git 可透過 winget 於 cmd 中完成安裝。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install --id Git.Git -e --source winget
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;想要確定電腦是否成功安裝 Git，開啟 cmd 並輸入：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git --version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;回傳結果版本號為 2.43.0.windows.1：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Users\wells&amp;gt;git --version
+git version 2.43.0.windows.1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;後續更詳細的 git 操作，後續有機會再開新的議題討論與分享。&lt;/p&gt;
+&lt;h3 id=&#34;notion&#34;&gt;Notion&lt;/h3&gt;
+&lt;p&gt;Notion 是一款多功能的筆記軟體，對於個人用戶來說基本上免費就很夠用了。我覺得他能夠快速、井然有序地建立表格、貼圖、多欄位等功能，就勝過很多筆記軟體了。並且還能夠直接分享筆記書出為公開網址、轉存為 PDF 或是 Markdown。&lt;/p&gt;
+&lt;p&gt;先前我整理筆記的方式是開 Word 搭配 Microsoft 365 的雲端進行同步，但 Word 基本為制式格式，並且鎖在 A4 等標準紙張，常常有像表格過長超過一頁，或是要靈活的在一個頁面分多欄，在 Word 上實現要使用分節或表格 + 隱藏框線等技巧也非常麻煩。&lt;/p&gt;
+&lt;p&gt;反之，Notion 這些問題都解決了。最大的缺點應該是免費版不提供歷史回朔。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我有試探性的使用 Microsoft OneNote 進行筆記撰寫，但邏輯上沒辦法接受。&lt;/p&gt;
+&lt;p&gt;一個筆記檔案，赤裸裸的儲存在 OneDrive 上，檔案可任意移動。&lt;/p&gt;
+&lt;p&gt;筆記本打開後，分了節與頁面，筆記的部分可以任意排位置，與 iOS 的&lt;a class=&#34;link&#34; href=&#34;https://www.apple.com/tw/newsroom/2022/12/apple-launches-freeform-a-powerful-new-app-designed-for-creative-collaboration/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;無邊記&lt;/a&gt;類似。基本上是沒有順序的邏輯。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/onenote.png&#34;
+	width=&#34;800&#34;
+	height=&#34;275&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/onenote_hu2dd8ab6822b7583574366201dae36e7f_9527_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/onenote_hu2dd8ab6822b7583574366201dae36e7f_9527_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;OneNote 筆記介面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;290&#34;
+		data-flex-basis=&#34;698px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;與 Notion 對打的有像是微軟的 &lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/loop&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Loop&lt;/a&gt;，不過目前是 beta 版本。&lt;/p&gt;
+&lt;p&gt;微軟最大的優勢在於一推出就有繁體中文，相較於 Notion 對於繁體中文的支援程度非常差。&lt;/p&gt;
+&lt;p&gt;不過 Loop 在 iOS 端我個人的體驗沒有很好，目前可能還要等待微軟的優化吧。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/notion.png&#34;
+	width=&#34;800&#34;
+	height=&#34;418&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/notion_hu5aa444a2501ab696161ee107968c201b_27275_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/notion_hu5aa444a2501ab696161ee107968c201b_27275_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Notion 撰寫筆記&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;459px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;安裝方式可以透過 winget 於 cmd 中完成安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id Notion.Notion
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，於 Notion 進行註冊後就可以開始撰寫了。手機與電腦版的體驗一致性蠻高的。&lt;/p&gt;
+&lt;h3 id=&#34;powershell-7&#34;&gt;Powershell 7&lt;/h3&gt;
+&lt;p&gt;在 Windows 系統中，除了內建的命令提示字元（cmd），其實還內建了 Powershell，只不過內建的版本是 PowerShell 5.1，並基於 .NET Framework，於執行中輸入 &lt;code&gt;powershell&lt;/code&gt; 便可開啟。&lt;/p&gt;
+&lt;p&gt;而 Powershell 7 是基於 .NET Core 來實現更好的跨平台，可透過執行輸入 &lt;code&gt;pwsh&lt;/code&gt; 開啟，除了支援新的指令（Cmdlet），也支援跨平台與新的模組的擴充與安裝，還有自動完成打過的指令（cmd 可透過 clink 實現）。為微軟目前積極更新的軟體之一。也建議每個開發者進行安裝。&lt;/p&gt;
+&lt;p&gt;Powershell 7 可透過 winget 於 cmd 中完成安裝，亦可&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/powershell/scripting/install/installing-powershell-on-windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;參照其他方式&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install --id Microsoft.Powershell --source winget 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/powershell.png&#34;
+	width=&#34;694&#34;
+	height=&#34;233&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/powershell_hu4cd64ba35832574fee79b7c1fd80c838_4686_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/powershell_hu4cd64ba35832574fee79b7c1fd80c838_4686_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:50%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Powershell 7 的執行介面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;297&#34;
+		data-flex-basis=&#34;714px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;powertoys&#34;&gt;PowerToys&lt;/h3&gt;
+&lt;p&gt;微軟開發的公用程式，裡面包含許多工具，工具都是綑綁在 PowerToys 裡面。&lt;/p&gt;
+&lt;p&gt;以下列出我覺得蠻常用的工具：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;工具名&lt;/th&gt;
+&lt;th&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/always-on-top&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Always on Top&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可讓您使用快速鍵捷徑 (&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Ctrl&lt;/code&gt; + &lt;code&gt;T&lt;/code&gt;) 將視窗釘選到其他視窗上面。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/awake&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys Awake&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可以讓電腦保持永遠喚醒狀態。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/color-picker&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;色彩選擇器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;是一種全系統的色彩挑選公用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/fancyzones&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;FancyZones&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;是一個視窗管理器，可讓您輕鬆地建立複雜的視窗版面配置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/file-explorer&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;File Explorer 附加元件&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可在 File Explorer 中啟用預覽窗格和縮圖轉譯。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/image-resizer&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;圖像大小調整器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;對著圖片右鍵就可快速調整影像大小。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/mouse-utilities&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;尋找我的滑鼠&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;按鍵盤&lt;code&gt;左 Ctrl&lt;/code&gt; 兩下可以快速定位滑鼠位置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/mouse-without-borders&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;無框線的滑鼠&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可讓您從相同的鍵盤和滑鼠與多部電腦互動。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/run&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys Run&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可協助您立即搜尋並啟動應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/text-extractor&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;文字擷取器&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;可以對圖片進行 OCR 識別文字。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;各個工具的介紹可以參考&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟 PowerToys 官方說明&lt;/a&gt;寫得非常清楚，並且在安裝後也會有 intro 介紹各個功能該如何使用。&lt;/p&gt;
+&lt;p&gt;PowerToys 可透過 winget 於 cmd 中完成安裝。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.PowerToys --source winget
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我們原先藉由 &lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;R&lt;/code&gt; 叫出執行視窗，如果輸入錯誤會無法正確啟動程式。&lt;/p&gt;
+&lt;p&gt;安裝好後，PowerToys 內建 PowerToys Run，可透過鍵盤上的 &lt;code&gt;Alt&lt;/code&gt; + &lt;code&gt;Space&lt;/code&gt;喚醒 Run 視窗，並支持模糊搜尋、中文輸入甚至是簡易計算。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/run_search.png&#34;
+	width=&#34;650&#34;
+	height=&#34;381&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/run_search_hu053f9b83829967e939b20f39ccd5ccbf_12701_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/run_search_hu053f9b83829967e939b20f39ccd5ccbf_12701_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;PowerToys Run 搜尋程式&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;409px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/run_calc.png&#34;
+	width=&#34;650&#34;
+	height=&#34;243&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/run_calc_hue2506d8c26c82b897901156ce9af40bd_11529_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/run_calc_hue2506d8c26c82b897901156ce9af40bd_11529_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;PowerToys Run 簡易計算&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;267&#34;
+		data-flex-basis=&#34;641px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;當然裡面還有一些工具像是抓取顏色（ColorPicker），適合用於網頁開發，快速鍵為&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;C&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;或是針對圖片進行文字 OCR 辨識並擷取文字，快速鍵為&lt;code&gt;⊞ Win&lt;/code&gt; + &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;T&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;PowerToys 與 Windows 整合性很高，同時也感受不到存在，卻又提供很重要的功能。&lt;/p&gt;
+&lt;h3 id=&#34;sharex&#34;&gt;ShareX&lt;/h3&gt;
+&lt;p&gt;開源的截圖、錄製軟體，可以錄製 mp4 或是 gif 動圖，並整合上傳功能、OCR 或是上浮水印等其他效果，也支援內建編輯器，是一個功能強大、但又輕巧的軟體。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/ShareX/ShareX/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub 下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id ShareX.ShareX
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，右下角會有 ShareX 圖示，可以設定語言、快捷鍵、截圖後要做什麼（開啟資料夾、上傳、列印等&amp;hellip;）等一系列操作。&lt;/p&gt;
+&lt;p&gt;本軟體是支援繁體中文的，但預設語言是英文。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/ShareX.png&#34;
+	width=&#34;436&#34;
+	height=&#34;452&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/ShareX_hu5fd4e9617cf9f5368ad02fc30256f175_23660_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/ShareX_hu5fd4e9617cf9f5368ad02fc30256f175_23660_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;ShareX 右下角圖示&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;96&#34;
+		data-flex-basis=&#34;231px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;對著圖示右鍵，找到應用程式設定（Application Settings） → 一般（General）可以找到語言（Language），把 Automatic 改為繁體中文即可。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/ShareX_setting.png&#34;
+	width=&#34;739&#34;
+	height=&#34;434&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/ShareX_setting_huc87ed29185b66608558cb48d25ad31e7_9256_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/ShareX_setting_huc87ed29185b66608558cb48d25ad31e7_9256_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;ShareX 修改語言&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;408px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;後續使用上應該沒有太多困難。比較龜毛的可以在任務設定 → 擷取底下有一個擷取視窗透明度可以打開，針對 Windows 11 的圓角邊框會處理好而不會有背景色。&lt;/p&gt;
+&lt;h3 id=&#34;tailscale&#34;&gt;Tailscale&lt;/h3&gt;
+&lt;p&gt;Tailscale 可以讓設備不透漏在外網的情況下進行存取。並快速實現個人 VPN，透過多種方式實現防火牆的穿透。&lt;/p&gt;
+&lt;p&gt;使用者不需要了解其中原理，僅需要將多個設備登入至 tailnet。便可實現裝置間的通訊。&lt;/p&gt;
+&lt;p&gt;像是可以實現以下情境：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A 電腦存取 B 電腦的資源，如網路芳鄰共享(Samba)、或是 NAS 資源。&lt;/li&gt;
+&lt;li&gt;點對點的連線，像是 SSH、遠端桌面連線。&lt;/li&gt;
+&lt;li&gt;子網 subnet 路由。例如內網 IP：192.168.6.XX。手機可以在不同網路上使用同個 IP 進行連線。&lt;/li&gt;
+&lt;li&gt;流量代理。可以指定裝置的流量，經由另一個節點出口。&lt;/li&gt;
+&lt;li&gt;公網直連。藉由 &lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1223/funnel/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Funnel&lt;/a&gt; 實現公網對該裝置的存取。&lt;/li&gt;
+&lt;li&gt;點對點傳檔。&lt;/li&gt;
+&lt;li&gt;等&amp;hellip;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;更多的配置與設定，可以參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;visual-studio-code&#34;&gt;Visual Studio Code&lt;/h3&gt;
+&lt;p&gt;微軟開發的跨平台編輯器，擴充性非常強大，對於開發者而言，Visual Studio Code（VS Code）是不可或缺的。&lt;/p&gt;
+&lt;p&gt;基本上裝了 VS Code，其他軟體像是 notepad++、Eclipse，可以有條件式的直接取代。&lt;/p&gt;
+&lt;p&gt;VS Code 特性包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/docs/editor/intellisense&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Intellisense 程式碼完成&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/docs/sourcecontrol/overview#_git-support&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git 版本控制&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;並支援多語言凸顯和語法檢查，例如 JavaScript、TypeScript、Python、C++ 等。&lt;/li&gt;
+&lt;li&gt;跨平台支援（Windows、macOS、Linux）。&lt;/li&gt;
+&lt;li&gt;內建程式碼格式化、重構、偵錯等功能。&lt;/li&gt;
+&lt;li&gt;支持使用 tasks.json 定義任務，如編譯、執行等。&lt;/li&gt;
+&lt;li&gt;豐富的擴充功能生態系統（不支援的語法？裝個擴充就解決了！）&lt;/li&gt;
+&lt;li&gt;SSH 遠端開發，並支援端口轉發（Port Forwarding）。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/tutorials/wsl-vscode&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;搭配 WSL 實現在 Windows 下進行 Linux 開發&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;多樣的主題可以自由更改。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;內容主題繁多，也需要花一些時間學習，但就初學者而言，也是可以當作一般的文字編輯器。&lt;/p&gt;
+&lt;p&gt;後續如果有機會再來說說 VS Code 的一些操作方式。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/download&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟官網下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.VisualStudioCode
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，就可以打開 VS Code，並資料夾（專案）或是單一檔案進行編輯，若開啟資料夾且偵測到 git 相關文件，則 VS Code 會自動解析 git 狀態。&lt;/p&gt;
+&lt;p&gt;這邊以我在 Linux 上撰寫 Hugo 文章為例，在 Windows 上以 SSH 遠端連線到 Linux 伺服器，並開啟 Linux 上的目錄。我切到 VS Code 內建的 Git 管理，可以看到那些檔案新增、編輯、刪除。另外，我有安裝擴充 - &lt;a class=&#34;link&#34; href=&#34;https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git Graph&lt;/a&gt;，可以以圖的方式檢視目前 Git 分支的狀態。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/vscode_remote_hugo.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;537&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/vscode_remote_hugo_hu5d128c35ac7da587b22a5383996469ec_61731_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/vscode_remote_hugo_hu5d128c35ac7da587b22a5383996469ec_61731_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;使用 VS Code 撰寫 Hugo 文章（SSH 遠端）&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;446px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;wincompose&#34;&gt;WinCompose&lt;/h3&gt;
+&lt;p&gt;針對特殊符號，系統不像 macOS 有組合鍵（compose key）。透過開源的 WinCompose 可以實現快速打出特殊符號。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以前我打特殊符號都是記 Unicode 表，甚至還印出了常用的 Unicode 表 XDD。&lt;/p&gt;
+&lt;p&gt;首先先切換到新注音輸入法，輸入 Tab 鍵盤上的前導字元 `，接著按下鍵盤 U 表示 unicode，然後輸入字符的號碼例如2605後按空白鍵，特殊符號就出來了。&lt;/p&gt;
+&lt;p&gt;例如：`u2605 表示 ★  |  `u2606 表示 ☆  |  `u00b0 表示 °&lt;/p&gt;
+&lt;p&gt;&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+	&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/preamble_key.gif&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;前導字元打出特殊符號&#34;
+	
+&gt;
+&lt;/div&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;透過 WinCompose，可以使用組合鍵（右 Alt） + 定義字元，就可以快速打出特殊符號。&lt;/p&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;♥：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入 &amp;lt;3 即可出現愛心（&lt;code&gt;&amp;lt;&lt;/code&gt; 輸入方式為 &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;ㄝ&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;♢：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入&amp;lt;&amp;gt;&lt;/li&gt;
+&lt;li&gt;√：&lt;code&gt;右Alt&lt;/code&gt;按一下，並按下鍵盤的sq（rt這邊省略掉的）&lt;/li&gt;
+&lt;li&gt;★：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入**（* 輸入方式為 &lt;code&gt;Shift&lt;/code&gt; + &lt;code&gt;數字 8&lt;/code&gt; ）&lt;/li&gt;
+&lt;li&gt;¼：&lt;code&gt;右Alt&lt;/code&gt;按一下，並輸入14&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+	&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/compose_key.gif&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;使用 compose key 輸入特殊符號&#34;
+	
+&gt;
+&lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;安裝方式可或透過 winget 於 cmd 中完成安裝，或是到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/samhocevar/wincompose/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinCompose Release&lt;/a&gt; 下載並安裝：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install -e --id SamHocevar.WinCompose
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後，右下角會出現 WinCompose 的圖示，右鍵 → 顯示組合鍵可以看到已經定義好的規則。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/wincompose.png&#34;
+	width=&#34;1010&#34;
+	height=&#34;593&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/wincompose_huffa1fb05b37d968322bd000361550f21_31965_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/wincompose_huffa1fb05b37d968322bd000361550f21_31965_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;WinCompose 預定義規則&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;408px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;左下方可以自訂組合鍵，使用上不會太困難。在此不繼續深入討論。&lt;/p&gt;
+&lt;h3 id=&#34;windows-sandbox&#34;&gt;Windows Sandbox&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Sandbox&lt;/a&gt;（沙箱）提供輕量型桌面環境，可安全地隔離執行應用程式。再測試軟體於全新作業系統中是否正常運作、測試檔案是否有病毒或是暫時安裝某個試用版軟體(?)時非常好用。&lt;/p&gt;
+&lt;p&gt;關閉沙箱後，整個資料都會移除。每次開新的沙箱，都像全新的 Windows 一樣乾淨。&lt;/p&gt;
+&lt;p&gt;比較需要注意的是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;需要&lt;code&gt;BIOS 中啟用的虛擬化功能&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;不支援 Windows 家用版（&lt;a class=&#34;link&#34; href=&#34;https://www.tenforums.com/tutorials/131437-enable-windows-sandbox-feature-windows-10-home-edition.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;繞過限制&lt;/a&gt;）&lt;/li&gt;
+&lt;li&gt;至少 4 GB 的 RAM，但建議 8 GB 以上&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;安裝方式於 cmd 中，輸入以下指令開啟 Windows 沙箱功能後，重新開機。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enable-WindowsOptionalFeature -FeatureName &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Containers-DisposableClientVM&amp;#34;&lt;/span&gt; -All -Online
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/search_sandbox.png&#34;
+	width=&#34;350&#34;
+	height=&#34;227&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/search_sandbox_hu370c63aa1b5ca84003c55c8fd8376d7b_21063_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/search_sandbox_hu370c63aa1b5ca84003c55c8fd8376d7b_21063_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開始找到 Sandbox&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;154&#34;
+		data-flex-basis=&#34;370px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;執行後，就可以看到一個乾淨的 Windows。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/sandbox.png&#34;
+	width=&#34;500&#34;
+	height=&#34;271&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/sandbox_hu88d8b2a80db97b99f28f93ff62e223ff_40689_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/sandbox_hu88d8b2a80db97b99f28f93ff62e223ff_40689_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;執行 Sandbox&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;442px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;windows-subsystem-for-linux&#34;&gt;Windows Subsystem for Linux&lt;/h3&gt;
+&lt;p&gt;在 Windows 上開發 Linux 有許多方法，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用虛擬機（virtual machine），透過像是 Windows 內建的 &lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/virtualization/hyper-v-on-windows/about/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Hyper-V&lt;/a&gt;，或是 &lt;a class=&#34;link&#34; href=&#34;https://www.virtualbox.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;VirtualBox&lt;/a&gt; 來進行完整的作業系統安裝&lt;/li&gt;
+&lt;li&gt;雙系統（dual boot），藉由多重引導同時安裝 Windows 與 Linux，開機時可以選擇要以哪個系統開機。（極度不推薦，弄壞整體系統可能性高且複雜）&lt;/li&gt;
+&lt;li&gt;遠端存取（remote development），組一台 Linux 主機，透過遠端的方式進行連線、開發。&lt;/li&gt;
+&lt;li&gt;Windows Subsystem for Linux（&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WSL&lt;/a&gt;），安裝 Linux 子系統，可以不需要安裝虛擬機或是雙系統。便可建立 Linux 開發環境。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;WSL 的特點是占用的資源比虛擬機少，且可以同時使用 Windows 與進行 Linux 開發。此外，可以安裝和執行各種 Linux 發行版，例如 Ubuntu、Debian、Kali 等等。&lt;/p&gt;
+&lt;p&gt;安裝方式分為安裝 WSL 與 安裝 Linux 兩部分。&lt;/p&gt;
+&lt;p&gt;首先於 cmd 中輸入以安裝 wsl：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝後重開機，再次進入 cmd 中，輸入 &lt;code&gt;wsl --help&lt;/code&gt; 檢查是否已啟用：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --help
+Copyright (c) Microsoft Corporation。著作權所有，並保留一切權利。
+如需此產品的隱私權資訊，請瀏覽https://aka.ms/privacy。
+
+使用方式: wsl.exe [引數] [選項...][CommandLine]
+
+用於運行 Linux 二進位檔案的引數:
+
+   如果未提供命令列，wsl.exe 會啟動預設殼層。
+
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;接著安裝 Linux，可藉由以下指令列出可以安裝的 Linux 版本：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wsl --list --online
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以看到許多不同的發行版本&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --list --online
+以下是可安裝的有效發佈的清單。
+使用 &amp;#39;wsl.exe --install &amp;lt;Distro&amp;gt;&amp;#39; 安裝。
+
+NAME                                   FRIENDLY NAME
+Ubuntu                                 Ubuntu
+Debian                                 Debian GNU/Linux
+kali-linux                             Kali Linux Rolling
+Ubuntu-18.04                           Ubuntu 18.04 LTS
+Ubuntu-20.04                           Ubuntu 20.04 LTS
+Ubuntu-22.04                           Ubuntu 22.04 LTS
+OracleLinux_7_9                        Oracle Linux 7.9
+OracleLinux_8_7                        Oracle Linux 8.7
+OracleLinux_9_1                        Oracle Linux 9.1
+openSUSE-Leap-15.5                     openSUSE Leap 15.5
+SUSE-Linux-Enterprise-Server-15-SP4    SUSE Linux Enterprise Server 15 SP4
+SUSE-Linux-Enterprise-15-SP5           SUSE Linux Enterprise 15 SP5
+openSUSE-Tumbleweed                    openSUSE Tumbleweed
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;我這邊開發環境限定為 Ubuntu 18.04，故安裝對應版本。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wsl --install -d Ubuntu-18.04
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝過程大概 5 分鐘內就結束了，安裝過程中會要求輸入 Linux 使用者與密碼。&lt;/p&gt;
+&lt;p&gt;若安裝過程中出現「無法解析伺服器名稱或位址」，請嘗試更換網路、或透過 VPN 進行嘗試排除。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; wsl --install -d Ubuntu-18.04
+安裝: Ubuntu 18.04 LTS
+Ubuntu 18.04 LTS 已安裝。
+正在啟動 Ubuntu 18.04 LTS...
+Installing, this may take a few minutes...
+Please create a default UNIX user account. The username does not need to match your Windows username.
+For more information visit: https://aka.ms/wslusers
+Enter new UNIX username: wells
+Enter new UNIX password:
+Retype new UNIX password:
+passwd: password updated successfully
+Installation successful!
+To run a command as administrator (user &amp;#34;root&amp;#34;), use &amp;#34;sudo &amp;lt;command&amp;gt;&amp;#34;.
+See &amp;#34;man sudo_root&amp;#34; for details.
+
+wells@server:~$
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;至此，已經安裝好 WSL 與對應的 Ubuntu 版本，輸入 wsl 就可以進入 Ubuntu 的 bash 終端。&lt;/p&gt;
+&lt;p&gt;如果有安裝&lt;a class=&#34;link&#34; href=&#34;#windows-terminal&#34; &gt; Windows 終端機&lt;/a&gt;的話，在新增實體時會看到多了新的 Ubuntu 18.04。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/terminal_ubuntu.png&#34;
+	width=&#34;500&#34;
+	height=&#34;331&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/terminal_ubuntu_hudfc5ba100c9adec49331fd975b4da292_15449_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/terminal_ubuntu_hudfc5ba100c9adec49331fd975b4da292_15449_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;終端機中多了新的實體&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;151&#34;
+		data-flex-basis=&#34;362px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果已經安裝 VS Code，可以藉由&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/tutorials/wsl-vscode&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;連接至 WSL&lt;/a&gt;進行存取，VS Code 安裝好 Linux 上所需要的資源後，可以瀏覽 WSL 上的檔案，並整合 bash 終端機。使用上基本與原生 Ubuntu 系統中安裝 VS Code 一致。&lt;/p&gt;
+&lt;h3 id=&#34;windows-terminal&#34;&gt;Windows Terminal&lt;/h3&gt;
+&lt;p&gt;Windows Terminal 是微軟開發的一款跨平台終端機應用程式，簡稱終端機。支援多個 shell 環境包括 cmd、&lt;a class=&#34;link&#34; href=&#34;#powershell-7&#34; &gt;PowerShell&lt;/a&gt; 和 &lt;a class=&#34;link&#34; href=&#34;#windows-subsystem-for-linux&#34; &gt;Windows Subsystem for Linux (WSL)&lt;/a&gt;等&amp;hellip;。同時支援分頁顯示，分割顯示，也支援 Windows 11 的&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/apps/design/style/acrylic&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;壓克力材質&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;安裝方式可以到 &lt;a class=&#34;link&#34; href=&#34;ms-windows-store://pdp/?ProductId=9n0dx20hk701&#34; &gt;Windows Store 中下載&lt;/a&gt;，或透過 winget：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;winget install Microsoft.WindowsTerminal
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安裝好後，在開始中找到&lt;code&gt;終端機&lt;/code&gt;並執行就可以開始使用了&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/search_terminal.png&#34;
+	width=&#34;350&#34;
+	height=&#34;219&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/search_terminal_hu69ad17c2067b39bc0859c12b6ef02bdc_26760_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/search_terminal_hu69ad17c2067b39bc0859c12b6ef02bdc_26760_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;找到終端機&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;383px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;點選上方視窗的 &lt;code&gt;ˇ&lt;/code&gt; 找到設定，可以修改預設配置，像是終端機預設開啟的實體，我這邊改為 PowerShell，或是也可以設定自己想要的終端實體。&lt;/p&gt;
+&lt;p&gt;預設終端應用程式可改為 &lt;code&gt;Windows 終端機&lt;/code&gt;，未來開啟 cmd 或其他實體時，會直接以終端機開啟。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/awesome-windows/windows_terminal.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;541&#34;
+	srcset=&#34;https://wellstsai.com/post/awesome-windows/windows_terminal_huef7c58c796b209efac56ac618dc0f1c7_43536_480x0_resize_box_3.png 480w, https://wellstsai.com/post/awesome-windows/windows_terminal_huef7c58c796b209efac56ac618dc0f1c7_43536_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Windows 終端機設定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;443px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其他設定可以參考&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/terminal/customize-settings/startup&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方的詳細文件&lt;/a&gt;，例如更改字體、外觀來實現更好、更美觀的終端機體驗。&lt;/p&gt;
+&lt;p&gt;另外，也可以自定配置檔，實現開新分頁的時候自動連上 SSH 或是其他操作。&lt;/p&gt;
+&lt;h2 id=&#34;其他軟體&#34;&gt;其他軟體&lt;/h2&gt;
+&lt;p&gt;其他軟體被歸類為非必須，但是在某些開發情況下很好用，不過因為並非每個人都需要因此歸類在此。&lt;/p&gt;
+&lt;p&gt;不加以詳細說明下載或安裝過程，僅提供官方連結參照，可以自行下載。&lt;/p&gt;
+&lt;h3 id=&#34;可個人用途&#34;&gt;可個人用途&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;軟體名稱&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.developershome.com/7-zip/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;7-Zip&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費可商用的壓縮軟體。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/sysinternals/downloads/autoruns&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Autoruns&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;檢測 Windows 開機時會自動載入哪些程式項目的工具。並可以刪除或暫時性不啟用。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.copytrans.net/copytransheic/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;CopyTransHEICforWindows&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;將 HEIC 圖片右鍵可轉換為更通用的 JPG 格式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.nirsoft.net/utils/dll_export_viewer.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DLL Export Viewer&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;查看 DLL 檔案內所 export 的函式名稱、位址和描述。可以快速幫助調適。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/valinet/ExplorerPatcher&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ExplorerPatcher&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;在 Windows 11 上，還原部分 Windows 10 功能的開源軟體，例如工具列和工作列的外觀。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://telerik-fiddler.s3.amazonaws.com/fiddler/FiddlerSetup.exe&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Fiddler Classic&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費的HTTP代理工具，可用於記錄和分析網路請求。官網現在都在推訂閱制的 Fiddler Everywhere。在此直接提供官方下載連結。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/esnet/iperf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iPerf&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;測試網路頻寬、延遲、吞吐量等性能參數。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://codecguide.com/download_k-lite_codec_pack_full.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;K-Lite Codec Pack (Full)&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;免費的多媒體解碼器套件，安裝後可以解決影片無法正常播放的問題。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://nodejs.org/en&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Node.js&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;JavaScript 執行環境，允許在伺服器端使用 JavaScript 語言編寫程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://shortcuttools.com/en/ms-powerpoint-shortcuts.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerPoint Shortcut Tools&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供 PowerPoint 的額外快捷工具。像是兩個物件的對齊、快速插入圖框等&amp;hellip;。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://rufus.ie/zh_TW/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Rufus&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;用於建立USB開機媒體，可以用來安裝和修復作業系統。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/TeraTermProject/teraterm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tera Term&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的終端機通訊軟體。它可以用於連接和控制各種設備。像是微控制器和嵌入式系統。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://windirstat.net/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinDirStat&lt;/a&gt; / &lt;a class=&#34;link&#34; href=&#34;http://www.uderzo.it/main_products/space_sniffer/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpaceSniffer&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;以視覺化的方式顯示各個文件夾佔用空間的狀況。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.highrez.co.uk/downloads/XMouseButtonControl.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;X-Mouse Button Control&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;自定義滑鼠按鍵的功能和設定。像是羅技滑鼠，可以取代肥大的Logitech Options。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://x64dbg.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;x64dbg&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的動態分析工具，並進行反編譯及偵錯。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;付費軟體&#34;&gt;付費軟體&lt;/h3&gt;
+&lt;p&gt;另外也提供付費軟體的選項，大多需要購買授權。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;軟體名稱&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;可商用？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.hwinfo.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;HWiNFO&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;個人非商業使用&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;商用須購買授權，個人用途不用。可以監控電腦硬體參數的軟體，可以查看CPU、記憶體、顯卡等設備的溫度、頻率等資訊。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.internetdownloadmanager.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Internet Download Manager (IDM)&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;正版 IDM 允許商用。是一款下載管理器，可以提高下載速度達5倍，並提供續傳和排程下載功能。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wiris.com/en/mathtype/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Mathtype&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;可以在 Word 文件中輸入數學公式的軟體。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://icons8.com/icons/set/pichon&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Pichon&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;部分免費&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供了超過 13.5 萬個高品質圖示，提供多種尺寸和不同格式。付費後可以解鎖更多圖示。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://typora.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Typora&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;流行的 Markdown 編輯器。它支持多種佈景主題與簡潔的界面。並支援跨平台。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.win-rar.com/start.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinRAR&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;付費軟體&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;壓縮檔案格式 RAR 的壓縮與解壓軟體。不過 Windows 11 已經可以內建解壓縮，基本上這個軟體的存在感越來越低。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;上述所提及到的推薦軟體，可以快速幫助我們在開發、協作和生產力方面取得更好的效果。&lt;/p&gt;
+&lt;p&gt;下表整理出各個工具的官網，以及針對是否開源、可商用進行說明。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;工具/應用程式&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;開源？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;可商用？&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;簡易說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/zh-cn/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Everything&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;基於檔名快速搜尋檔案或資料夾。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;分散式版本控制系統，廣泛應用於軟體開發。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.notion.so/desktop&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Notion&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;跨平台的工作協作工具，支援筆記、任務管理等功能。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/powershell/scripting/install/installing-powershell&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerShell 7&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Windows 的命令列殼層及指令碼語言。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/powertoys/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PowerToys&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供 Windows 桌面的附加工具，增加系統體驗和生產力。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://getsharex.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ShareX&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;開源的螢幕截圖和錄影工具，支援豐富的功能和自定義設置。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://code.visualstudio.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Visual Studio Code&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;跨平台的程式碼編輯器，支援多種語言和豐富的擴充、並整合 Git 工具。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/samhocevar/wincompose&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WinCompose&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供易於使用的方式輸入特殊字符，支援自定義組合鍵。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Sandbox&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;提供一個輕量、隔離的環境，用於安全地執行不受信任的應用程式。並在結束時清除虛擬環境。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/wsl/install&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Subsystem for Linux&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｘ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;可以在同一台機器上同時使用Windows和Linux環境。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/terminal/install&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows Terminal&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ｏ&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;結合多個命令列工具、提供分頁和高度可定制外觀的現代化命令列應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/zh-tw/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Winget&lt;/a&gt;&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;O&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;O&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Windows 包管理器，用於快速安裝、升級和管理應用程式。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;如果資訊有誤的話，請提醒告知，感謝。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/en-us/windows/package-manager/winget/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Use the winget tool to install and manage applications&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.voidtools.com/support/everything/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Everything support&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/about&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;About - Git&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.notion.so/help/guides/what-is-notion&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;What is Notion?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://developer.microsoft.com/en-us/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Microsoft Developer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://getsharex.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ShareX&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Compose_key&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Compose key&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>使用 Tailscale 輕鬆建立安全且私密的通道</title>
+        <link>https://wellstsai.com/post/tailscale/</link>
+        <pubDate>Wed, 29 Nov 2023 12:00:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale/cover.jpg" alt="Featured image of post 使用 Tailscale 輕鬆建立安全且私密的通道" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;當今天人在外時，如何遠端連線到家裡的電腦、工作電腦、或是家中的 NAS？&lt;/p&gt;
+&lt;p&gt;本篇文章會一步一步教你如何使用 Tailscale 與內網裝置進行連線。&lt;/p&gt;
+&lt;h2 id=&#34;寫給對電腦不清楚的人&#34;&gt;寫給對電腦不清楚的人&lt;/h2&gt;
+&lt;p&gt;要讓裝置能夠互通，裝置首先要確定能夠連上網路。後續藉由 Tailscale 實現裝置的互通。&lt;/p&gt;
+&lt;p&gt;首先在&lt;a class=&#34;link&#34; href=&#34;https://login.tailscale.com/start&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方網站註冊&lt;/a&gt;，並於電腦 A、電腦 B、手機、NAS 或其他待組網裝置，安裝 Tailscale 並登入帳號。&lt;/p&gt;
+&lt;p&gt;登入帳號後，等同於登入 tailnet。這些裝置會取得到彼此的內網 tailnet IP。&lt;/p&gt;
+&lt;p&gt;並可以透過裝置名稱進行連線，像是遠端桌面連線、列印、存取 NAS 等&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/mstsc_connection.png&#34;
+	width=&#34;475&#34;
+	height=&#34;287&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;透過裝置名稱進行遠端桌面連線&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;165&#34;
+		data-flex-basis=&#34;397px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/ssh_connection.png&#34;
+	width=&#34;466&#34;
+	height=&#34;172&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;透過裝置名稱進行 SSH 連線&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;270&#34;
+		data-flex-basis=&#34;650px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;不想知道 VPN 背景的可直接跳到&lt;a class=&#34;link&#34; href=&#34;#%e5%a6%82%e4%bd%95%e5%ae%89%e8%a3%9d-tailscale&#34; &gt;如何安裝 Tailscale&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;#%e8%a3%9d%e7%bd%ae%e9%87%8d%e6%96%b0%e5%91%bd%e5%90%8d&#34; &gt;裝置重新命名&lt;/a&gt;與&lt;a class=&#34;link&#34; href=&#34;#%e7%b5%90%e8%ab%96&#34; &gt;結論&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;如何遠端存取裝置&#34;&gt;如何遠端存取裝置？&lt;/h2&gt;
+&lt;p&gt;在標準的情境應用中，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;自己架設的網頁伺服器（localhost:80）&lt;/li&gt;
+&lt;li&gt;NAS 本身提供 Web GUI（localhost:5000）&lt;/li&gt;
+&lt;li&gt;Windows 遠端桌面連線（localhost:3389）&lt;/li&gt;
+&lt;li&gt;DNS 伺服器（localhost:53）&lt;/li&gt;
+&lt;li&gt;其他服務&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如果我們想讓外網的人存取這台伺服器，首先有個&lt;strong&gt;對外 IP (WAN IP)&lt;/strong&gt; （&lt;a class=&#34;link&#34; href=&#34;https://whatismyipaddress.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;IP 查詢&lt;/a&gt;）。我們可以透過這個對外 IP，從外部輸入 IP 進行連線。&lt;/p&gt;
+&lt;p&gt;連線後會找到我們的路由器（router），設定此路由器把對外的 port 導到對應的應用。&lt;/p&gt;
+&lt;p&gt;以 OpenWRT 的路由器介面為例，以下是路由器的設定，會在外網 IP 連線時進行通訊埠轉發（Port Forwarding）到區網 IP (LAN IP)：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/port_forwards.png&#34;
+	width=&#34;800&#34;
+	height=&#34;414&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;OpenWRT 通訊埠轉發設定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其目的在於把 &lt;code&gt;外網 IP:Port&lt;/code&gt; 導向至 &lt;code&gt;內網 IP:Port&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;由上圖可得知：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.1.2 為 DNS 伺服器，負責處理 Port 53, 853, 784 服務。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.1.3 為 網頁伺服器，負責處理網頁相關的內容。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.6.4 為 遠端伺服器，由外網 Port 82 導到 內網的 Port 3389。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;設定好後通訊埠轉發後，便可由外部存取 DNS、網頁或是進行遠端桌面連線了。然而，上述通訊埠轉發的方式，是讓外網 IP 直接存取內網的相關資源，也意味者任何人是可以連線的。如果想要讓特定使用者存取，則必須自己建立虛擬私人網路（virtual network，VPN）。&lt;/p&gt;
+&lt;h2 id=&#34;建立虛擬私人網路vpn&#34;&gt;建立虛擬私人網路（VPN）&lt;/h2&gt;
+&lt;p&gt;VPN 是一種服務，它可以建立一個安全的加密通道，將用戶與遠端伺服器建立連接。這樣可以隱藏用戶的真實IP位址和加密數據傳輸。&lt;/p&gt;
+&lt;p&gt;以 Windows 為例，根據&lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/windows/%E5%9C%A8-windows-%E4%B8%AD%E9%80%A3%E7%B7%9A%E5%88%B0-vpn-3d29aeb1-f497-f6b7-7633-115722c1009c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟官網教學&lt;/a&gt;於 A 電腦上建立 IKEv2、L2TP 或是 IPsec 協定的 VPN 後。在另外一台 B 電腦就可以嘗試連線了。&lt;/p&gt;
+&lt;p&gt;連線成功後，B 電腦便等同於 A 電腦一樣，可以存取 NAS 服務、印表機等內網資源。&lt;/p&gt;
+&lt;p&gt;要確定的是路由器與電腦是否有防火牆阻擋 UDP Port 500, 1701, 4500。&lt;/p&gt;
+&lt;p&gt;若防火牆阻擋，會造成 VPN 連線失敗。&lt;/p&gt;
+&lt;h2 id=&#34;常見的-vpn-協定&#34;&gt;常見的 VPN 協定&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://openvpn.net/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OpenVpn&lt;/a&gt; − 提供多種驗證方式（金鑰、憑證、帳號密碼）進行驗證，可以在不同設備上使用，為開源專案。整理來說開源、安全、易用、兼容性好。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wireguard.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WireGuard&lt;/a&gt; − 於 2020 年整合於 Linux，較為新興的 VPN 協定。其特點為：使用 UDP 傳輸、比 IPsec、OpenVPN 更快、性能更好、並支持跨平台。較新的路由器有些會整合 WireGuard 伺服器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;L2TP/IPSec，專有協定（Cisco &amp;amp; Microsoft），已經內建於系統中。不需要安裝軟體就可以架設與連線。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PPTP，已淘汰的點對點協定。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;什麼是-tailscale&#34;&gt;什麼是 Tailscale？&lt;/h2&gt;
+&lt;p&gt;Tailscale 是一個基於 WireGuard 協定的 VPN 軟體。可以將多個設備連接，實現虛擬內部網路。&lt;/p&gt;
+&lt;p&gt;傳統上設定 WireGuard 較為繁瑣，無論是在架設、或是維護上都有一定困難。例如在各個裝置先透過 &lt;a class=&#34;link&#34; href=&#34;https://manpages.debian.org/unstable/wireguard-tools/wg-quick.8.en.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;wg-quick&lt;/a&gt; 產生公鑰與私鑰，然後在該裝置上安裝 WireGuard後，設定相關的文件，文件內容需要填寫監聽的埠、專用 IP、私鑰，對等公鑰。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;例如一台伺服器（Server）與兩台客戶端（Client），公私鑰設定如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;裝置&lt;/th&gt;
+&lt;th&gt;私鑰&lt;/th&gt;
+&lt;th&gt;公鑰&lt;/th&gt;
+&lt;th&gt;設定&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;伺服器&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 A、客戶端的公鑰 D、公鑰 F&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;客戶端 1&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;D&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 C、伺服器的公鑰 B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;客戶端 2&lt;/td&gt;
+&lt;td&gt;E&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 E、伺服器的公鑰 B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;若往後有更多客戶端、伺服器需要重新設定，且以上情況僅為 1 個伺服器的例子，多個伺服器設定起來會更加複雜。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;若使用 Tailscale，基本上可以無腦架設私人 VPN，並提供一個完整的 Web GUI 顯示連線的裝置。&lt;/p&gt;
+&lt;p&gt;其中 Tailscale 基於 WireGuard，但有以下特點：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;不使用輻射狀網絡（Hub-and-spoke networks），而是使用網狀網路（Mesh networks）改善裝置通訊的交換。當然這也是 WireGuard相較於其他 VPN 協定的不同之處。&lt;/li&gt;
+&lt;li&gt;支持 NAT 打洞（NAT Hole Punching）[*] ，允許位於不同 NAT 後網路的兩個節點直接通訊，而不需要中央伺服器。從而實現 peer-to-peer (P2P) 直連。&lt;/li&gt;
+&lt;li&gt;若 NAT 打洞失敗，fallback 到中繼模式 （relay server mode），並基於 &lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-tailscale-works/#encrypted-tcp-relays-derp&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DERP（Detour Encrypted Routing Protocol）伺服器&lt;/a&gt;來建立連結。&lt;/li&gt;
+&lt;li&gt;連入 Tailscale 時，會使用協調伺服器（coordination servers / DERP Servers）進行用戶的資訊交換，如 IP、Port、裝置狀態。&lt;/li&gt;
+&lt;li&gt;簡易的 Web GUI 管理介面，可以管理各個裝置彼此間的訪問程度。&lt;/li&gt;
+&lt;li&gt;提供 MagicDNS、TailDrop、Tailscale Funnel 等功能，可以更方便的存取裝置。[**]&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;* 網路地址轉換（Network Address Translation，NAT），IP 封包標頭中的IP位址轉換為另一個 IP 位址，從而實現地址重用，讓所有內網都可以使用同一個 IP 連接到外部網路。&lt;/p&gt;
+&lt;p&gt;** MagicDNS 提供使用裝置名稱存取裝置而不用記住 IP。TailDrop 實現了類似 AirDrop 的功能，可以直接對其他裝置傳送傳檔案。Tailscale Funnel 實現反向代理的功能，可以讓外網存取指定內網裝置。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;tailscale-的競爭品&#34;&gt;Tailscale 的競爭品&lt;/h2&gt;
+&lt;p&gt;異地建立網路的相似產品有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.zerotier.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Zerotier&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cloudflare.com/zh-tw/products/tunnel/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Cloudflare Tunnel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.netmaker.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Netmaker&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ngrok.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Ngrok&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.twingate.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Twingate&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;等&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;我有使用過的是 Zerotier，使用的是自己的&lt;a class=&#34;link&#34; href=&#34;https://docs.zerotier.com/protocol/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;協定&lt;/a&gt;而非 WireGuard。個人使用心得是裝置連線 Zerotier 私人網域後，會有一組內網 IP，這組內網 IP 由於沒有 DNS 去解析，所以要存取該裝置，必須直接輸入 IP。雖然提供 &lt;a class=&#34;link&#34; href=&#34;https://github.com/zerotier/zeronsd&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ZeroNSD&lt;/a&gt; ，不過就印象中需要架設，也就退而轉為 TailScale了。&lt;/p&gt;
+&lt;h2 id=&#34;如何安裝-tailscale&#34;&gt;如何安裝 Tailscale&lt;/h2&gt;
+&lt;p&gt;首先到官網（https://tailscale.com/）進行註冊，這邊的註冊是透過 Google、Microsoft、Github、Apple 四個身分識別提供者進行註冊（identity provider，IdP），本身 Tailscale 不提供註冊，也因此沒有密碼儲存在 Tailscale 上。&lt;/p&gt;
+&lt;p&gt;使用這些 IdP，若要確保安全性，可另外開啟雙重驗證登入。&lt;/p&gt;
+&lt;p&gt;基本上是沒有人可以直接存取你的私人網路的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/sign_up_tailscale.png&#34;
+	width=&#34;564&#34;
+	height=&#34;676&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:60%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;註冊 Tailscale 帳號&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;83&#34;
+		data-flex-basis=&#34;200px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;登入後，由於沒有任何裝置，Tailscale 預設會提供下列不同的安裝方式，照著官方進行安裝與下載即可。這邊雖然只列出 Synology 有提供官方安裝包，不過也可以使用 Docker 進行安裝在其他 NAS 上。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/download_tailscale.png&#34;
+	width=&#34;654&#34;
+	height=&#34;658&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:60%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;下載 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;99&#34;
+		data-flex-basis=&#34;238px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;下載並安裝後，電腦右下角會出現 Tailscale 的圖示，右鍵選擇 Log in&amp;hellip; 會跳出登入介面。登入後，點選 Connect 即可加入私人網路 (tailnet) 。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/connect_tailscale.png&#34;
+	width=&#34;498&#34;
+	height=&#34;245&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:40%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;將裝置加入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;487px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;重複步驟，&lt;a class=&#34;link&#34; href=&#34;https://apps.apple.com/tw/app/tailscale/id1470499037&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iOS&lt;/a&gt; 或 &lt;a class=&#34;link&#34; href=&#34;https://play.google.com/store/apps/details?id=com.tailscale.ipn&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Android&lt;/a&gt; 下載 Tailscale，登入後點選 Connect，裝置可能會要求加入 VPN，點選新增 VPN 後，也成功加入私人網路中。&lt;/p&gt;
+&lt;p&gt;可以於 Web GUI 中即時看到裝置的新增。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/two_devices_joined.png&#34;
+	width=&#34;800&#34;
+	height=&#34;446&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;手機加入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;430px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Linux 的部分也是一樣，只不過從 UI 介面改為命令列形式，根據&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1031/install-linux/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方 Linux 安裝教學&lt;/a&gt;，整體過程也是一致的。在登入過程中，系統會彈出一個網址，要求使用者在瀏覽器中輸入此網址進行登入。當使用者完成登入後，終端機將顯示 Success。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/linux_tailscale_login.png&#34;
+	width=&#34;520&#34;
+	height=&#34;175&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;於 Linux 登入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;297&#34;
+		data-flex-basis=&#34;713px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;至此，安裝 Tailscale 並讓設備能夠互相連線也就完成了。此時可以於 cmd 中，輸入 tailscale status 或是 tailscale ping IP 來查看連線的狀態。&lt;/p&gt;
+&lt;p&gt;如果是 active; direct 表示走的是直連，ping通常在 10 − 15 ms；反之，如果是active; relay &amp;ldquo;xxx&amp;rdquo; 表示走的是 中繼伺服器，延遲約為 80 ~ 300 ms 附近。&lt;/p&gt;
+&lt;p&gt;走中繼伺服器的原因可能是防火牆阻擋了 UDP port，導致 tailscale 只能走中繼，但比起不能直接連線，至少提供了中繼伺服器的解決方案來解決直連無法連線的問題。&lt;/p&gt;
+&lt;p&gt;若要改善 ping 延遲，可檢查路由器相關設定或防火牆來達成直連：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;例如開啟 UPnP 與 NAT-PMP （&lt;a class=&#34;link&#34; href=&#34;https://www.quora.com/What-does-disabling-UPnP-on-a-router-do&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;較不安全&lt;/a&gt;，但無腦自動設定好）。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1082/firewall-ports/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;修改防火牆設定&lt;/a&gt;，關閉 UPnP，並允許防火牆內部裝置使用UDP通訊，並指定通訊端口為 41641，目標端口則是任意（不同廠家路由器有不同設定）。&lt;/li&gt;
+&lt;li&gt;Linux 中可能阻擋到端口，開啟終端機並輸入 sudo ufw allow 41641/udp 以開啟 UDP 端口。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; tailscale ping nas
+pong from nas (100.105.151.221) via 142.251.43.14:41642 in 12ms
+
+PS C:\Users\wells&amp;gt; tailscale ping work
+pong from work (100.122.114.19) via DERP(tok) in 190ms
+pong from work (100.122.114.19) via DERP(tok) in 86ms
+pong from work (100.122.114.19) via DERP(tok) in 88ms
+
+PS C:\Users\wells&amp;gt; tailscale status
+100.105.151.221  nas          wells@  windows active; direct 142.251.43.14:41642
+100.122.114.19   work         wells@  linux   active; relay &amp;#34;tok&amp;#34;
+100.206.21.12    server1      wells@  linux   idle, tx 22416 rx 28304
+100.95.142.53    server2      wells@  linux   -
+100.111.59.11    home-1       wells@  windows active; direct 142.251.43.14:41641, tx 10684092 rx 110457924
+100.92.116.28    home-2       wells@  windows -
+100.154.231.41   wells-iphone wells@  iOS     offline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後，可以對著右下角的圖示右鍵 → Preferences → Run unattended 讓開機的時候&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1088/run-unattended/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;自動連線 tailnet&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/run_unattended.png&#34;
+	width=&#34;750&#34;
+	height=&#34;321&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開機自動連線 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;233&#34;
+		data-flex-basis=&#34;560px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;裝置重新命名&#34;&gt;裝置重新命名&lt;/h2&gt;
+&lt;p&gt;Tailnet 內建 DNS 功能，此功能可以把 hostname 或是裝置名稱轉為 IP（當然你是 IP 愛好者的話記 IP 也是可以的🙃）。&lt;/p&gt;
+&lt;p&gt;對著右下角的圖示，進入到 Admin console&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/admin_console.png&#34;
+	width=&#34;750&#34;
+	height=&#34;330&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開啟 Admin console&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;227&#34;
+		data-flex-basis=&#34;545px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;裝置名稱預設是使用 hostname，若想要&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1098/machine-names/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;自訂裝置名稱&lt;/a&gt;，可以點選裝置右邊的 &amp;hellip; 的按鈕，並重新命名裝置。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/rename_device.png&#34;
+	width=&#34;550&#34;
+	height=&#34;423&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;重新命名裝置&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;130&#34;
+		data-flex-basis=&#34;312px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;後續在裝置連線上，便可以直接透過裝置名稱進行連線&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh wells@build-server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tailscale-相關指令cli&#34;&gt;Tailscale 相關指令（CLI）&lt;/h2&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1080/cli/?tab=windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale CLI&lt;/a&gt; 提供在 Linux 環境下，開啟或關閉相關設定，在 Windows 上有圖示可以點選，也因此大部分的指令用不到（部分進階功能例外，需透過 CLI 進行設定），不過用來檢查相關連線狀態，用一張表格來說明我自己常用的指令，更多詳細的說明可以參照官網。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Commands&lt;/th&gt;
+&lt;th&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale status&lt;/td&gt;
+&lt;td&gt;檢查當前網路狀態，可以檢查是否透過中繼還是直連&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale ping [IP/device]&lt;/td&gt;
+&lt;td&gt;檢查該裝置是否直連，若看到 DERP 表示走的是中繼&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale up [flags]&lt;/td&gt;
+&lt;td&gt;連線至 tailnet，可以帶有不同的flags&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale netcheck&lt;/td&gt;
+&lt;td&gt;檢查當前 DERP 的狀態&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale update&lt;/td&gt;
+&lt;td&gt;更新本裝置 tailscale 的版本&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;自己常用的就幾個，比較進階的可能等未來用到再說吧。&lt;/p&gt;
+&lt;p&gt;以下是我使用過的 tailscale up 設定：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;--advertise-exit-node：假設 A 電腦有開啟這個 flag，那麼 B 電腦的流量可以使用 A 電腦做為出口，此時 B 電腦上網的 IP就變為 A 電腦的 IP。&lt;/li&gt;
+&lt;li&gt;--advertise-routes=&lt;!-- raw HTML omitted --&gt;：公開子網域，例如 A 電腦有內網 192.168.1.50，B 電腦若想直接訪問 192.168.1.xx 的網段，可以設定此設置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;詳細的設定可以再參考官網詳細的說明。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;本身 Tailscale 的安裝上非常簡單。且防火牆、NAT 穿透等複雜事情都幫你處理好了。&lt;/p&gt;
+&lt;p&gt;註冊完後，每個裝置下載 tailscale，並登入帳號即可加入 tailnet。並實現裝置之間的互連。&lt;/p&gt;
+&lt;p&gt;每個裝置都有主機名稱，可以透過 Admin console 修改，或是查看各個裝置的狀態。&lt;/p&gt;
+&lt;p&gt;另外也可以將以加入 tailnet 的裝置進行子網域組網，並且在 tailnet 中廣播該網段。&lt;/p&gt;
+&lt;p&gt;甚至今天加入 tailnet 裡的裝置，還可以單獨分享該裝置節點（&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1084/sharing/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Sharing nodes&lt;/a&gt;）給其他帳號進行組網，實現更複雜的網路應用。&lt;/p&gt;
+&lt;p&gt;其他更進階的設定可以參照&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/start/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方網站&lt;/a&gt;的說明獲取更進一步的原理與資料。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/546382535&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;什麼是 VPN 協議？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wireguard.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WireGuard: fast, modern, secure VPN tunnel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.zerotier.com/protocol/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ZeroTier Documentation - The Protocol&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-nat-traversal-works/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How NAT traversal works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-tailscale-works/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How Tailscale works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1080/cli/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale CLI&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1054/dns/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DNS in Tailscale&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

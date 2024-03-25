@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>M.2 on WellWells</title>
+        <link>https://wellstsai.com/tags/m.2/</link>
+        <description>Recent content in M.2 on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Fri, 23 Feb 2024 01:22:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/m.2/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>SSD 外接硬碟開箱與速度測試</title>
+        <link>https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/</link>
+        <pubDate>Fri, 23 Feb 2024 01:22:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/cover.jpg" alt="Featured image of post SSD 外接硬碟開箱與速度測試" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;買的 M.2 NVMe 外接硬碟盒終於到貨了。&lt;/p&gt;
+&lt;p&gt;本篇將進行說明安裝與測速，以供後人參考。&lt;/p&gt;
+&lt;p&gt;最終目的為組一個 USB 3.2 Gen 2 的 SSD 外接硬碟。&lt;/p&gt;
+&lt;h2 id=&#34;外接硬碟盒&#34;&gt;外接硬碟盒&lt;/h2&gt;
+&lt;p&gt;延續前篇 &lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/external-ssd-buying-guide/&#34; &gt;M.2 SSD 外接固態硬碟選購指南&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;最終根據外觀與需求選擇了 iTGZ 外接盒，使用的是瑞昱的 RTL9210。&lt;/p&gt;
+&lt;p&gt;本次在淘寶上含運費約 ¥65，約為台幣 295 元。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/box_cover.png&#34;
+	width=&#34;1024&#34;
+	height=&#34;736&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/box_cover_hu73942111249d159b25d32d88591a62d8_227504_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/box_cover_hu73942111249d159b25d32d88591a62d8_227504_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;iTGZ 包裝盒&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;139&#34;
+		data-flex-basis=&#34;333px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;整個內容物包含：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;M.2 外接硬碟盒。&lt;/li&gt;
+&lt;li&gt;十字螺絲起子。&lt;/li&gt;
+&lt;li&gt;20 公分傳輸線，Type C 對 C 與 Type C 對 A 各一。&lt;/li&gt;
+&lt;li&gt;散熱片。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;m2-ssd&#34;&gt;M.2 SSD&lt;/h2&gt;
+&lt;p&gt;本身 RTL9210 支援 PCIe Gen3×2，其設計為 USB 3.2 Gen 2，根據這兩點只需要選擇 PCIe 3 即可。&lt;/p&gt;
+&lt;p&gt;在此選擇了 TOSHIBA 旗下的&lt;code&gt;KIOXIA EXCERIA G2 1TB&lt;/code&gt;，其特點為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;讀寫都大於 1200 MB/s。&lt;/li&gt;
+&lt;li&gt;主控：Phison E12C。&lt;/li&gt;
+&lt;li&gt;NAND 類型：TLC。&lt;/li&gt;
+&lt;li&gt;便宜。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;2024/02/01 購入，南紡 3C 販售價格為 NT$1590，搭配折價券在折 200 元。實付 NT$1390。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/exceria-g2.png&#34;
+	width=&#34;756&#34;
+	height=&#34;233&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/exceria-g2_hu85ab18132c728ed122de158c79971580_65279_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/exceria-g2_hu85ab18132c728ed122de158c79971580_65279_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;KIOXIA EXCERIA G2 1TB&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;324&#34;
+		data-flex-basis=&#34;778px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;安裝-m2-ssd-到外接盒&#34;&gt;安裝 M.2 SSD 到外接盒&lt;/h2&gt;
+&lt;p&gt;安裝 SSD 到外接盒非常容易：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;透過外接盒所附贈的附螺絲起子，把外接盒打開。&lt;/li&gt;
+&lt;li&gt;插入 M.2 SSD。&lt;/li&gt;
+&lt;li&gt;貼上散熱片。&lt;/li&gt;
+&lt;li&gt;蓋上外接盒蓋子並鎖上螺絲。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;並使用附贈的線材連接至電腦。&lt;/p&gt;
+&lt;h2 id=&#34;格式化與-4k-對齊外接-ssd&#34;&gt;格式化與 4K 對齊外接 SSD&lt;/h2&gt;
+&lt;p&gt;預設插入電腦，電腦是不會出現裝置的，因為沒有格式化。&lt;/p&gt;
+&lt;p&gt;首先點選鍵盤 &lt;code&gt;Win + R&lt;/code&gt; 叫出執行，輸入 diskpart，&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/diskpart.png&#34;
+	width=&#34;558&#34;
+	height=&#34;226&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/diskpart_hu568ff86f50ab8466185a5bf6f5d6b231_15425_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/diskpart_hu568ff86f50ab8466185a5bf6f5d6b231_15425_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開啟 diskpart&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;246&#34;
+		data-flex-basis=&#34;592px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;輸入 &lt;code&gt;list disk&lt;/code&gt; 顯示當前電腦的硬碟資訊：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; list disk
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟 &lt;span style=&#34;color:#75715e&#34;&gt;###  狀態           大小     可用     Dyn  Gpt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --------  -------------  -------  -------  ---  ---
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟 &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;    連線              &lt;span style=&#34;color:#ae81ff&#34;&gt;953&lt;/span&gt; GB  &lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt; KB        *
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟 &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;    連線               &lt;span style=&#34;color:#ae81ff&#34;&gt;14&lt;/span&gt; GB      &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; B
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟 &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;    連線              &lt;span style=&#34;color:#ae81ff&#34;&gt;931&lt;/span&gt; GB   &lt;span style=&#34;color:#ae81ff&#34;&gt;931&lt;/span&gt; GB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;在這台電腦，&lt;code&gt;硬碟 2&lt;/code&gt;為插入的 SSD 外接盒。透過 &lt;code&gt;select disk 2&lt;/code&gt; 選擇這個硬碟：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; disk &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;磁碟 &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt; 是所選擇的磁碟。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;建立主要分割區，其中 4K 進行對齊：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; create partition primary align&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;4096&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DiskPart 成功地建立了指定的磁碟分割。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;輸入&lt;code&gt;format fs=exFAT quick&lt;/code&gt;進行格式化，其檔案格式為 exFAT，可在 Windows、macOS、Android、iOS 上進行存取。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; format fs&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;exFAT quick
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt; % 已完成
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DiskPart 已順利格式化磁碟區。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;輸入&lt;code&gt;list vol&lt;/code&gt;顯示磁碟區的標籤，可以看到磁碟區 3 還沒有標籤。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; list vol
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟區 &lt;span style=&#34;color:#75715e&#34;&gt;###  Ltr  標籤         Fs     類型        大小     狀態       資訊&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ----------  ---  -----------  -----  ----------  -------  ---------  --------
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟區 &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;     C                NTFS   磁碟分割         &lt;span style=&#34;color:#ae81ff&#34;&gt;953&lt;/span&gt; GB  良好         開機
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟區 &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;                      FAT32  磁碟分割         &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt; MB  良好         系統
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟區 &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;                      NTFS   磁碟分割         &lt;span style=&#34;color:#ae81ff&#34;&gt;683&lt;/span&gt; MB  良好         隱藏
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  磁碟區 &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;                      exFAT  磁碟分割         &lt;span style=&#34;color:#ae81ff&#34;&gt;931&lt;/span&gt; GB  良好
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;選擇該磁碟區&lt;code&gt;sel vol 3&lt;/code&gt;，並指派一個磁碟編號，在此設定為 E 槽，其指令為&lt;code&gt;assign letter=E&lt;/code&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; vol &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;磁碟區 &lt;span style=&#34;color:#ae81ff&#34;&gt;3&lt;/span&gt; 是所選擇的磁碟區。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DISKPART&amp;gt; assign letter&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;E
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DiskPart 成功地指派了磁碟機代號或掛接點。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;打開本機，就會看到外接硬碟了。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/new_disk.png&#34;
+	width=&#34;526&#34;
+	height=&#34;89&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/new_disk_hu53aec6ded8fd6e0274bf544541739085_16181_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/new_disk_hu53aec6ded8fd6e0274bf544541739085_16181_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;本機可以看到新的外接硬碟&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;591&#34;
+		data-flex-basis=&#34;1418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;硬碟測速&#34;&gt;硬碟測速&lt;/h2&gt;
+&lt;p&gt;測速分別使用&lt;code&gt;CrystalDiskMark&lt;/code&gt; 與 &lt;code&gt;AS SSD Benchmark&lt;/code&gt; 兩款工具，其測試速度結果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/CDM_result.png&#34;
+	width=&#34;482&#34;
+	height=&#34;347&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/CDM_result_hu284f8b85f42d891fe7c05fae2cb29f3a_25127_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/CDM_result_hu284f8b85f42d891fe7c05fae2cb29f3a_25127_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;CrystalDiskMark 測速&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;138&#34;
+		data-flex-basis=&#34;333px&#34;
+	
+&gt;
+&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/as_ssd_result.png&#34;
+	width=&#34;513&#34;
+	height=&#34;476&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/as_ssd_result_hucc0a4e5f509d54f9349a75eb08cb2ff2_31659_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/as_ssd_result_hucc0a4e5f509d54f9349a75eb08cb2ff2_31659_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;AS SSD Benchmark 測速&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;107&#34;
+		data-flex-basis=&#34;258px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其中可以看到的是，順序讀寫約為 900 MB/s 附近。&lt;/p&gt;
+&lt;p&gt;以實際&lt;code&gt;複製 115 GB 共 29 個檔案&lt;/code&gt;為案例，耗時約為 2 分 30 秒。&lt;/p&gt;
+&lt;p&gt;溫度從一開始待機 35 度上升至 58 度，複製後 30 秒內 可降至 50 度內。&lt;/p&gt;
+&lt;p&gt;複製速度在 700 MB/s 附近。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_start.png&#34;
+	width=&#34;449&#34;
+	height=&#34;286&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_start_hu2290f95873a063785cb50e17b88507b5_23617_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_start_hu2290f95873a063785cb50e17b88507b5_23617_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開始複製檔案速度&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;156&#34;
+		data-flex-basis=&#34;376px&#34;
+	
+&gt;
+&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_end.png&#34;
+	width=&#34;449&#34;
+	height=&#34;286&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_end_hu949509d6280ac0878231d0afab323abe_23542_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/test_copy_end_hu949509d6280ac0878231d0afab323abe_23542_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;剩餘一個檔案時的速度&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;156&#34;
+		data-flex-basis=&#34;376px&#34;
+	
+&gt;
+&lt;img src=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/temp_after_copy.png&#34;
+	width=&#34;673&#34;
+	height=&#34;659&#34;
+	srcset=&#34;https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/temp_after_copy_hub38119ec6c085233765ab5a094292865_96535_480x0_resize_box_3.png 480w, https://wellstsai.com/post/unboxing-nvme-ssd-enclosure/temp_after_copy_hub38119ec6c085233765ab5a094292865_96535_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;複製完畢的硬碟溫度&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;102&#34;
+		data-flex-basis=&#34;245px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;以 NT$1685 的價格組好一個 USB 3.2 Gen 2 的 1 TB SSD 外接硬碟覺得 CP 值蠻高的。&lt;/p&gt;
+&lt;p&gt;後續就看未來使用上有什麼問題再繼續補充了。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>2024 M.2 SSD 外接固態硬碟選購指南</title>
+        <link>https://wellstsai.com/post/external-ssd-buying-guide/</link>
+        <pubDate>Fri, 02 Feb 2024 13:30:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/external-ssd-buying-guide/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/external-ssd-buying-guide/cover.jpg" alt="Featured image of post 2024 M.2 SSD 外接固態硬碟選購指南" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;今天想要選購一個外接固態硬碟（external SSD），該如何進行？&lt;/p&gt;
+&lt;p&gt;另外在市面上還可以看到隨身碟（USB flash drive）與傳統外接硬碟（external HDD）這兩種。&lt;/p&gt;
+&lt;p&gt;其特性與差異整理如下表：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;特點&lt;/th&gt;
+&lt;th&gt;隨身碟&lt;/th&gt;
+&lt;th&gt;固態硬碟（SSD）&lt;/th&gt;
+&lt;th&gt;外接(機械)硬碟（HDD）&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;速度&lt;/td&gt;
+&lt;td&gt;速度較慢&lt;/td&gt;
+&lt;td&gt;非常快，低讀寫延遲&lt;/td&gt;
+&lt;td&gt;最慢、高讀寫延遲&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;容量&lt;/td&gt;
+&lt;td&gt;8, 16, 32, 64, 128, 256, 512, 1024 GB&lt;/td&gt;
+&lt;td&gt;250, 500 GB, 1, 2, 4 TB&lt;/td&gt;
+&lt;td&gt;1, 2, 4, 5, 6, 8, 10 TB&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;體積&lt;/td&gt;
+&lt;td&gt;小巧，便於攜帶&lt;/td&gt;
+&lt;td&gt;小型，便於攜帶&lt;/td&gt;
+&lt;td&gt;較大，相對較重&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;熱處理&lt;/td&gt;
+&lt;td&gt;差&lt;/td&gt;
+&lt;td&gt;散熱片導熱&lt;/td&gt;
+&lt;td&gt;不需處理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;優點&lt;/td&gt;
+&lt;td&gt;便宜、小巧&lt;/td&gt;
+&lt;td&gt;速度快&lt;/td&gt;
+&lt;td&gt;容量大、單位成本低&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;缺點&lt;/td&gt;
+&lt;td&gt;速度差異大&lt;/td&gt;
+&lt;td&gt;價格普遍較高&lt;/td&gt;
+&lt;td&gt;機械結構：耗電大、怕摔、有噪音&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;市場平均每 GB 成本（NTD/GB）&lt;/td&gt;
+&lt;td&gt;3.58 元&lt;/td&gt;
+&lt;td&gt;2.59 元（外接成品）、2.33~2.54（M.2）&lt;/td&gt;
+&lt;td&gt;1.26 元&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;HDD&lt;/p&gt;
+&lt;p&gt;上表可以看到 HDD 使用機械結構，在考慮大容量、不在意速度時可以考慮。且由於怕摔，目前在方便攜帶上不是考慮的最佳選擇。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;隨身碟&lt;/p&gt;
+&lt;p&gt;隨身碟與固態硬碟的差異主要在於容量與速度的考量，隨身碟其特性為小巧好攜帶，但市面上太多節約成本的考量導致&lt;code&gt;速度參差不齊&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;隨身碟是單位成本最貴的，但容量也不過 32, 64, 128 GB 為常見選擇，其價位也差不多為 100 （32 GB）到 500 元（128 GB）附近。&lt;/p&gt;
+&lt;p&gt;市售產品有像是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Kingston DT Max 256G 256 GB：NTD 799。&lt;/li&gt;
+&lt;li&gt;威剛 UE800 256G：NTD 999。&lt;/li&gt;
+&lt;li&gt;廣穎 Marvel M80 250G：NTD 945。&lt;/li&gt;
+&lt;li&gt;創見 ESD310C 256GB：NTD 1199。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SSD&lt;/p&gt;
+&lt;p&gt;固態硬碟市場上有分為&lt;code&gt;成品型&lt;/code&gt;與&lt;code&gt;獨立 NVMe M.2 SSD + 外接盒&lt;/code&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;成品型&lt;/th&gt;
+&lt;th&gt;獨立NVMe M.2 SSD + 外接盒&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;外觀較為小巧、買來可以直接使用，通常裡面會提供一個 SSD 硬碟與一條線，可以直接無痛使用。不需要再管東管西。&lt;/td&gt;
+&lt;td&gt;一切都很自由，可以自行選擇不同的廠商、記憶體顆粒、主控晶片、外接盒的控制器等，且整體價格上會在更低一點。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;M.2 指的是一種小型、高效的介面規格，並支援多種訊號協定。其中用於 SSD 的協定為 SATA 與 PCI Express（PCIe） 兩種傳輸協定。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SATA 最快速度為 6 Gbps，實際最高速度為 600 MB/s。如果可以請選擇 NVMe，否則會受限於 USB 速度無法跑版 USB 3.2 Gen 2 的 1000 MB/s。&lt;/li&gt;
+&lt;li&gt;NVMe 是一種專為使用 PCIe 介面的快閃記憶體而設計的通訊協定，其中在選購 SSD 時會標記 PCIe Gen3 或是 PCIe Gen4，PCIe Gen 4 具有比 PCIe Gen3 更快的速度，但若選擇組裝外接 SSD，USB Gen 2 的速度選擇 PCIe Gen 3 即可，可以達到最快讀寫速度 1000 MB/s 左右。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;本篇文章會以 NVMe M.2 SSD + 外接盒為出發點，進行選購注意參數說明。&lt;/p&gt;
+&lt;h2 id=&#34;硬碟選擇優先順序&#34;&gt;硬碟選擇優先順序&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;好攜帶：隨身碟 &amp;gt; SSD &amp;gt; HDD&lt;/li&gt;
+&lt;li&gt;高效能：SSD &amp;gt; 隨身碟 &amp;gt; HDD&lt;/li&gt;
+&lt;li&gt;考慮超大容量：HDD &amp;gt; SSD &amp;gt; 隨身碟&lt;/li&gt;
+&lt;li&gt;成本考量：隨身碟 &amp;gt; HDD &amp;gt; SSD&lt;/li&gt;
+&lt;li&gt;作業系統開機：SSD &amp;gt; HDD &amp;gt; 隨身碟&lt;/li&gt;
+&lt;li&gt;怕摔：隨身碟 &amp;gt; SSD &amp;raquo; HDD&lt;/li&gt;
+&lt;li&gt;功耗：SSD &amp;gt; 隨身碟 &amp;gt; HDD&lt;/li&gt;
+&lt;li&gt;不缺錢：SSD &amp;gt; 隨身碟 &amp;gt; HDD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;usb-外接介面&#34;&gt;USB 外接介面&lt;/h2&gt;
+&lt;p&gt;外接硬碟無論內部是走哪種協定或技術，最終對主機都是透過 USB 進行通訊。&lt;/p&gt;
+&lt;p&gt;USB 歷年改版上有很多不同名稱與版本，容易令人混淆與匪夷所思。&lt;/p&gt;
+&lt;p&gt;目前把握常見的三個最常見的 USB 版本：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;USB 3.2 Gen 1：最高速度為 500 MB/s。&lt;/li&gt;
+&lt;li&gt;USB 3.2 Gen 2：最高速度為 1200 MB/s。&lt;/li&gt;
+&lt;li&gt;USB 3.2 Gen 2x2：最高速度為 2400 MB/s。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;詳細的 USB 名稱與速度、線長比較如下表所示：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;USB 3.2 Gen 1&lt;/th&gt;
+&lt;th&gt;USB 3.2 Gen 2&lt;/th&gt;
+&lt;th&gt;USB 3.2 Gen 2×2&lt;/th&gt;
+&lt;th&gt;USB4 Gen 2×2&lt;/th&gt;
+&lt;th&gt;USB4 Gen 3×2&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;傳輸頻寬&lt;/td&gt;
+&lt;td&gt;5 Gbps&lt;/td&gt;
+&lt;td&gt;10 Gbps&lt;/td&gt;
+&lt;td&gt;20 Gbps&lt;/td&gt;
+&lt;td&gt;20 Gbps&lt;/td&gt;
+&lt;td&gt;40 Gbps&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;理論最快速度&lt;/td&gt;
+&lt;td&gt;500 MB/s&lt;/td&gt;
+&lt;td&gt;≈ 1200 MB/s&lt;/td&gt;
+&lt;td&gt;≈ 2400 MB/s&lt;/td&gt;
+&lt;td&gt;≈ 2400 MB/s&lt;/td&gt;
+&lt;td&gt;≈ 4800 MB/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;實際單檔讀取速度&lt;/td&gt;
+&lt;td&gt;450-500 MB/s&lt;/td&gt;
+&lt;td&gt;950-1000 MB/s&lt;/td&gt;
+&lt;td&gt;1800-1900 MB/s&lt;/td&gt;
+&lt;td&gt;1800-1900 MB/s&lt;/td&gt;
+&lt;td&gt;3700-3800 MB/s&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;先前名為&lt;/td&gt;
+&lt;td&gt;USB 3.1 Gen 1、USB 3.0&lt;/td&gt;
+&lt;td&gt;USB 3.1、USB 3.1 Gen 2&lt;/td&gt;
+&lt;td&gt;×&lt;/td&gt;
+&lt;td&gt;×&lt;/td&gt;
+&lt;td&gt;×&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;介面選項&lt;/td&gt;
+&lt;td&gt;USB-A、USB Micro B、USB-C&lt;/td&gt;
+&lt;td&gt;USB-A、USB Micro B、USB-C&lt;/td&gt;
+&lt;td&gt;USB-C&lt;/td&gt;
+&lt;td&gt;USB-C&lt;/td&gt;
+&lt;td&gt;USB-C&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;線長&lt;/td&gt;
+&lt;td&gt;&amp;lt; 1 m&lt;/td&gt;
+&lt;td&gt;&amp;lt; 1 m&lt;/td&gt;
+&lt;td&gt;&amp;lt; 0.8 m&lt;/td&gt;
+&lt;td&gt;&amp;lt; 0.8 m&lt;/td&gt;
+&lt;td&gt;&amp;lt; 0.8 m&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;例如 iPhone 15 Pro 支援 USB 3.2 Gen 2 速度，速度最高可達 1200 MB/s，反觀 iPhone 15 只支援到 USB 2.0，故速度最高只有到 480 Mbps（60 MB/s）。&lt;/p&gt;
+&lt;p&gt;若要將 NVMe M.2 SSD 變成外接硬碟，其 2024 年主流硬碟皆為 &lt;code&gt;USB 3.2 Gen 2&lt;/code&gt;，實際速度讀寫約為 1000 Mbps 附近。&lt;/p&gt;
+&lt;p&gt;也因此，選擇 NVMe M.2 SSD 讀寫速度只需要找讀寫 1000 MB/s 以上即可。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;例如「鎧俠 KIOXIA Exceria G2 1TB/M.2 PCIe Gen3/讀:2100M/寫:1700M/TLC/五年保」，表示循序讀寫分別為 2100 MB/s 與 1700 MB/s，並使用 TLC 顆粒，容量為 1 TB。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;根據 USB 編碼方式的差異，理論上最高傳輸速度可能會略有差異。實際速度根據不同的顆粒、快取機制也有所差異，可多參考網路上的性能指標評測。實際單檔速度僅為讀取速度，實際單檔寫入速度通常會相同或更低一些。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;nvme-m2-ssd-選購注意參數&#34;&gt;NVMe M.2 SSD 選購注意參數&lt;/h2&gt;
+&lt;h3 id=&#34;tlc-還是-qlc&#34;&gt;TLC 還是 QLC？&lt;/h3&gt;
+&lt;p&gt;在選用上&lt;code&gt;優先考量 TLC&lt;/code&gt; 而不是 QLC，QLC 並非目前市場主流選擇。&lt;/p&gt;
+&lt;p&gt;在選用 SSD 時最常看到就是 TLC (3) 與 QLC (4)，偶而會看到 MLC (2)。&lt;/p&gt;
+&lt;p&gt;括號內表示的是每個單元可以儲存的 bit 數，越小表示要達到同等容量會需要更多的單元，而因為單元數量更多，也因為資料更能夠有冗餘避免讀寫失敗，等於壽命較長。且資料處理上也相對較快。&lt;/p&gt;
+&lt;h3 id=&#34;選擇-pcie-gen-3-還是-pcie-gen-4&#34;&gt;選擇 PCIe Gen 3 還是 PCIe Gen 4？&lt;/h3&gt;
+&lt;p&gt;市面上外接盒的主控晶片通常 PCIe Gen 3，可達到 USB 3.2 Gen 2的速度。所以選擇 PCIe Gen 3 即可，並且讀寫要大於 1200 MB/s 即可。選擇 PCIe Gen 4，也是可以向下兼容 PCIe Gen 3。&lt;/p&gt;
+&lt;p&gt;若要組 USB 3.2 Gen 2×2，則要看外接盒的控制晶片有沒有支援，且該 NVMe M.2 SSD 讀寫要大於 2400 MB/s。&lt;/p&gt;
+&lt;h3 id=&#34;是否要有-dram&#34;&gt;是否要有 DRAM？&lt;/h3&gt;
+&lt;p&gt;選擇至少有 1 GB DRAM 的 M.2 SSD，不要選擇 DRAMless。&lt;/p&gt;
+&lt;p&gt;DRAM 是 SSD PCB 上一個獨立的晶片，可以用來加快資料傳輸的目的。例如把快閃記憶體轉換層（FTL）快取在 DRAM，有較大的 DRAM 可以有更快的存儲速度。&lt;/p&gt;
+&lt;p&gt;部分 NVMe M.2 SSD 考量成本使用 DRAMless，即&lt;code&gt;沒有 DRAM&lt;/code&gt;。沒有 DRAM 的 SSD 會依賴於 NAND 快閃記憶體本身或主機記憶體（電腦的DRAM）來保存映射表和快取資料。而要讀取電腦的 DRAM，需要使用主機記憶體緩衝（host memory buffer，HMB）利用 PCIe 介面直接對電腦 DRAM 進行存取。若應用&lt;code&gt;在外接應碟上，由於走的是 USB 協定，HMB 技術不支援 USB 協定&lt;/code&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;外接硬碟盒控制晶片的選擇&#34;&gt;外接硬碟盒控制晶片的選擇？&lt;/h3&gt;
+&lt;p&gt;選擇外接硬碟盒控制晶片時，首要考慮的是 M.2 插槽所支援的協定，市面上有 SATA 與 PCIe（NVMe）。該控制晶片負責橋接 PCIe 或 SATA 將其轉換為 USB 介面。這也直接影響外接硬碟盒支援的 USB 3.2 速度。市面常見晶片為：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;主控晶片&lt;/th&gt;
+&lt;th&gt;USB 協定&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;瑞昱 RTL9210&lt;/td&gt;
+&lt;td&gt;USB 3.2 Gen 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;瑞昱 RTL9210b&lt;/td&gt;
+&lt;td&gt;USB 3.2 Gen 2 + SATA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;智微 JMS583&lt;/td&gt;
+&lt;td&gt;USB 3.2 Gen 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;祥碩 ASM2362&lt;/td&gt;
+&lt;td&gt;USB 3.2 Gen 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;祥碩 ASM2364&lt;/td&gt;
+&lt;td&gt;USB 3.2 Gen 2×2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;祥碩 ASM2464PD&lt;/td&gt;
+&lt;td&gt;USB 4/Thunderbolt Gen 3×2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;以上晶片都是台灣製造，即便是淘寶買的 SSD 外接盒也不外乎這三個晶片。而網路上對於三款控制晶片的測試並不多，所以並非考量 SSD 性能差異的因素。此外，USB3.2 Gen 2x2，SSD 的讀寫速度需大於 2400 MB/s，才能發揮其速度。&lt;/p&gt;
+&lt;p&gt;部分可能會看到使用 Intel JHL7440 晶片，這晶片相對於今日比較舊了。其對應晶片可以選擇 ASM2464PD 取代。&lt;/p&gt;
+&lt;h3 id=&#34;買滑蓋式還是掀蓋式的外接盒&#34;&gt;買滑蓋式還是掀蓋式的外接盒？&lt;/h3&gt;
+&lt;p&gt;如果可以優先選擇掀蓋式而不是滑蓋式。&lt;/p&gt;
+&lt;p&gt;市面上許多標榜免工具即可安裝，這種大多數為滑蓋式，像是抽屜一樣即可取出 M.2 SSD，滑蓋式的散熱通常裡面會蓋上獨立的散熱遮罩，並沒辦法直接把熱導到機殼。反之，掀蓋式沒有滑動的行為，所以散熱條貼在 SSD 上後，蓋上外殼可以直接把熱導到外殼。不過這些可以再網路上找到更多的評測進行選擇。&lt;/p&gt;
+&lt;h3 id=&#34;ssd-正常使用溫度&#34;&gt;SSD 正常使用溫度？&lt;/h3&gt;
+&lt;p&gt;Wells 目前安裝於桌上型使用溫度平常為 42℃，一般工作溫度為 50 ~ 55℃ 之間，若超過 60℃ 會使 SSD 降速並降低使用壽命。&lt;/p&gt;
+&lt;h3 id=&#34;硬碟的格式化選擇&#34;&gt;硬碟的格式化選擇？&lt;/h3&gt;
+&lt;p&gt;exFAT 為優先考量。可以實現跨裝置的需求。&lt;/p&gt;
+&lt;p&gt;選擇 exFAT 可以實現跨裝置（Windows, macOS, iOS, Android）並正常讀取硬碟內資料。&lt;/p&gt;
+&lt;p&gt;如果只在特定裝置工作，可根據作業系統選擇對應的格式。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows：NTFS&lt;/li&gt;
+&lt;li&gt;macOS / iPad / iOS：AFPS&lt;/li&gt;
+&lt;li&gt;Android：exFAT&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;跑不到預期速度&#34;&gt;跑不到預期速度？&lt;/h3&gt;
+&lt;p&gt;請確定線長、USB 孔的支援、控制晶片支援的 PCIe、控制晶片韌體、SSD 本身的快取。&lt;/p&gt;
+&lt;p&gt;速度這件事情是組裝或購買高速 SSD 蠻容易注重的點，畢竟錢都花了，沒跑到預期速度當然會蠻嘔的。&lt;/p&gt;
+&lt;p&gt;如果沒有跑到預期速度，可以檢查以下幾點：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;線長是否短於 0.8 m？&lt;/li&gt;
+&lt;li&gt;電腦的 USB 孔確定是否支援所需的 USB 版本？&lt;/li&gt;
+&lt;li&gt;如果有使用 Type C 轉 Type A，轉接頭是否不良？&lt;/li&gt;
+&lt;li&gt;M.2 SSD 本身讀寫速度是否滿足 USB 的速度（本身 PCIe 讀寫只有 2000 Mbps，總跑不到 USB4 的速度吧？）&lt;/li&gt;
+&lt;li&gt;控制晶片本身的效能&lt;/li&gt;
+&lt;li&gt;控制晶片的韌體是否為最新版？&lt;/li&gt;
+&lt;li&gt;SSD 本身的快取空間滿了、溫度過高會降速&lt;/li&gt;
+&lt;li&gt;有沒有開啟寫入快取？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;考慮到實際應用、容量、成本、散熱、廠商口碑等因素，往往會取決於決定哪款 SSD，在選擇之前可以多查詢網路上的讀寫實測。&lt;/p&gt;
+&lt;p&gt;如果真的沒心力進行評估哪款 M.2 SSD 的話，選擇大廠、較多人買的成品 SSD 也比較不會踩雷。&lt;/p&gt;
+&lt;p&gt;例如 2024 年市面上比較常看到的外接 SSD 產品如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;ADATA SE900G&lt;/li&gt;
+&lt;li&gt;SanDisk Extreme PRO Portable SSD V2&lt;/li&gt;
+&lt;li&gt;SK hynix Beetle X31&lt;/li&gt;
+&lt;li&gt;ADATA SD810&lt;/li&gt;
+&lt;li&gt;Kingston XS2000 Portable SSD&lt;/li&gt;
+&lt;li&gt;Crucial X10 Pro&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上幾款外接 SSD，在外觀和防護方面都值得肯定。而由於尺寸要求小巧，散熱設計可能會有所犧牲。&lt;/p&gt;
+&lt;p&gt;另外，儘管它們都支援 USB 3.2 Gen 2×2，但由於採用不同的 NVMe 控制晶片或快取設置的不同，某些產品可能能夠達到最高速度，而其他產品則不一定。&lt;/p&gt;
+&lt;p&gt;在購買時，建議參考其他人的評測結果。不過這些終端產品的售價普遍都會比較高一點。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kingston.com/tw/blog/pc-performance/two-types-m2-vs-ssd&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;兩種 M.2 SSD 固態硬碟的類型：SATA 和 NVMe&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.crucial.com/articles/about-ssd/m2-with-pcie-or-sata&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;NVMe vs M.2 vs SATA vs PCIe: What are these SSDs?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wpgdadatong.com/blog/detail/44366&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;最新SSD固態硬碟顆粒SLC/MLC/TLC/QLC有什麼區別？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kingston.com/tw/usb-flash-drives/usb-30&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;USB 3.1 Gen 1、Gen 2 及 USB 3.2 的差異為何？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tw.msi.com/blog/new-usb-standard-usb-3-2-gen-1-gen2-explained&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;The New USB standard: USB 3.2 Explained&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.usb.org/usb4&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;USB4® | USB-IF&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://support.apple.com/zh-tw/105099&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;使用 iPhone 15 的 USB-C 連接器充電及連接&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.coolpc.com.tw/m/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;原價屋查價&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.sinya.com.tw/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;欣亞數位線上估價&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.techpowerup.com/ssd-specs/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SSD Database&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ssd.borecraft.com/SSD_Buying_Guide_List.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SSD_Buying_Guide_List.pdf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kingston.com/en/blog/personal-storage/understanding-file-systems&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Understanding File Systems&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

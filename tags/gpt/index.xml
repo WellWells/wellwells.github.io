@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>GPT on WellWells</title>
+        <link>https://wellstsai.com/tags/gpt/</link>
+        <description>Recent content in GPT on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Thu, 28 Dec 2023 17:17:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/gpt/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>免費申請 ChatGPT API 金鑰</title>
+        <link>https://wellstsai.com/post/chatgpt-key/</link>
+        <pubDate>Thu, 28 Dec 2023 17:17:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/chatgpt-key/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/chatgpt-key/cover.jpg" alt="Featured image of post 免費申請 ChatGPT API 金鑰" /&gt;&lt;p&gt;目前此方法已經失效。&lt;/p&gt;
+&lt;h2 id=&#34;什麼是-chatgpt&#34;&gt;什麼是 ChatGPT？&lt;/h2&gt;
+&lt;p&gt;ChatGPT 是由 OpenAI 開發的一種語言模型，使用了基於生成式預先訓練轉換器（generative pre-trained transformers，GPT）的語言模型，透過大量文字內容學習自然語言處理的能力，理解使用者的輸入，並根據上下文產生對應的回應內容。&lt;/p&gt;
+&lt;p&gt;在程式碼方面，ChatGPT 能夠回答不同程式語言、函式庫和框架的相關問題，也能能夠提供程式，並解釋其運作原理或是相關建議。&lt;/p&gt;
+&lt;p&gt;在修飾、潤稿方面上也能提供建議，或是翻譯為英文、日文等操作。&lt;/p&gt;
+&lt;p&gt;為目前電腦使用者基本且不可或缺的工具。但也不應該過度依賴，畢竟有產出的內容可能是錯誤的資訊。&lt;/p&gt;
+&lt;h2 id=&#34;chatgpt-api-金鑰&#34;&gt;ChatGPT API 金鑰&lt;/h2&gt;
+&lt;p&gt;傳統上使用 ChatGPT，會需要到&lt;a class=&#34;link&#34; href=&#34;https://chat.openai.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方網站&lt;/a&gt;，並提供&lt;strong&gt;網頁介面&lt;/strong&gt;供使用者進行與得到回覆內容。&lt;/p&gt;
+&lt;p&gt;透過 OpenAI 所提供的 API 金鑰，則可以使用官方提供的 API 來存取服務內容。藉此可以整合其他服務。&lt;/p&gt;
+&lt;p&gt;例如透過 API 金鑰，可以：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;VSCode 的外掛整合（&lt;a class=&#34;link&#34; href=&#34;https://marketplace.visualstudio.com/items?itemName=genieai.chatgpt-vscode&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Genie AI&lt;/a&gt;，問程式碼、建議分析）&lt;/li&gt;
+&lt;li&gt;瀏覽器外掛（&lt;a class=&#34;link&#34; href=&#34;https://chromewebstore.google.com/detail/mikcekmbahpbehdpakenaknkkedeonhf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ChatGPT Summary for Chrome&lt;/a&gt;，頁面進行摘要）&lt;/li&gt;
+&lt;li&gt;命令行界面（&lt;a class=&#34;link&#34; href=&#34;https://github.com/tbckr/sgpt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SGPT&lt;/a&gt;，在命令列直接與 ChatGPT 交互）&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/openai-translator/openai-translator/tree/main&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;翻譯軟體&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;手機相關軟體（&lt;a class=&#34;link&#34; href=&#34;https://apps.apple.com/us/app/ai-keyboard-assistant-keybot/id1663671666&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Keybot&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;https://opencat.app/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OpenCat&lt;/a&gt; 等&amp;hellip;）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;其中 API 金鑰的定價根據&lt;a class=&#34;link&#34; href=&#34;https://openai.com/pricing&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方描述&lt;/a&gt;，常見的模型對應售價可以整理成以下表格：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Model&lt;/th&gt;
+&lt;th&gt;Input&lt;/th&gt;
+&lt;th&gt;Output&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-3.5-turbo-1106&lt;/td&gt;
+&lt;td&gt;$0.0010 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.0020 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-3.5-turbo-instruct&lt;/td&gt;
+&lt;td&gt;$0.0015 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.0020 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-4-1106-preview&lt;/td&gt;
+&lt;td&gt;$0.01 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.03 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-4-1106-vision-preview&lt;/td&gt;
+&lt;td&gt;$0.01 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.03 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-4&lt;/td&gt;
+&lt;td&gt;$0.03 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.06 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;gpt-4-32k&lt;/td&gt;
+&lt;td&gt;$0.06 / 1K tokens&lt;/td&gt;
+&lt;td&gt;$0.12 / 1K tokens&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;已認證的手機號碼可獲得三個月內 5 美金的使用額度。可以到&lt;a class=&#34;link&#34; href=&#34;https://platform.openai.com/api-keys&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方渠道進行產生金鑰&lt;/a&gt;並直接使用。&lt;/p&gt;
+&lt;p&gt;對於未驗證的帳號或已使用完額度的帳戶，實際上在登入 API 頁面時，會產生 session API 金鑰。透過這個金鑰也可以進行 ChatGPT API 的存取而不需要費用。&lt;/p&gt;
+&lt;h2 id=&#34;取得-session-api-金鑰&#34;&gt;取得 session API 金鑰&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;首先於&lt;a class=&#34;link&#34; href=&#34;https://platform.openai.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官網&lt;/a&gt;右上角登入（Login），如果沒有註冊帳號的可以直接註冊，目前註冊帳號不用驗證手機號碼了。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/chatgpt-key/login_chatgpt.png&#34;
+	width=&#34;584&#34;
+	height=&#34;806&#34;
+	srcset=&#34;https://wellstsai.com/post/chatgpt-key/login_chatgpt_hu2115a575e6c4a1866d08531b369b3dac_10032_480x0_resize_box_3.png 480w, https://wellstsai.com/post/chatgpt-key/login_chatgpt_hu2115a575e6c4a1866d08531b369b3dac_10032_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;註冊並登入帳號&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;72&#34;
+		data-flex-basis=&#34;173px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;登入後，網址應該為 &lt;a class=&#34;link&#34; href=&#34;https://platform.openai.com/docs/overview&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://platform.openai.com/docs/overview&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/chatgpt-key/login_overview.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;664&#34;
+	srcset=&#34;https://wellstsai.com/post/chatgpt-key/login_overview_hu8987dde7b16470755d79901003d6dfc8_76258_480x0_resize_box_3.png 480w, https://wellstsai.com/post/chatgpt-key/login_overview_hu8987dde7b16470755d79901003d6dfc8_76258_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;overview 頁面&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;開啟開發者工具（F12），找到開發者工具內的&lt;strong&gt;網路&lt;/strong&gt;標籤。&lt;/p&gt;
+&lt;p&gt;此時重新整理網頁會看到 login，右側的預覽裡面帶有 sensitive_id，此為 session key、API 金鑰。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/chatgpt-key/get_session_api_key.png&#34;
+	width=&#34;1000&#34;
+	height=&#34;530&#34;
+	srcset=&#34;https://wellstsai.com/post/chatgpt-key/get_session_api_key_hu9bc78d825fd171aa4985c1163e0a7a12_61181_480x0_resize_box_3.png 480w, https://wellstsai.com/post/chatgpt-key/get_session_api_key_hu9bc78d825fd171aa4985c1163e0a7a12_61181_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;在開發者工具底下找到 login，裡面包含 session key&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;188&#34;
+		data-flex-basis=&#34;452px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;複製 API 金鑰後，就可以貼在需要 API 的第三方應用內了。該金鑰的特點為：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;效期為 14 天，過期後需要重新登入，在取得一次新的金鑰。&lt;/li&gt;
+&lt;li&gt;14 天內如果再次重新登入 ，該金鑰會強制過期。&lt;/li&gt;
+&lt;li&gt;僅支援 gpt-3.5 以及更低版本的模型，gpt-4 無法使用。&lt;/li&gt;
+&lt;li&gt;低調使用。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;ChatGPT&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

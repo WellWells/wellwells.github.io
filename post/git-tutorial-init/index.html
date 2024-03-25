@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-tw" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='使用 Git 與 VSCode 進行專案管理與開發，從建立、提交、推送到儲存庫，進而減少操作錯誤與提高準確性。'>
+
+<title>開始使用 Git 管理專案 - WellWells</title>
+
+
+<link rel='canonical' href='https://wellstsai.com/post/git-tutorial-init/'>
+
+<link rel="stylesheet" href="/scss/style.min.6f97a446ffede30c6e468103f6f619d741887c25a3b7ed2ff0286e373820a699.css"><meta property='og:title' content='開始使用 Git 管理專案'>
+<meta property='og:description' content='使用 Git 與 VSCode 進行專案管理與開發，從建立、提交、推送到儲存庫，進而減少操作錯誤與提高準確性。'>
+<meta property='og:url' content='https://wellstsai.com/post/git-tutorial-init/'>
+<meta property='og:site_name' content='WellWells'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Git' /><meta property='article:tag' content='軟體' /><meta property='article:tag' content='教學' /><meta property='article:published_time' content='2024-03-12T16:30:00&#43;08:00'/><meta property='article:modified_time' content='2024-03-12T00:00:00&#43;00:00'/><meta property='og:image' content='https://wellstsai.com/post/git-tutorial-init/cover.png' />
+<meta name="twitter:title" content="開始使用 Git 管理專案">
+<meta name="twitter:description" content="使用 Git 與 VSCode 進行專案管理與開發，從建立、提交、推送到儲存庫，進而減少操作錯誤與提高準確性。"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://wellstsai.com/post/git-tutorial-init/cover.png' /><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+<link rel="manifest" href="/site.webmanifest?v=2">
+<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon.ico?v=2">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+
+<link href="https://cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack-subset.min.css" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JKC4KZLT26"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-JKC4KZLT26', { 'anonymize_ip': false });
+}
+</script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        <img src="/mimi.png" width="300px"
+                            height="300px" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">✨</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">WellWells</a></h1>
+            <h2 class="site-description">井裡總有一些意想不到的東西</h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首頁</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>關於 Wells</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>歷史文章</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+                <li id="i18n-switch">  
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                    <select name="language" onchange="window.location.href = this.selectedOptions[0].value">
+                        
+                            <option value="https://wellstsai.com/" selected></option>
+                        
+                    </select>
+                </li>
+            
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>深色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目錄</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#使用-git-的分散式工作流程">使用 Git 的分散式工作流程</a></li>
+    <li><a href="#設定-git-的使用者資訊">設定 Git 的使用者資訊</a></li>
+    <li><a href="#vscode-與前置作業">VSCode 與前置作業</a>
+      <ul>
+        <li><a href="#執行-vscode">執行 VSCode</a></li>
+        <li><a href="#vscode-快速鍵">VSCode 快速鍵</a></li>
+        <li><a href="#vscode-的延伸模組">VSCode 的延伸模組</a></li>
+        <li><a href="#ssh-與遠端連線">SSH 與遠端連線</a></li>
+      </ul>
+    </li>
+    <li><a href="#初始化-git-資料夾">初始化 Git 資料夾</a>
+      <ul>
+        <li><a href="#開啟資料夾">開啟資料夾</a></li>
+        <li><a href="#新增檔案">新增檔案</a></li>
+      </ul>
+    </li>
+    <li><a href="#初始化本地儲存庫">初始化本地儲存庫</a></li>
+    <li><a href="#原始檔控制">原始檔控制</a>
+      <ul>
+        <li><a href="#檢視差異git-diff">檢視差異（git diff）</a></li>
+        <li><a href="#暫存檔案git-add">暫存檔案（git add）</a></li>
+        <li><a href="#提交暫存區檔案git-commit">提交暫存區檔案（git commit）</a></li>
+        <li><a href="#顯示當前的-graphgit-log">顯示當前的 graph（git log）</a></li>
+      </ul>
+    </li>
+    <li><a href="#git-commit-特徵">Git commit 特徵</a></li>
+    <li><a href="#結論">結論</a></li>
+    <li><a href="#參考文獻">參考文獻</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/post/git-tutorial-init/">
+                <img src="/post/git-tutorial-init/cover_hu1d6c6e3de26ddd79b007c8451395a77f_90136_800x0_resize_box_3.png"
+                        srcset="/post/git-tutorial-init/cover_hu1d6c6e3de26ddd79b007c8451395a77f_90136_800x0_resize_box_3.png 800w, /post/git-tutorial-init/cover_hu1d6c6e3de26ddd79b007c8451395a77f_90136_1600x0_resize_box_3.png 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="這是一張有關標題為 開始使用 Git 管理專案 的圖片" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/git-tutorial-init/">開始使用 Git 管理專案</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            使用 Git 與 VSCode 進行專案管理與開發，從建立、提交、推送到儲存庫，進而減少操作錯誤與提高準確性。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024/03/12</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    閱讀時間: 7 分鐘
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="前言">前言</h2>
+<p>延續前篇 <a class="link" href="/post/git-tutorial-introduction/" >什麼是 Git 與版本控制？</a>，本節主要說明如何使用 VSCode 與 Git 管理專案。</p>
+<p>其中大部分的操作盡量簡化並避免指令的輸入，除非在操作上有必須且不可之因素。</p>
+<p>不知道什麼是 Git、VSCode 或是還沒安裝的可以參考 <a class="link" href="/post/awesome-windows/" >Awesome Windows - 必備生產力軟體安裝與說明</a>，有說明 <a class="link" href="/post/awesome-windows/#visual-studio-code" >VSCode</a> 與 <a class="link" href="/post/awesome-windows/#git" >Git</a> 的安裝教學。</p>
+<p>其他平台上的安裝，可以到各自的官方網站中進行下載與安裝，在此就不過多贅述。</p>
+<h2 id="使用-git-的分散式工作流程">使用 Git 的分散式工作流程</h2>
+<p><img src="/post/git-tutorial-init/git_distributed_workflow.png"
+	width="1082"
+	height="706"
+	srcset="/post/git-tutorial-init/git_distributed_workflow_hu887835c720616c3b4a4276a3aedb3e35_21978_480x0_resize_box_3.png 480w, /post/git-tutorial-init/git_distributed_workflow_hu887835c720616c3b4a4276a3aedb3e35_21978_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="分散式工作流程"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="153"
+		data-flex-basis="367px"
+	
+></p>
+<p>在一個資料夾中透過指令的方式輸入 <code>git init</code> 初始化工作區資料夾後，會在當前目錄下建立一個新的 <code>.git 資料夾</code>，這個資料夾會記錄並追蹤其他檔案以進行版本控制。</p>
+<p>這個資料夾預設是不會動到的，換言之，如果想移除某個資料夾的 git 版本控制，移除 .git 資料夾目錄即可。</p>
+<p>初始化工作區後，我們便可以透過 git add 指令，把需要的檔案加入暫存區（stash area）。</p>
+<p>當確定好暫存區的檔案後，便可以進行提交（git commit）。把這些檔案的變化，以一個 commit 的形式新增到本地儲存庫（local repo）中。</p>
+<p>新增到本地儲存庫後，後續可以透過推送（git push）把本地端的修改推到遠端儲存庫上。</p>
+<p>而其他人像是 User 2 或是 User 3，透過複製（git clone）或是擷取（git fetch）把遠端儲存庫下載到本機電腦，便可以看到剛剛推送的新資料。</p>
+<p>其中，User 2 與 User 3 各自有獨立的本地儲存庫。也因此被稱為分散式版本控制系統。</p>
+<p>當遠端儲存庫有新的修改，本地儲存庫必須先與遠端儲存庫同步才能推送，這部分後續會在說明。</p>
+<p>這邊只需要注意的點：</p>
+<ol>
+<li>上述指令都可以藉由 VSCode 中的指令快速完成，也因此詳細的指令不需要特別記住。</li>
+<li>本地初始化本地儲存庫後，要推送到遠端儲存庫前，要先使用 git remote 新增遠端儲存庫的資訊。</li>
+<li>在使用<code>推送</code>前一定要先進行<code>擷取</code>，以確保當前的分支與遠端儲存庫一致。不要隨便使用 force push 覆蓋遠端儲存庫的資訊。</li>
+</ol>
+<h2 id="設定-git-的使用者資訊">設定 Git 的使用者資訊</h2>
+<p>在安裝好 git 後，需要先設定使用者的名稱。每次提交都會使用這些資訊來進行記錄。</p>
+<p>首先打開命令列（鍵盤上的 ⊞ Win + R，並輸入 cmd 後點確定）。</p>
+<p>並藉由以下指令設定 git 使用者的資訊，其中下面資訊需更換為自己的名稱與信箱：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git config --global user.name <span style="color:#e6db74">&#34;WellsTsai&#34;</span>
+</span></span><span style="display:flex;"><span>git config --global user.email <span style="color:#e6db74">&#34;Wells@wellstsai.com&#34;</span>
+</span></span></code></pre></div><p>使用 git config &ndash;list，可以檢查目前 git 的設定狀態</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>wells@server:~/$ git config --list
+</span></span><span style="display:flex;"><span>user.name<span style="color:#f92672">=</span>WellsTsai
+</span></span><span style="display:flex;"><span>user.email<span style="color:#f92672">=</span>Wells@wellstsai.com
+</span></span><span style="display:flex;"><span>core.editor<span style="color:#f92672">=</span>code --wait
+</span></span></code></pre></div><p>或是也可以直接使用 VSCode，開啟配置檔檢查：</p>
+<ul>
+<li>
+<p>Linux: ~/.gitconfig</p>
+</li>
+<li>
+<p>Windows: C:\Users\USER_NAME.gitconfig</p>
+</li>
+</ul>
+<p><img src="/post/git-tutorial-init/show_git_config_in_vscode.png"
+	width="390"
+	height="187"
+	srcset="/post/git-tutorial-init/show_git_config_in_vscode_hu7632fd9a6ca1fe6fa5c23e7227a8eb49_5821_480x0_resize_box_3.png 480w, /post/git-tutorial-init/show_git_config_in_vscode_hu7632fd9a6ca1fe6fa5c23e7227a8eb49_5821_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="打開 git 的 config 檔"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="208"
+		data-flex-basis="500px"
+	
+></p>
+<p>確定 .gitconfig 有內容就可以開始進行 git 的相關指令了。</p>
+<h2 id="vscode-與前置作業">VSCode 與前置作業</h2>
+<h3 id="執行-vscode">執行 VSCode</h3>
+<p>第一次執行 VSCode，語言可能是英文的。</p>
+<p>可以點選 <code>Ctrl + Shift + P</code> 呼叫出命令面板，輸入 Language，找到 Configure Display Language，便可以切換語言為繁體中文。</p>
+<p><img src="/post/git-tutorial-init/hello_vscocde.png"
+	width="1024"
+	height="768"
+	srcset="/post/git-tutorial-init/hello_vscocde_hu8175ae04684577d353894062cc3fe03f_26934_480x0_resize_box_3.png 480w, /post/git-tutorial-init/hello_vscocde_hu8175ae04684577d353894062cc3fe03f_26934_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="第一次執行 VSCode"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+>
+<img src="/post/git-tutorial-init/change_vscode_language.png"
+	width="1082"
+	height="812"
+	srcset="/post/git-tutorial-init/change_vscode_language_hud1bb375035a1b0654e35556e03739f63_63192_480x0_resize_box_3.png 480w, /post/git-tutorial-init/change_vscode_language_hud1bb375035a1b0654e35556e03739f63_63192_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="Ctrl&#43;Shift&#43;P 切換語言"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="319px"
+	
+></p>
+<p>更多功能像是左下方的齒輪，可以提供主題切換、同步 VSCode、多個設定配置、遠端通道存取。需要了解的點選上方的說明進行學習。</p>
+<h3 id="vscode-快速鍵">VSCode 快速鍵</h3>
+<p>有部分指令記住可以加快 VSCode 上的使用，以下快速鍵是建議記住的：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>說明</th>
+<th>快速鍵</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>命令面板</td>
+<td>Ctrl + Shift + P 或是 F1</td>
+<td>最常使用的指令，要做的事情幾乎都可以用到。</td>
+</tr>
+<tr>
+<td>搜尋與開啟檔案</td>
+<td>Ctrl + P</td>
+<td>搜尋檔案，輸入冒號可以快速跳到某行。</td>
+</tr>
+<tr>
+<td>開啟命令提示字元</td>
+<td>Ctrl + `</td>
+<td>「`」 是位於鍵盤 1 左邊的「~鍵」，叫出命令列可以進行系統的操作，像是刪除檔案、執行腳本、操作 Git 指令等。</td>
+</tr>
+<tr>
+<td>開啟資料夾</td>
+<td>Ctrl + K, Ctrl + O</td>
+<td>除了開啟單一檔案(Ctrl + O)，VSCode 可以開啟資料夾，以某個資料夾為根目錄進行專案開發。</td>
+</tr>
+<tr>
+<td>自動換行</td>
+<td>Alt + Z</td>
+<td>有時候螢幕太小而程式碼太長，自動換行可以把超出螢幕的文字自動換行。</td>
+</tr>
+</tbody>
+</table></div>
+<p>其實還有很多快速鍵，不過我最常用的也就這幾個，更多的指令可以<a class="link" href="https://code.visualstudio.com/docs/getstarted/tips-and-tricks"  target="_blank" rel="noopener"
+    >參考官方資料</a></p>
+<p>這些指令不記的話，那麼就要把滑鼠移動到左上方點選<code>檔案→開啟資料夾</code>，對比於使用快速鍵（Ctrl + K, Ctrl + O）可以省下許多時間。</p>
+<p>或是 F1 叫出命令面板，輸入<code>開啟資料夾</code>也是另一種方法。</p>
+<h3 id="vscode-的延伸模組">VSCode 的延伸模組</h3>
+<p>VSCode 提供非常多好用的延伸模組，其中要能夠順手的操作 Git，有一些是幾乎必裝的延伸模組。</p>
+<ol>
+<li><a class="link" href="https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens"  target="_blank" rel="noopener"
+    >GitLens</a>： 提供非常多功能，並提供付費版可以解鎖一些進階功能（Git Graph、可視化文件歷史記錄等&hellip;），對於普通開發者免費版本已經足夠，像是<code>互動式的 rebase 編輯器</code>、<code>編輯器顯示 blame 資訊</code> 等都是免費的。為目前 Git 延伸模組安裝的第一名。</li>
+<li><a class="link" href="https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph"  target="_blank" rel="noopener"
+    >Git Graph</a>： 提供了一個交互式的 Git 圖形界面，讓你可以在編輯器中輕鬆地查看和操作分支、提交歷史等 Git 相關信息，並直觀地理解專案結構、分支和歷史。由於 GitLens 的 Git 圖形是進階功能，可以改裝此擴充解決。</li>
+</ol>
+<p>基本的兩套已經非常足夠，還有一些其他延伸模組沒提及到的就自行評估與自行安裝。</p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-init/getlens_rebase.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="GitLens 的 互動式 rebase"
+	
+>
+</div></p>
+<p><div style="display: flex; justify-content: center;">
+	<img src="/post/git-tutorial-init/git_graph_demo.gif"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="Git Graph Demo"
+	
+>
+</div></p>
+<h3 id="ssh-與遠端連線">SSH 與遠端連線</h3>
+<p>在我們一般工作的電腦，往往都是在 Windows 上進行，像是上網看影片、Windows 驅動開發、Office 資料處理、MATLAB 等&hellip;。</p>
+<p>對於 Linux 伺服器上所進行的開發，VSCode 提供了非常多的方式進行遠端連線與開發。例如：</p>
+<ol>
+<li>
+<p>Windows 系統下<a class="link" href="/post/awesome-windows/#windows-subsystem-for-linux" >安裝 Windows Subsystem for Linux</a>並<a class="link" href="https://code.visualstudio.com/docs/remote/wsl"  target="_blank" rel="noopener"
+    >藉由 VSCode 連線至 WSL</a>。</p>
+</li>
+<li>
+<p>使用 <a class="link" href="https://code.visualstudio.com/docs/remote/ssh"  target="_blank" rel="noopener"
+    >Remote-SSH 進行連線</a>。</p>
+<p>在外面沒辦法進行 SSH 到 Linux 伺服器？ 我們可以<a class="link" href="/post/tailscale/" >安裝 Tailscale 進行內網穿透</a>。</p>
+</li>
+<li>
+<p>使用 <a class="link" href="https://code.visualstudio.com/docs/remote/tunnels"  target="_blank" rel="noopener"
+    >遠端隧道 - Remote Tunnels</a> 進行遠端開發。</p>
+</li>
+<li>
+<p><a class="link" href="https://code.visualstudio.com/docs/devcontainers/containers"  target="_blank" rel="noopener"
+    >部屬容器進行連線</a>。</p>
+</li>
+</ol>
+<p>這邊要注意的是，曾經看到同事<strong>掛載 SAMBA 伺服器，並直接在 Windows 底下使用 VSCode 開啟掛載路徑</strong>，這樣進行開發的效能是直接大打折扣的。</p>
+<h2 id="初始化-git-資料夾">初始化 Git 資料夾</h2>
+<h3 id="開啟資料夾">開啟資料夾</h3>
+<p>打開 VSCode 後，我們可以在使用者目錄底下新增一個新的資料夾，並透過 VSCode 開啟此資料夾。</p>
+<p>新增資料夾可以透過 UI 或是指令的方式新增，其指令在 Windows 與 Linux 皆為 <code>mkdir git_test</code></p>
+<p>新增後，可以使用 <code>Ctrl + K, Ctrl + O</code> 開啟該資料夾。</p>
+<p>或是直接在終端機中輸入 <code>code git_test</code>。</p>
+<p>VSCode 會開新視窗，並將其根目錄設為 git_test。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>wells@server:~$ mkdir git_test
+</span></span><span style="display:flex;"><span>wells@server:~$ code git_test
+</span></span></code></pre></div><p><img src="/post/git-tutorial-init/code_git_test.png"
+	width="979"
+	height="584"
+	srcset="/post/git-tutorial-init/code_git_test_hu2a445562e8a47ee1e3d898fadd26ef65_16146_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_git_test_hu2a445562e8a47ee1e3d898fadd26ef65_16146_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="使用 code 開啟 git_test 資料夾"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="167"
+		data-flex-basis="402px"
+	
+></p>
+<h3 id="新增檔案">新增檔案</h3>
+<p>使用 <code>Ctrl + N</code> 新增一個空白檔案，或是在終端機中輸入 <code>code hello.txt</code> 便可以開啟一個 hello.txt 的空白檔案。</p>
+<p>輸入一些文字後儲存，路徑就為預設的專案根目錄中。</p>
+<p><img src="/post/git-tutorial-init/code_new_file.png"
+	width="979"
+	height="584"
+	srcset="/post/git-tutorial-init/code_new_file_hu64cb7327e26bde9f8fd42a43e3e31dd2_17960_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_new_file_hu64cb7327e26bde9f8fd42a43e3e31dd2_17960_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="新增一個檔案在根目錄中"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="167"
+		data-flex-basis="402px"
+	
+></p>
+<h2 id="初始化本地儲存庫">初始化本地儲存庫</h2>
+<p>於終端機中輸入 <code>git init</code>，便可在該目錄初始化本地儲存庫。預設分支名稱為 master。</p>
+<p>此時，hello.txt 檔案名稱會被標記為變為綠色，表示 git 看到了未追蹤的檔案。</p>
+<p><img src="/post/git-tutorial-init/code_git_init.png"
+	width="1051"
+	height="744"
+	srcset="/post/git-tutorial-init/code_git_init_hubde11bed5a65b6cf981b63ecce6fab8f_40495_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_git_init_hubde11bed5a65b6cf981b63ecce6fab8f_40495_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="Git 原始檔控制"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="339px"
+	
+></p>
+<h2 id="原始檔控制">原始檔控制</h2>
+<h3 id="檢視差異git-diff">檢視差異（git diff）</h3>
+<p>點選 VSCode 左邊有一個類似於 git 分支的圖示可以進行原始檔控制，可以看到有一個 hello.txt 的變更。</p>
+<p><img src="/post/git-tutorial-init/code_source_control.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_source_control_hu8e0f6aad013cb14fbde57a578105be71_26325_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_source_control_hu8e0f6aad013cb14fbde57a578105be71_26325_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="Git 原始檔控制"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+></p>
+<p>該檔案右邊有個 U 表示 Update，若為 M 表示該檔案已被追蹤，現在被修改了。</p>
+<p>點選 hello.txt，編輯區會跳出比對視窗，比對視窗的左邊為原始檔，右邊為目前的檔案，會以綠色標示新增的內容、紅色代表刪減的內容。由於一開始沒有內容，故左邊原始檔案內容全部為空，而右邊則是我們新增的內容文字。</p>
+<h3 id="暫存檔案git-add">暫存檔案（git add）</h3>
+<p>我們可以選取想要的檔案，將其暫存至暫存區（stash）。對變更區的檔案右鍵點選<code>暫存變更</code>，或是當滑鼠移到該檔案時，有一個 <code>+</code> 號，點擊即為暫存變更。</p>
+<p><img src="/post/git-tutorial-init/code_file_stash.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_file_stash_hu20792dffbc69ca0575934c803227be42_29396_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_file_stash_hu20792dffbc69ca0575934c803227be42_29396_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="將檔案暫存至暫存區"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+></p>
+<h3 id="提交暫存區檔案git-commit">提交暫存區檔案（git commit）</h3>
+<p>在暫存區後，我們可以在<code>暫存的變更</code>看到被暫存的檔案，此時有一個檔案在暫存區。</p>
+<p>我們輸入好提交按鈕上方的<code>訊息</code>，點擊<code>提交</code>便可以在本地端儲存庫提交一筆新的 commit。</p>
+<p><img src="/post/git-tutorial-init/code_ready_to_commit.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_ready_to_commit_hucb7709c20da87dc0344c86ecd6875042_31526_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_ready_to_commit_hucb7709c20da87dc0344c86ecd6875042_31526_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="檔案在暫存區後，輸入訊息，點選提交"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+></p>
+<h3 id="顯示當前的-graphgit-log">顯示當前的 graph（git log）</h3>
+<p>可以再重新刪掉一些內容，或在新增一些檔案。然後重新進行上述步驟新增第 2,3 筆 commit。</p>
+<p>回到<code>原始檔控制</code>的標籤，可以找到 View Git Graph (git log) 的按鈕，該按鈕為 GitGraph 延伸功能所提供，所以必須確定有安裝此擴充功能才有此按鈕。</p>
+<p>可以看到當前的分支為 master，目前已經提交了兩筆 commit。</p>
+<p><img src="/post/git-tutorial-init/code_show_git_graph_button.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_show_git_graph_button_hu9c489a4643172a988abe7391afeebe44_26475_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_show_git_graph_button_hu9c489a4643172a988abe7391afeebe44_26475_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="Git Graph 按鈕（需安裝 GitGraph）"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+>
+<img src="/post/git-tutorial-init/code_git_graph.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_git_graph_huf0c3944e9935df7d5c8c8b2ccf9f3bd8_26599_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_git_graph_huf0c3944e9935df7d5c8c8b2ccf9f3bd8_26599_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="顯示 Git Graph"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+>
+<img src="/post/git-tutorial-init/code_git_commit_detail.png"
+	width="1419"
+	height="621"
+	srcset="/post/git-tutorial-init/code_git_commit_detail_huf361b75464b8a03495fc50d53f0a317a_30521_480x0_resize_box_3.png 480w, /post/git-tutorial-init/code_git_commit_detail_huf361b75464b8a03495fc50d53f0a317a_30521_1024x0_resize_box_3.png 1024w"
+		style="max-width:80%;border-radius: 5px; "
+	loading="lazy"
+	
+		alt="查看 commit 的內容"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="548px"
+	
+></p>
+<p>由此 Git Graph 可以對 Git 進行許多複雜的操作，這些操作會等後面的章節提到再說明。</p>
+<h2 id="git-commit-特徵">Git commit 特徵</h2>
+<p>從上述的 Git Graph 中可以看到，我們目前在分支 master。在實際專案中，可能會有許多不同的分支進行著，而在沒有衝突的情況下，開發者可以任意且自由地切換分支。</p>
+<p>提交的 commit 具有以下要素：</p>
+<ul>
+<li>作者（Author）</li>
+<li>提交者（Committer）</li>
+<li>內容（標題 + 詳細說明）</li>
+<li>檔案變動資訊</li>
+<li>Commit ID</li>
+<li>時間</li>
+</ul>
+<p>其中要特別注意的：</p>
+<ul>
+<li>
+<p>commit ID 為唯一，用來進行 Git 相關操作的一個獨立 ID。</p>
+</li>
+<li>
+<p>commit 內容的部分，第一行為標題，之後會空一行才開始輸入內文。</p>
+<p>你也可以指輸入一行標題，弄死下一個看你程式的人。🤫</p>
+<p>下一個人看到你寫的程式的時候，就會抱怨為什麼這個＿＿連寫清楚 commit 都有問題？</p>
+</li>
+</ul>
+<h2 id="結論">結論</h2>
+<p>在此，我們已經學會了在本地端使用 git 初始化 repo、新增檔案、將檔案暫存後進行推送，並且瞭解了整個 Git 圖形的情況。</p>
+<p>這些基本操作在 VSCode 上進行算是蠻清晰明瞭，當然也可以透過命令行一步步執行，只是要查看檔案的狀態通常需要使用命令，像是 git status 與 git log，在純文字介面情況下進行判讀，若遇到大型專案會難閱讀分支間的關係。</p>
+<p>甚至是透過指令輸入提交，需要一直不斷地 -m 分割每行（git commit -m &ldquo;第一行&rdquo; -m &ldquo;第二行&rdquo; -m &ldquo;第三行&rdquo;）。</p>
+<p>也因此簡單的事情，我們還是透過 VSCode 內建的原始檔控制進行以降低人為錯誤。</p>
+<h2 id="參考文獻">參考文獻</h2>
+<ol>
+<li><a class="link" href="https://git-scm.com/book/zh-tw/v2/%e9%96%8b%e5%a7%8b-%e5%88%9d%e6%ac%a1%e8%a8%ad%e5%ae%9a-Git"  target="_blank" rel="noopener"
+    >初次設定 Git</a></li>
+<li><a class="link" href="https://code.visualstudio.com/docs"  target="_blank" rel="noopener"
+    >VSCode - docs</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/git/">Git</a>
+        
+            <a href="/tags/%E8%BB%9F%E9%AB%94/">軟體</a>
+        
+            <a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"  target="_blank" rel="noopener"
+    >創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最後更新 2024/03/12
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相關文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/post/git-tutorial-introduction/">
+        
+        
+            <div class="article-image">
+                <img src="/post/git-tutorial-introduction/cover.e891c63ab7319b5bda84d75f8005e3ec_hua77a28c2b5a5a614a6a1ece286d27b68_228739_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 什麼是 Git 與版本控制？"
+                        
+                        data-hash="md5-6JHGOrcxm1vahNdfgAXj7A==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">什麼是 Git 與版本控制？</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/iperf3/">
+        
+        
+            <div class="article-image">
+                <img src="/post/iperf3/cover.ae03e604a1559ccb722c04aa82c0aab1_hue1d73ec6af284376bcb13e4bfb180fe3_117568_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 安裝並使用 iPerf3 進行網路速度測試"
+                        
+                        data-hash="md5-rgPmBKFVnMtyLASqgsCqsQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">安裝並使用 iPerf3 進行網路速度測試</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/tailscale-synology/">
+        
+        
+            <div class="article-image">
+                <img src="/post/tailscale-synology/cover.a064d94c55af71e965559ceb73941aca_hub0c52d4e5b287e589c8d4ab51a4e4223_212794_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale"
+                        
+                        data-hash="md5-oGTZTFWvcellVZzrc5Qayg==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/ssh-connection/">
+        
+        
+            <div class="article-image">
+                <img src="/post/ssh-connection/cover.90d9eebf082eea99c5f883e95a4caef6_hu008f9935e91088f0fcd36d9134ad0b3c_252783_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 SSH 金鑰進行無密碼遠端連線"
+                        
+                        data-hash="md5-kNnuvwgu6pnF&#43;IPpWkyu9g==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 SSH 金鑰進行無密碼遠端連線</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/post/tailscale/">
+        
+        
+            <div class="article-image">
+                <img src="/post/tailscale/cover.efa8a6427b80d0a9999fed6382f8e77b_hu5a1df5d6cca77f0876c4c8749db3d7d6_149294_250x150_fill_q75_box_smart1.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post 使用 Tailscale 輕鬆建立安全且私密的通道"
+                        
+                        data-hash="md5-76imQnuA0KmZn&#43;1jgvjnew==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">使用 Tailscale 輕鬆建立安全且私密的通道</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="wellwells/wellwells.github.io"
+    data-repo-id="R_kgDOKRvukA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOKRvukM4Cban9"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="zh-TW"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 WellWells
+    </section>
+    
+    <section class="powerby">
+        主題 Stack 由 Jimmy 設計
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption" style="display: flex; justify-content: center;">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

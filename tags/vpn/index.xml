@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>VPN on WellWells</title>
+        <link>https://wellstsai.com/tags/vpn/</link>
+        <description>Recent content in VPN on WellWells</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-tw</language>
+        <lastBuildDate>Thu, 25 Jan 2024 17:10:00 +0800</lastBuildDate><atom:link href="https://wellstsai.com/tags/vpn/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>在 Synology NAS (DSM) 上安裝最新版本的 Tailscale</title>
+        <link>https://wellstsai.com/post/tailscale-synology/</link>
+        <pubDate>Thu, 25 Jan 2024 17:10:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale-synology/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale-synology/cover.jpg" alt="Featured image of post 在 Synology NAS (DSM) 上安裝最新版本的 Tailscale" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在先前文章&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;中，說明如何透過 Tailscale 建立只有自己能夠存取的 VPN（tailnet）。&lt;/p&gt;
+&lt;p&gt;本篇文章將著重如何在 Synology 上如何安裝最新版本的 Tailscale。&lt;/p&gt;
+&lt;p&gt;並實現自動更新等機制。確保 Tailscale 保持在最新版本。&lt;/p&gt;
+&lt;p&gt;以下操作的系統配置：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NAS 裝置：DS220+&lt;/li&gt;
+&lt;li&gt;作業系統：DiskStation Manager 7 (DSM 7)&lt;/li&gt;
+&lt;li&gt;CPU：Intel Celeron J4025&lt;/li&gt;
+&lt;li&gt;Synology Package Arch：Geminilake&lt;/li&gt;
+&lt;li&gt;Generic Arch：&lt;code&gt;x86_64&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其中，如果要更新到最新版本的 Tailscale，需要知道 NAS 的通用架構（Generic Arch）。&lt;/p&gt;
+&lt;p&gt;這部分會根據不同的通用架構決定要下載哪個 Synology package（spk）檔案進行安裝與更新。&lt;/p&gt;
+&lt;p&gt;如果不知道自己的 NAS 架構，可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;以查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;h2 id=&#34;傳統安裝方式&#34;&gt;傳統安裝方式&lt;/h2&gt;
+&lt;p&gt;傳統安裝方式為透過 Synology 內的套件中心進行安裝，此版本為 Synology 釋出的版本。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選套件中心（Synology package center）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/2_click_spc_huc6d2c2542e50b8933a495e2f7255f37e_122516_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;套件中心&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在所有套件中，最下方找到 Tailscale，並點選安裝套件。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc.png&#34;
+	width=&#34;1899&#34;
+	height=&#34;885&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/3_install_tailscale_from_spc_hu135fd4c1d83cc22f65fcebbf4e76979b_65646_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安裝 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;514px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;至此，安裝好後，點選主選單的 Tailscale 登入後就可以正常使用了。&lt;/p&gt;
+&lt;p&gt;在套件中心，已安裝的頁面中檢查安裝版本，可以看到為官方所提供的 1.38.4-700038004。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version.png&#34;
+	width=&#34;1458&#34;
+	height=&#34;698&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/4_check_tailscale_version_huc9eae81213ceb7360972dcadce5e8663_46975_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;208&#34;
+		data-flex-basis=&#34;501px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;該版本為 &lt;a class=&#34;link&#34; href=&#34;https://archive.synology.com/download/Package/Tailscale/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 發布&lt;/a&gt; (2023/5/8)。&lt;/p&gt;
+&lt;p&gt;根據 &lt;a class=&#34;link&#34; href=&#34;https://github.com/tailscale/tailscale/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 官方最新釋出版本&lt;/a&gt;為 1.58.2 (2024/1/25)。&lt;/p&gt;
+&lt;h2 id=&#34;從官網安裝最新版本的-tailscale&#34;&gt;從官網安裝最新版本的 Tailscale&lt;/h2&gt;
+&lt;p&gt;Tailscale 每次更新，官方會為 Synology 編譯並發布&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;最新版本的 spk&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;使用者可以自行下載，並在套件中心手動進行安裝。未來有更新，則重複此動作。&lt;/p&gt;
+&lt;p&gt;在此，Wells 已經整合成一個腳本，實現全自動安裝與定時更新。照著以下步驟執行即可。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 更新 Tailscale&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 檢查更新是否成功&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt; $? -eq &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;; &lt;span style=&#34;color:#66d9ef&#34;&gt;then&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;執行 Tailscale 更新成功&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exit &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;fi&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 若找不到指令，手動下載指定版本的 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://pkgs.tailscale.com/stable/tailscale-x86_64-1.58.2-7000058002-dsm7.spk&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;basename &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 在使用者的家目錄下建立暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd ~
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mkdir tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下載 Tailscale 安裝包&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;wget &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$url&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 安裝 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg install &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;$filename&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 啟動 Tailscale Synology 套件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sudo synopkg start Tailscale
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 移除暫存資料夾&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm -rf ~/tmp_synology
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 再次執行 Tailscale 更新&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tailscale update --yes
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;複製上述的腳本內容到記事本。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改腳本中 url，&lt;code&gt;需要針對 NAS 通用架構，進行更改&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;可以到 &lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;查詢 NAS 的通用架構。&lt;/p&gt;
+&lt;p&gt;找到自己的 NAS 型號所對應的 Generic Arch。以 DS220+ 為例，為&lt;code&gt;x86_64&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;到 &lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale 釋出穩定版本&lt;/a&gt; 找到對應的 DSM 版本與 Generic Arch。&lt;/p&gt;
+&lt;p&gt;複製其 spk 網址，並取代腳本中 url 那行的網址即可。&lt;/p&gt;
+&lt;p&gt;其中腳本的 spk 網址為適用於 &lt;code&gt;x86_64&lt;/code&gt;，如果為相同的 Generic Arch，則腳本不需要更改。&lt;/p&gt;
+&lt;p&gt;例如：DS224+, DS923+, DS723+, DS423+, DS1621+, DS220+, DS420+, RS820+, RS1219+, FS1018, FS3017 等機種都是 x86_64，所以上述腳本不需修改可以直接使用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選左上方的主選單按鈕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/1_button.png&#34;
+	width=&#34;118&#34;
+	height=&#34;48&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/1_button_huef8afddc4c61e42ea0152b511689bfb3_861_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;主選單按鈕&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;245&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選控制台（Control Panel）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control.png&#34;
+	width=&#34;1285&#34;
+	height=&#34;373&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/5_click_control_hu39a582d2f224a283b8fe8e3e2b063826_126145_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;控制台&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;826px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選任務排程表（Task Scheduler）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/6_click_task_hu5afa78f80257970fc08a983e558f8bf0_30367_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新增一個排程任務（定時執行）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/7_add_new_script_hubaa408f433cf355e74a39f5bd7477614_146915_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;任務排程表&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;填寫任務名稱。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/8_task_name_hue53a90dc81d18a62f9e445279e7a0646_130237_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;填寫任務名稱，並使用 root 運行此腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;設定腳本定時執行時間，在此設定每天凌晨 0 點執行此腳本。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/9_task_time_hu086a12a0221385b186409c2dc2270cf2_149316_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;設定腳本執行時間，此時間可自訂&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;任務設定中，在執行指令貼上對應 NAS 的架構，在此可設定是否透過信箱回傳執行結果。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/10_task_script_hu294a031e71dcbaba8ae97e571ad13ddb_149667_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;貼上對應 NAS 架構的腳本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;點選確認。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add.png&#34;
+	width=&#34;1115&#34;
+	height=&#34;680&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/11_task_add_huc39ac5f20d627fcc2b55982b97bc3d74_158234_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;點選確認後會出現警告訊息，點選確定即可&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;163&#34;
+		data-flex-basis=&#34;393px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第一次可以手動執行更新將 NAS 上的版本更新為最新版本。&lt;/p&gt;
+&lt;p&gt;這邊 Wells 安裝套件中心的版本（1.38），不移除該版本的情況下。&lt;/p&gt;
+&lt;p&gt;是可以直接正常升級到最新版本。所以有沒有先移除在執行腳本應該都沒差。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script.png&#34;
+	width=&#34;363&#34;
+	height=&#34;188&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/12_run_script_hu91beef8c754572cc1d7ba70e90c7a429_6023_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;對任務點擊右鍵 → 執行&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;套件中心檢查版本，可以看到為 1.58.2，而 Synology的最新版本為 1.38.4&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest.png&#34;
+	width=&#34;1332&#34;
+	height=&#34;454&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale-synology/13_check_version_latest_hu3668f99cf2eac3a8e05a533c2aa10f6e_13887_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;檢查 Tailscale 版本，透過腳本更新為最新版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;293&#34;
+		data-flex-basis=&#34;704px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如此一來，每天 0 點，會自動執行 tailscale update 進行自動更新。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;安裝好後，就可以進入到控制台，並點選 Tailscale 的 APP，此時會打開新的分頁，登入後就可以開始組網了。&lt;/p&gt;
+&lt;p&gt;詳細的組網可參考&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://kb.synology.com/zh-tw/DSM/tutorial/What_kind_of_CPU_does_my_NAS_have&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;我的 Synology NAS 使用哪種 CPU？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/SynoCommunity/spksrc/wiki/Synology-and-SynoCommunity-Package-Architectures&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Synology 和 SynoCommunity 套件架構&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://wellstsai.com/post/tailscale/&#34; &gt;使用 Tailscale 輕鬆建立安全且私密的通道&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://pkgs.tailscale.com/stable/#spks&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale套件 - 穩定版&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>使用 Tailscale 輕鬆建立安全且私密的通道</title>
+        <link>https://wellstsai.com/post/tailscale/</link>
+        <pubDate>Wed, 29 Nov 2023 12:00:00 +0800</pubDate>
+        
+        <guid>https://wellstsai.com/post/tailscale/</guid>
+        <description>&lt;img src="https://wellstsai.com/post/tailscale/cover.jpg" alt="Featured image of post 使用 Tailscale 輕鬆建立安全且私密的通道" /&gt;&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;當今天人在外時，如何遠端連線到家裡的電腦、工作電腦、或是家中的 NAS？&lt;/p&gt;
+&lt;p&gt;本篇文章會一步一步教你如何使用 Tailscale 與內網裝置進行連線。&lt;/p&gt;
+&lt;h2 id=&#34;寫給對電腦不清楚的人&#34;&gt;寫給對電腦不清楚的人&lt;/h2&gt;
+&lt;p&gt;要讓裝置能夠互通，裝置首先要確定能夠連上網路。後續藉由 Tailscale 實現裝置的互通。&lt;/p&gt;
+&lt;p&gt;首先在&lt;a class=&#34;link&#34; href=&#34;https://login.tailscale.com/start&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方網站註冊&lt;/a&gt;，並於電腦 A、電腦 B、手機、NAS 或其他待組網裝置，安裝 Tailscale 並登入帳號。&lt;/p&gt;
+&lt;p&gt;登入帳號後，等同於登入 tailnet。這些裝置會取得到彼此的內網 tailnet IP。&lt;/p&gt;
+&lt;p&gt;並可以透過裝置名稱進行連線，像是遠端桌面連線、列印、存取 NAS 等&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/mstsc_connection.png&#34;
+	width=&#34;475&#34;
+	height=&#34;287&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/mstsc_connection_hud9d7cd30285235f70f54691d5c624902_15093_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;透過裝置名稱進行遠端桌面連線&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;165&#34;
+		data-flex-basis=&#34;397px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/ssh_connection.png&#34;
+	width=&#34;466&#34;
+	height=&#34;172&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/ssh_connection_hu58360c8738a2b4838289c30c9627f82c_14579_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;透過裝置名稱進行 SSH 連線&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;270&#34;
+		data-flex-basis=&#34;650px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;不想知道 VPN 背景的可直接跳到&lt;a class=&#34;link&#34; href=&#34;#%e5%a6%82%e4%bd%95%e5%ae%89%e8%a3%9d-tailscale&#34; &gt;如何安裝 Tailscale&lt;/a&gt;、&lt;a class=&#34;link&#34; href=&#34;#%e8%a3%9d%e7%bd%ae%e9%87%8d%e6%96%b0%e5%91%bd%e5%90%8d&#34; &gt;裝置重新命名&lt;/a&gt;與&lt;a class=&#34;link&#34; href=&#34;#%e7%b5%90%e8%ab%96&#34; &gt;結論&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;如何遠端存取裝置&#34;&gt;如何遠端存取裝置？&lt;/h2&gt;
+&lt;p&gt;在標準的情境應用中，例如：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;自己架設的網頁伺服器（localhost:80）&lt;/li&gt;
+&lt;li&gt;NAS 本身提供 Web GUI（localhost:5000）&lt;/li&gt;
+&lt;li&gt;Windows 遠端桌面連線（localhost:3389）&lt;/li&gt;
+&lt;li&gt;DNS 伺服器（localhost:53）&lt;/li&gt;
+&lt;li&gt;其他服務&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如果我們想讓外網的人存取這台伺服器，首先有個&lt;strong&gt;對外 IP (WAN IP)&lt;/strong&gt; （&lt;a class=&#34;link&#34; href=&#34;https://whatismyipaddress.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;IP 查詢&lt;/a&gt;）。我們可以透過這個對外 IP，從外部輸入 IP 進行連線。&lt;/p&gt;
+&lt;p&gt;連線後會找到我們的路由器（router），設定此路由器把對外的 port 導到對應的應用。&lt;/p&gt;
+&lt;p&gt;以 OpenWRT 的路由器介面為例，以下是路由器的設定，會在外網 IP 連線時進行通訊埠轉發（Port Forwarding）到區網 IP (LAN IP)：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/port_forwards.png&#34;
+	width=&#34;800&#34;
+	height=&#34;414&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/port_forwards_hu7318035ca9d27622cc373ec0aa25bd7f_24256_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;OpenWRT 通訊埠轉發設定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;463px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;其目的在於把 &lt;code&gt;外網 IP:Port&lt;/code&gt; 導向至 &lt;code&gt;內網 IP:Port&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;由上圖可得知：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.1.2 為 DNS 伺服器，負責處理 Port 53, 853, 784 服務。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.1.3 為 網頁伺服器，負責處理網頁相關的內容。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;192.168.6.4 為 遠端伺服器，由外網 Port 82 導到 內網的 Port 3389。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;設定好後通訊埠轉發後，便可由外部存取 DNS、網頁或是進行遠端桌面連線了。然而，上述通訊埠轉發的方式，是讓外網 IP 直接存取內網的相關資源，也意味者任何人是可以連線的。如果想要讓特定使用者存取，則必須自己建立虛擬私人網路（virtual network，VPN）。&lt;/p&gt;
+&lt;h2 id=&#34;建立虛擬私人網路vpn&#34;&gt;建立虛擬私人網路（VPN）&lt;/h2&gt;
+&lt;p&gt;VPN 是一種服務，它可以建立一個安全的加密通道，將用戶與遠端伺服器建立連接。這樣可以隱藏用戶的真實IP位址和加密數據傳輸。&lt;/p&gt;
+&lt;p&gt;以 Windows 為例，根據&lt;a class=&#34;link&#34; href=&#34;https://support.microsoft.com/zh-tw/windows/%E5%9C%A8-windows-%E4%B8%AD%E9%80%A3%E7%B7%9A%E5%88%B0-vpn-3d29aeb1-f497-f6b7-7633-115722c1009c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;微軟官網教學&lt;/a&gt;於 A 電腦上建立 IKEv2、L2TP 或是 IPsec 協定的 VPN 後。在另外一台 B 電腦就可以嘗試連線了。&lt;/p&gt;
+&lt;p&gt;連線成功後，B 電腦便等同於 A 電腦一樣，可以存取 NAS 服務、印表機等內網資源。&lt;/p&gt;
+&lt;p&gt;要確定的是路由器與電腦是否有防火牆阻擋 UDP Port 500, 1701, 4500。&lt;/p&gt;
+&lt;p&gt;若防火牆阻擋，會造成 VPN 連線失敗。&lt;/p&gt;
+&lt;h2 id=&#34;常見的-vpn-協定&#34;&gt;常見的 VPN 協定&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://openvpn.net/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;OpenVpn&lt;/a&gt; − 提供多種驗證方式（金鑰、憑證、帳號密碼）進行驗證，可以在不同設備上使用，為開源專案。整理來說開源、安全、易用、兼容性好。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wireguard.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WireGuard&lt;/a&gt; − 於 2020 年整合於 Linux，較為新興的 VPN 協定。其特點為：使用 UDP 傳輸、比 IPsec、OpenVPN 更快、性能更好、並支持跨平台。較新的路由器有些會整合 WireGuard 伺服器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;L2TP/IPSec，專有協定（Cisco &amp;amp; Microsoft），已經內建於系統中。不需要安裝軟體就可以架設與連線。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PPTP，已淘汰的點對點協定。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;什麼是-tailscale&#34;&gt;什麼是 Tailscale？&lt;/h2&gt;
+&lt;p&gt;Tailscale 是一個基於 WireGuard 協定的 VPN 軟體。可以將多個設備連接，實現虛擬內部網路。&lt;/p&gt;
+&lt;p&gt;傳統上設定 WireGuard 較為繁瑣，無論是在架設、或是維護上都有一定困難。例如在各個裝置先透過 &lt;a class=&#34;link&#34; href=&#34;https://manpages.debian.org/unstable/wireguard-tools/wg-quick.8.en.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;wg-quick&lt;/a&gt; 產生公鑰與私鑰，然後在該裝置上安裝 WireGuard後，設定相關的文件，文件內容需要填寫監聽的埠、專用 IP、私鑰，對等公鑰。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;例如一台伺服器（Server）與兩台客戶端（Client），公私鑰設定如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;裝置&lt;/th&gt;
+&lt;th&gt;私鑰&lt;/th&gt;
+&lt;th&gt;公鑰&lt;/th&gt;
+&lt;th&gt;設定&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;伺服器&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 A、客戶端的公鑰 D、公鑰 F&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;客戶端 1&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;D&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 C、伺服器的公鑰 B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;客戶端 2&lt;/td&gt;
+&lt;td&gt;E&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;填入自己的私鑰 E、伺服器的公鑰 B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;若往後有更多客戶端、伺服器需要重新設定，且以上情況僅為 1 個伺服器的例子，多個伺服器設定起來會更加複雜。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;若使用 Tailscale，基本上可以無腦架設私人 VPN，並提供一個完整的 Web GUI 顯示連線的裝置。&lt;/p&gt;
+&lt;p&gt;其中 Tailscale 基於 WireGuard，但有以下特點：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;不使用輻射狀網絡（Hub-and-spoke networks），而是使用網狀網路（Mesh networks）改善裝置通訊的交換。當然這也是 WireGuard相較於其他 VPN 協定的不同之處。&lt;/li&gt;
+&lt;li&gt;支持 NAT 打洞（NAT Hole Punching）[*] ，允許位於不同 NAT 後網路的兩個節點直接通訊，而不需要中央伺服器。從而實現 peer-to-peer (P2P) 直連。&lt;/li&gt;
+&lt;li&gt;若 NAT 打洞失敗，fallback 到中繼模式 （relay server mode），並基於 &lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-tailscale-works/#encrypted-tcp-relays-derp&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DERP（Detour Encrypted Routing Protocol）伺服器&lt;/a&gt;來建立連結。&lt;/li&gt;
+&lt;li&gt;連入 Tailscale 時，會使用協調伺服器（coordination servers / DERP Servers）進行用戶的資訊交換，如 IP、Port、裝置狀態。&lt;/li&gt;
+&lt;li&gt;簡易的 Web GUI 管理介面，可以管理各個裝置彼此間的訪問程度。&lt;/li&gt;
+&lt;li&gt;提供 MagicDNS、TailDrop、Tailscale Funnel 等功能，可以更方便的存取裝置。[**]&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;* 網路地址轉換（Network Address Translation，NAT），IP 封包標頭中的IP位址轉換為另一個 IP 位址，從而實現地址重用，讓所有內網都可以使用同一個 IP 連接到外部網路。&lt;/p&gt;
+&lt;p&gt;** MagicDNS 提供使用裝置名稱存取裝置而不用記住 IP。TailDrop 實現了類似 AirDrop 的功能，可以直接對其他裝置傳送傳檔案。Tailscale Funnel 實現反向代理的功能，可以讓外網存取指定內網裝置。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;tailscale-的競爭品&#34;&gt;Tailscale 的競爭品&lt;/h2&gt;
+&lt;p&gt;異地建立網路的相似產品有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.zerotier.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Zerotier&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cloudflare.com/zh-tw/products/tunnel/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Cloudflare Tunnel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.netmaker.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Netmaker&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://ngrok.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Ngrok&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.twingate.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Twingate&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;等&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;我有使用過的是 Zerotier，使用的是自己的&lt;a class=&#34;link&#34; href=&#34;https://docs.zerotier.com/protocol/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;協定&lt;/a&gt;而非 WireGuard。個人使用心得是裝置連線 Zerotier 私人網域後，會有一組內網 IP，這組內網 IP 由於沒有 DNS 去解析，所以要存取該裝置，必須直接輸入 IP。雖然提供 &lt;a class=&#34;link&#34; href=&#34;https://github.com/zerotier/zeronsd&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ZeroNSD&lt;/a&gt; ，不過就印象中需要架設，也就退而轉為 TailScale了。&lt;/p&gt;
+&lt;h2 id=&#34;如何安裝-tailscale&#34;&gt;如何安裝 Tailscale&lt;/h2&gt;
+&lt;p&gt;首先到官網（https://tailscale.com/）進行註冊，這邊的註冊是透過 Google、Microsoft、Github、Apple 四個身分識別提供者進行註冊（identity provider，IdP），本身 Tailscale 不提供註冊，也因此沒有密碼儲存在 Tailscale 上。&lt;/p&gt;
+&lt;p&gt;使用這些 IdP，若要確保安全性，可另外開啟雙重驗證登入。&lt;/p&gt;
+&lt;p&gt;基本上是沒有人可以直接存取你的私人網路的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/sign_up_tailscale.png&#34;
+	width=&#34;564&#34;
+	height=&#34;676&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/sign_up_tailscale_hu85404465c904d1bfa6f19d840e0e07d7_29621_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:60%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;註冊 Tailscale 帳號&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;83&#34;
+		data-flex-basis=&#34;200px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;登入後，由於沒有任何裝置，Tailscale 預設會提供下列不同的安裝方式，照著官方進行安裝與下載即可。這邊雖然只列出 Synology 有提供官方安裝包，不過也可以使用 Docker 進行安裝在其他 NAS 上。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/download_tailscale.png&#34;
+	width=&#34;654&#34;
+	height=&#34;658&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/download_tailscale_hu580676e5ada5eacacf7ddb6ca7f3f632_44188_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:60%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;下載 Tailscale&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;99&#34;
+		data-flex-basis=&#34;238px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;下載並安裝後，電腦右下角會出現 Tailscale 的圖示，右鍵選擇 Log in&amp;hellip; 會跳出登入介面。登入後，點選 Connect 即可加入私人網路 (tailnet) 。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/connect_tailscale.png&#34;
+	width=&#34;498&#34;
+	height=&#34;245&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/connect_tailscale_hu957c107cb97c10565ab85c44cd29fd10_35750_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; width:40%;&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;將裝置加入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;487px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;重複步驟，&lt;a class=&#34;link&#34; href=&#34;https://apps.apple.com/tw/app/tailscale/id1470499037&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;iOS&lt;/a&gt; 或 &lt;a class=&#34;link&#34; href=&#34;https://play.google.com/store/apps/details?id=com.tailscale.ipn&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Android&lt;/a&gt; 下載 Tailscale，登入後點選 Connect，裝置可能會要求加入 VPN，點選新增 VPN 後，也成功加入私人網路中。&lt;/p&gt;
+&lt;p&gt;可以於 Web GUI 中即時看到裝置的新增。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/two_devices_joined.png&#34;
+	width=&#34;800&#34;
+	height=&#34;446&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/two_devices_joined_huc4246599fd6930bbbcbc003ddb4d1959_30798_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;手機加入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;430px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Linux 的部分也是一樣，只不過從 UI 介面改為命令列形式，根據&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1031/install-linux/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方 Linux 安裝教學&lt;/a&gt;，整體過程也是一致的。在登入過程中，系統會彈出一個網址，要求使用者在瀏覽器中輸入此網址進行登入。當使用者完成登入後，終端機將顯示 Success。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/linux_tailscale_login.png&#34;
+	width=&#34;520&#34;
+	height=&#34;175&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/linux_tailscale_login_hu244a1d08a9b1bec21f81a66122acf8e3_16358_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;於 Linux 登入 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;297&#34;
+		data-flex-basis=&#34;713px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;至此，安裝 Tailscale 並讓設備能夠互相連線也就完成了。此時可以於 cmd 中，輸入 tailscale status 或是 tailscale ping IP 來查看連線的狀態。&lt;/p&gt;
+&lt;p&gt;如果是 active; direct 表示走的是直連，ping通常在 10 − 15 ms；反之，如果是active; relay &amp;ldquo;xxx&amp;rdquo; 表示走的是 中繼伺服器，延遲約為 80 ~ 300 ms 附近。&lt;/p&gt;
+&lt;p&gt;走中繼伺服器的原因可能是防火牆阻擋了 UDP port，導致 tailscale 只能走中繼，但比起不能直接連線，至少提供了中繼伺服器的解決方案來解決直連無法連線的問題。&lt;/p&gt;
+&lt;p&gt;若要改善 ping 延遲，可檢查路由器相關設定或防火牆來達成直連：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;例如開啟 UPnP 與 NAT-PMP （&lt;a class=&#34;link&#34; href=&#34;https://www.quora.com/What-does-disabling-UPnP-on-a-router-do&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;較不安全&lt;/a&gt;，但無腦自動設定好）。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1082/firewall-ports/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;修改防火牆設定&lt;/a&gt;，關閉 UPnP，並允許防火牆內部裝置使用UDP通訊，並指定通訊端口為 41641，目標端口則是任意（不同廠家路由器有不同設定）。&lt;/li&gt;
+&lt;li&gt;Linux 中可能阻擋到端口，開啟終端機並輸入 sudo ufw allow 41641/udp 以開啟 UDP 端口。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;PS C:\Users\wells&amp;gt; tailscale ping nas
+pong from nas (100.105.151.221) via 142.251.43.14:41642 in 12ms
+
+PS C:\Users\wells&amp;gt; tailscale ping work
+pong from work (100.122.114.19) via DERP(tok) in 190ms
+pong from work (100.122.114.19) via DERP(tok) in 86ms
+pong from work (100.122.114.19) via DERP(tok) in 88ms
+
+PS C:\Users\wells&amp;gt; tailscale status
+100.105.151.221  nas          wells@  windows active; direct 142.251.43.14:41642
+100.122.114.19   work         wells@  linux   active; relay &amp;#34;tok&amp;#34;
+100.206.21.12    server1      wells@  linux   idle, tx 22416 rx 28304
+100.95.142.53    server2      wells@  linux   -
+100.111.59.11    home-1       wells@  windows active; direct 142.251.43.14:41641, tx 10684092 rx 110457924
+100.92.116.28    home-2       wells@  windows -
+100.154.231.41   wells-iphone wells@  iOS     offline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後，可以對著右下角的圖示右鍵 → Preferences → Run unattended 讓開機的時候&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1088/run-unattended/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;自動連線 tailnet&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/run_unattended.png&#34;
+	width=&#34;750&#34;
+	height=&#34;321&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/run_unattended_hu231cf47e5a55bcf4b41f01c6fb3a2dd2_125668_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開機自動連線 tailnet&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;233&#34;
+		data-flex-basis=&#34;560px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;裝置重新命名&#34;&gt;裝置重新命名&lt;/h2&gt;
+&lt;p&gt;Tailnet 內建 DNS 功能，此功能可以把 hostname 或是裝置名稱轉為 IP（當然你是 IP 愛好者的話記 IP 也是可以的🙃）。&lt;/p&gt;
+&lt;p&gt;對著右下角的圖示，進入到 Admin console&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/admin_console.png&#34;
+	width=&#34;750&#34;
+	height=&#34;330&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/admin_console_hudd41c60d5f8ab470ed56651ddc1e8011_51491_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;開啟 Admin console&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;227&#34;
+		data-flex-basis=&#34;545px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;裝置名稱預設是使用 hostname，若想要&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1098/machine-names/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;自訂裝置名稱&lt;/a&gt;，可以點選裝置右邊的 &amp;hellip; 的按鈕，並重新命名裝置。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://wellstsai.com/post/tailscale/rename_device.png&#34;
+	width=&#34;550&#34;
+	height=&#34;423&#34;
+	srcset=&#34;https://wellstsai.com/post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_480x0_resize_box_3.png 480w, https://wellstsai.com/post/tailscale/rename_device_huc4059e75a3d8fcfa711a9a8af2cc1a96_22095_1024x0_resize_box_3.png 1024w&#34;
+		style=&#34;max-width:80%;border-radius: 5px; &#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;重新命名裝置&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;130&#34;
+		data-flex-basis=&#34;312px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;後續在裝置連線上，便可以直接透過裝置名稱進行連線&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh wells@build-server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tailscale-相關指令cli&#34;&gt;Tailscale 相關指令（CLI）&lt;/h2&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1080/cli/?tab=windows&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale CLI&lt;/a&gt; 提供在 Linux 環境下，開啟或關閉相關設定，在 Windows 上有圖示可以點選，也因此大部分的指令用不到（部分進階功能例外，需透過 CLI 進行設定），不過用來檢查相關連線狀態，用一張表格來說明我自己常用的指令，更多詳細的說明可以參照官網。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Commands&lt;/th&gt;
+&lt;th&gt;說明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale status&lt;/td&gt;
+&lt;td&gt;檢查當前網路狀態，可以檢查是否透過中繼還是直連&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale ping [IP/device]&lt;/td&gt;
+&lt;td&gt;檢查該裝置是否直連，若看到 DERP 表示走的是中繼&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale up [flags]&lt;/td&gt;
+&lt;td&gt;連線至 tailnet，可以帶有不同的flags&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale netcheck&lt;/td&gt;
+&lt;td&gt;檢查當前 DERP 的狀態&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;tailscale update&lt;/td&gt;
+&lt;td&gt;更新本裝置 tailscale 的版本&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;自己常用的就幾個，比較進階的可能等未來用到再說吧。&lt;/p&gt;
+&lt;p&gt;以下是我使用過的 tailscale up 設定：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;--advertise-exit-node：假設 A 電腦有開啟這個 flag，那麼 B 電腦的流量可以使用 A 電腦做為出口，此時 B 電腦上網的 IP就變為 A 電腦的 IP。&lt;/li&gt;
+&lt;li&gt;--advertise-routes=&lt;!-- raw HTML omitted --&gt;：公開子網域，例如 A 電腦有內網 192.168.1.50，B 電腦若想直接訪問 192.168.1.xx 的網段，可以設定此設置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;詳細的設定可以再參考官網詳細的說明。&lt;/p&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
+&lt;p&gt;本身 Tailscale 的安裝上非常簡單。且防火牆、NAT 穿透等複雜事情都幫你處理好了。&lt;/p&gt;
+&lt;p&gt;註冊完後，每個裝置下載 tailscale，並登入帳號即可加入 tailnet。並實現裝置之間的互連。&lt;/p&gt;
+&lt;p&gt;每個裝置都有主機名稱，可以透過 Admin console 修改，或是查看各個裝置的狀態。&lt;/p&gt;
+&lt;p&gt;另外也可以將以加入 tailnet 的裝置進行子網域組網，並且在 tailnet 中廣播該網段。&lt;/p&gt;
+&lt;p&gt;甚至今天加入 tailnet 裡的裝置，還可以單獨分享該裝置節點（&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1084/sharing/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Sharing nodes&lt;/a&gt;）給其他帳號進行組網，實現更複雜的網路應用。&lt;/p&gt;
+&lt;p&gt;其他更進階的設定可以參照&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/start/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;官方網站&lt;/a&gt;的說明獲取更進一步的原理與資料。&lt;/p&gt;
+&lt;h2 id=&#34;參考文獻&#34;&gt;參考文獻&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/546382535&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;什麼是 VPN 協議？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.wireguard.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;WireGuard: fast, modern, secure VPN tunnel&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.zerotier.com/protocol/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ZeroTier Documentation - The Protocol&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-nat-traversal-works/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How NAT traversal works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/blog/how-tailscale-works/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How Tailscale works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1080/cli/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Tailscale CLI&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://tailscale.com/kb/1054/dns/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;DNS in Tailscale&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
