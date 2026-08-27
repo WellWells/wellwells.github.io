@@ -1,0 +1,449 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Ubuntu Server 24.04 的安裝紀錄：主機與發行版怎麼選、磁碟分割怎麼切、Netplan 網路設定、Tailscale 與 SSH 遠端環境，以及時區、語系與常用套件的安裝。"><title>Ubuntu Server 24.04：安裝、磁碟分割與網路設定 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/ubuntu-setup/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Ubuntu Server 24.04：安裝、磁碟分割與網路設定"><meta property='og:description' content="Ubuntu Server 24.04 的安裝紀錄：主機與發行版怎麼選、磁碟分割怎麼切、Netplan 網路設定、Tailscale 與 SSH 遠端環境，以及時區、語系與常用套件的安裝。"><meta property='og:url' content='https://wellstsai.com/post/ubuntu-setup/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Linux'><meta property='article:tag' content='Ubuntu'><meta property='article:tag' content='教學'><meta property='article:tag' content='服務'><meta property='article:tag' content='系統'><meta property='article:tag' content='網路'><meta property='article:published_time' content='2024-06-18T14:35:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/ubuntu-setup/cover.webp'><meta name="twitter:title" content="Ubuntu Server 24.04：安裝、磁碟分割與網路設定"><meta name="twitter:description" content="Ubuntu Server 24.04 的安裝紀錄：主機與發行版怎麼選、磁碟分割怎麼切、Netplan 網路設定、Tailscale 與 SSH 遠端環境，以及時區、語系與常用套件的安裝。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/ubuntu-setup/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/ubuntu-setup/cover_hu_fa99eabf619d4fbe.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/ubuntu-setup/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/ubuntu-setup/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/ubuntu-setup/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/ubuntu-setup/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"引言 最近伺服器出現一些硬體異常就順便剛好重灌 Linux 伺服器，本篇文章將介紹如何安裝 Ubuntu 作為自己的工作伺服器。\n部署 Linux 伺服器可以做很多事情，包含：\nDNS 伺服器：用來阻擋廣告等相關應用。 遠端開發：可隨時從信任的電腦連線，開發不中斷。 網頁伺服器：使用 Nginx 或 Apache 架設網站，並搭配資料庫服務。 代理伺服器：實現翻牆或 NAT 穿透等行為。 簡易檔案伺服器：不建議作為標準 NAS，資料維護成本高，建議使用現成的 NAS 方案。 本地端 AI 模型執行：樹莓派（Raspberry Pi）這類低功耗裝置適合跑 1.5B 到 3B 的小模型，做基本的文字生成與摘要。DeepSeek R1 14B 這種規模即使量化到 4-bit 也要約 9 到 10 GB 記憶體，得放在有獨立顯卡的伺服器上跑才會順。兩種都適用於開發、測試及自動化應用。 伺服器的效能需求要看用途。例如部署網頁伺服器要考慮防火牆等安全措施；執行人工智慧模型則要評估外接顯卡、記憶體和中央處理器的效能，跑起來才會順。\n主機選擇 在安裝 Linux 伺服器前，首先需要選擇適合的執行環境。 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2024-06-18T14:35:00+08:00","description":"Ubuntu Server 24.04 的安裝紀錄：主機與發行版怎麼選、磁碟分割怎麼切、Netplan 網路設定、Tailscale 與 SSH 遠端環境，以及時區、語系與常用套件的安裝。","headline":"Ubuntu Server 24.04：安裝、磁碟分割與網路設定","image":"https://wellstsai.com/post/ubuntu-setup/cover.webp","keywords":["Linux","Ubuntu","教學","服務","系統","網路"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/ubuntu-setup/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/ubuntu-setup/" selected>繁體中文</option><option value="/en/post/ubuntu-setup/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#引言">引言</a></li><li><a href="#主機選擇">主機選擇</a><ol><li><a href="#我的主機選擇">我的主機選擇</a></li><li><a href="#常見的第三方-vps-供應商">常見的第三方 VPS 供應商</a></li></ol></li><li><a href="#選擇-linux-發行版">選擇 Linux 發行版</a></li><li><a href="#安裝-ubuntu-server-2404-時的磁碟分割">安裝 Ubuntu Server 24.04 時的磁碟分割</a></li><li><a href="#進行網路設定">進行網路設定</a></li><li><a href="#確保系統與套件處於最新狀態">確保系統與套件處於最新狀態</a></li><li><a href="#遠端環境建立">遠端環境建立</a><ol><li><a href="#安裝-tailscale">安裝 Tailscale</a></li><li><a href="#配置-ssh">配置 SSH</a></li></ol></li><li><a href="#系統基礎設定與安裝">系統基礎設定與安裝</a><ol><li><a href="#系統時區與語言設定">系統時區與語言設定</a></li><li><a href="#安裝-net-tools">安裝 Net tools</a></li><li><a href="#安裝建置工具包">安裝建置工具包</a></li><li><a href="#安裝-blesh">安裝 ble.sh</a></li><li><a href="#安裝-homebrew">安裝 Homebrew</a></li><li><a href="#安裝-fzf">安裝 fzf</a></li><li><a href="#安裝-nodejs">安裝 Node.js</a></li><li><a href="#安裝-tldr">安裝 tldr</a></li><li><a href="#更新-git-到最新版本">更新 Git 到最新版本</a></li><li><a href="#設定-git-使用者">設定 Git 使用者</a></li></ol></li><li><a href="#其他進階設定">其他進階設定</a><ol><li><a href="#關閉-ipv6-連線">關閉 IPv6 連線</a><ol><li><a href="#透過-sysctl-停用-ipv6">透過 sysctl 停用 IPv6</a></li><li><a href="#透過-netplan-停用-ipv6">透過 Netplan 停用 IPv6</a></li></ol></li><li><a href="#設定-vs-code-為-ssh-遠端開發的預設編輯器">設定 VS Code 為 SSH 遠端開發的預設編輯器</a></li><li><a href="#設定-ubuntu-pro-安全性">設定 Ubuntu Pro 安全性</a></li></ol></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/ubuntu-setup/" style="position:relative;display:block"><img src="/post/ubuntu-setup/cover_hu_e0f0050fa88656db.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/ubuntu-setup/cover_hu_fa99eabf619d4fbe.webp"><source media="(min-width: 769px)" srcset="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp">
+<img src="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Ubuntu Server 24.04：安裝、磁碟分割與網路設定" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/ubuntu-setup/">Ubuntu Server 24.04：安裝、磁碟分割與網路設定</a></h2><h3 class="article-subtitle">Ubuntu Server 24.04 的安裝紀錄：主機與發行版怎麼選、磁碟分割怎麼切、Netplan 網路設定、Tailscale 與 SSH 遠端環境，以及時區、語系與常用套件的安裝。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2024-06-18T14:35:00+08:00'>2024/06/18</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：12 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/ubuntu-setup/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#引言">引言</a></li><li><a href="#主機選擇">主機選擇</a><ol><li><a href="#我的主機選擇">我的主機選擇</a></li><li><a href="#常見的第三方-vps-供應商">常見的第三方 VPS 供應商</a></li></ol></li><li><a href="#選擇-linux-發行版">選擇 Linux 發行版</a></li><li><a href="#安裝-ubuntu-server-2404-時的磁碟分割">安裝 Ubuntu Server 24.04 時的磁碟分割</a></li><li><a href="#進行網路設定">進行網路設定</a></li><li><a href="#確保系統與套件處於最新狀態">確保系統與套件處於最新狀態</a></li><li><a href="#遠端環境建立">遠端環境建立</a><ol><li><a href="#安裝-tailscale">安裝 Tailscale</a></li><li><a href="#配置-ssh">配置 SSH</a></li></ol></li><li><a href="#系統基礎設定與安裝">系統基礎設定與安裝</a><ol><li><a href="#系統時區與語言設定">系統時區與語言設定</a></li><li><a href="#安裝-net-tools">安裝 Net tools</a></li><li><a href="#安裝建置工具包">安裝建置工具包</a></li><li><a href="#安裝-blesh">安裝 ble.sh</a></li><li><a href="#安裝-homebrew">安裝 Homebrew</a></li><li><a href="#安裝-fzf">安裝 fzf</a></li><li><a href="#安裝-nodejs">安裝 Node.js</a></li><li><a href="#安裝-tldr">安裝 tldr</a></li><li><a href="#更新-git-到最新版本">更新 Git 到最新版本</a></li><li><a href="#設定-git-使用者">設定 Git 使用者</a></li></ol></li><li><a href="#其他進階設定">其他進階設定</a><ol><li><a href="#關閉-ipv6-連線">關閉 IPv6 連線</a><ol><li><a href="#透過-sysctl-停用-ipv6">透過 sysctl 停用 IPv6</a></li><li><a href="#透過-netplan-停用-ipv6">透過 Netplan 停用 IPv6</a></li></ol></li><li><a href="#設定-vs-code-為-ssh-遠端開發的預設編輯器">設定 VS Code 為 SSH 遠端開發的預設編輯器</a></li><li><a href="#設定-ubuntu-pro-安全性">設定 Ubuntu Pro 安全性</a></li></ol></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="引言">引言</h2><p>最近伺服器出現一些硬體異常就順便剛好重灌 Linux 伺服器，本篇文章將介紹如何安裝 Ubuntu 作為自己的工作伺服器。</p><p>部署 Linux 伺服器可以做很多事情，包含：</p><ul><li>DNS 伺服器：用來阻擋廣告等相關應用。</li><li>遠端開發：可隨時從信任的電腦連線，開發不中斷。</li><li>網頁伺服器：使用 Nginx 或 Apache 架設網站，並搭配資料庫服務。</li><li>代理伺服器：實現翻牆或 NAT 穿透等行為。</li><li>簡易檔案伺服器：不建議作為標準 NAS，資料維護成本高，建議使用現成的 NAS 方案。</li><li>本地端 AI 模型執行：樹莓派（Raspberry Pi）這類低功耗裝置適合跑 1.5B 到 3B 的小模型，做基本的文字生成與摘要。DeepSeek R1 14B 這種規模即使量化到 4-bit 也要約 9 到 10 GB 記憶體，得放在有獨立顯卡的伺服器上跑才會順。兩種都適用於開發、測試及自動化應用。</li></ul><p>伺服器的效能需求要看用途。例如部署網頁伺服器要考慮防火牆等安全措施；執行人工智慧模型則要評估外接顯卡、記憶體和中央處理器的效能，跑起來才會順。</p><h2 id="主機選擇">主機選擇</h2><p>在安裝 Linux 伺服器前，首先需要選擇適合的執行環境。常見的主機環境包含：</p><ol><li><strong>實體主機（本地伺服器）</strong>：直接在硬體上安裝 Linux，常見的硬體選項包括迷你電腦如 <strong>Intel NUC</strong> 和 Raspberry Pi 等。</li><li><strong>虛擬化主機</strong>：用 WSL、Docker 等技術，在現有系統內部部署與管理 Linux 環境，做到輕量級虛擬化。</li><li><strong>雲端主機</strong>：<ul><li><strong>虛擬主機（Shared Hosting）</strong>：多個使用者共享伺服器資源，但彼此的環境相對獨立。常見於小型網站、部落格。適合新手，無須管理系統。</li><li><strong>虛擬私有伺服器（virtual private server，VPS）</strong>：將一台實體伺服器分割成多個獨立的虛擬伺服器，每個 VPS 都有獨立的作業系統與完整管理權限，適合需要自訂環境的開發者。</li><li><strong>裸金屬伺服器（Bare Metal Server）</strong>：一整台實體伺服器，沒有虛擬化層，所有硬體資源完全由單一租戶使用。適合高效能應用與企業級部署。</li></ul></li></ol><h3 id="我的主機選擇">我的主機選擇</h3><p>根據我自身的應用需求是自己組裝硬體設備，包含：機殼、主機板、CPU、RAM、SSD、電源供應器。主要用途為：</p><ul><li>遠端開發與管理</li><li>網頁爬蟲與資料處理</li><li>網頁伺服器與應用程式部署</li></ul><p>如果目標是建置擋廣告伺服器，例如部署 AdGuard Home，或是使用 Home Assistant 控制智慧家電，建議選擇 Raspberry Pi，ARM 架構的功耗與成本都更低。</p><p>如果不想使用實體主機，可以選擇 VPS，但與實體主機相比，VPS 使用上會有硬體資源限制及潛在的資料安全疑慮。</p><h3 id="常見的第三方-vps-供應商">常見的第三方 VPS 供應商</h3><ul><li><strong>亞馬遜雲服務（Amazon Web Services，AWS）</strong></li><li><strong>Google 雲端平台（Google Cloud Platform，GCP）</strong></li><li><strong>微軟 Azure（Microsoft Azure）</strong></li><li><strong>DigitalOcean</strong></li><li><strong>Vultr</strong></li><li><strong>Linode</strong></li></ul><p>這些服務的計費模式依據實際使用量或按月固定收費。以輕量級服務為例，其預估費用約為每小時 USD 0.093 至 USD 0.15，或每月 USD 10 至 USD 30。</p><h2 id="選擇-linux-發行版">選擇 Linux 發行版</h2><p>我主要拿來架服務、架網頁跟做開發，所以裝了 Ubuntu Server 24.04。不過有些 SDK 要求開發環境用 Ubuntu 18.04，選發行版時還是要看自己的開發需求和環境。</p><p>對比於不同的發行版，以下是它們的適合對象與特點：</p><div class="table-wrapper"><table><thead><tr><th>發行版</th><th>適合對象</th><th>主要特色</th></tr></thead><tbody><tr><td><strong>Ubuntu</strong></td><td>一般使用者、開發者、新手</td><td>最流行的 Linux，支援廣泛，LTS 版穩定，短期版較新。</td></tr><tr><td><strong>Linux Mint</strong></td><td>Windows 轉換使用者</td><td>友好介面、穩定，適合日常使用，提供多種桌面環境。</td></tr><tr><td><strong>MX Linux</strong></td><td>輕量級需求</td><td>適合舊電腦，內建系統管理工具，穩定且易用。</td></tr><tr><td><strong>Debian</strong></td><td>伺服器、開發者</td><td>穩定性極高，長期支援，但新軟體版本較舊。</td></tr><tr><td><strong>Pop!_OS</strong></td><td>生產力、STEM 學生</td><td>提供自動視窗排列、適合科學計算與開發，內建隱私功能。</td></tr><tr><td><strong>Fedora</strong></td><td>想用最新技術的開發者</td><td>採用新技術快、官方支援好，適合開發但非長期穩定。</td></tr><tr><td><strong>openSUSE</strong></td><td>企業、伺服器</td><td>分為穩定版（Leap）與滾動更新版（Tumbleweed），適合企業與專業使用者。</td></tr><tr><td><strong>EndeavourOS</strong></td><td>想學 Arch 的人</td><td>提供簡化的 Arch 安裝，保持原生 Arch 體驗，滾動更新。</td></tr><tr><td><strong>Manjaro</strong></td><td>Arch 初學者</td><td>內建驅動管理、較穩定的 Arch 變體，適合桌面使用。</td></tr></tbody></table></div><p>使用 Ubuntu 的主要原因是它對新手友好，可以避免遇到許多僅專業人士才會遇到的困難。而且大多數工作在任何發行版上都能正常開發，所以選發行版不用太糾結，挑自己喜歡的就好。</p><h2 id="安裝-ubuntu-server-2404-時的磁碟分割">安裝 Ubuntu Server 24.04 時的磁碟分割</h2><p>在安裝 Ubuntu Server 24.04 的過程中，介面主要靠鍵盤操作，相對單純。</p><p>安裝過程會遇到硬碟的磁碟分割，可以參考 <a class="link" href="https://help.ubuntu.com/community/DiskSpace" target="_blank" rel="noopener">Ubuntu 磁碟空間建議與策略</a>。</p><div class="table-wrapper"><table><thead><tr><th>分割區</th><th>容量</th><th>我的規劃</th></tr></thead><tbody><tr><td>/</td><td>至少 15 GB</td><td>30 GB (ext4)</td></tr><tr><td>/boot</td><td>250 MB ~ 1 GB</td><td>500 MB (ext4)</td></tr><tr><td>/var</td><td>2 GB</td><td>2 GB (ext4)</td></tr><tr><td>swap</td><td>RAM 的大小</td><td>8 GB, (ext4)</td></tr><tr><td>/home</td><td>剩餘硬碟空間</td><td>151.34 GB (ext4)</td></tr></tbody></table></div><ol><li><p><code>/</code> 為根分割區，官方建議至少分配 15 GB。由於日誌檔案、臨時快取及安裝包等因素，根分割區隨時間可能逐漸被填滿，導致系統效能下降或運作故障。為降低此類風險，我將分割區容量設為建議值的兩倍。儘管如此，仍建議定期清理根分割區內的檔案，或在空間不足時調整分割區大小。</p></li><li><p>/boot 大多數的 UEFI 為 500 MB ~ 1 GB。</p></li><li><p>一般桌面系統使用時，可以將 /var 分配 1-2 GB 就足夠了。如果是伺服器系統，特別是會產生大量系統日誌（如網頁伺服器），建議 /var 分割區分配 5 GB 或更大的空間，以防止日誌檔案占滿根目錄。使用 Docker 時，建議為 /var 分配至少 20 到 50 GB 的磁碟空間。如果一開始規劃的空間過小，可以修改 /etc/docker/daemon.json，將預設路徑 /var/lib/docker/ 更改到其他目錄，或是使用符號連結來解決。</p></li><li><p>swap 使用與系統 RAM 約 1.5 ~ 2 倍的配置，例如 4 GB 的 RAM，可以將 SWAP 設為 6 GB。或是如果是 8 GB 以上的 RAM，則 SWAP 可以分配 1 倍即可。</p></li><li><p>其餘的空間都留給 /home，或者根據需要特別規劃其他分割區。</p></li></ol><p>確認所有分割設定無誤後，即可開始正式安裝系統。安裝完成並重新啟動後，系統便會順利進入 Ubuntu。</p><h2 id="進行網路設定">進行網路設定</h2><p>⚠️ 系統安裝完成後，建議第一時間檢查網路環境能否正常運作，包括 IP 位址配置、DNS 伺服器可用性，以及能否順利連線外部網路。若網路連線不穩定或中斷，後續的套件安裝、遠端管理與系統維護都將受到嚴重影響。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 顯示網路介面的詳細資訊</span>
+</span></span><span class="line"><span class="cl">ip addr show
+</span></span></code></pre></td></tr></table></div></div><p>在輸出結果中，可以找到有線網路的介面名稱（例如 <code>enp8s0</code>）：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu <span class="m">65536</span> qdisc noqueue state UNKNOWN group default qlen <span class="m">1000</span>
+</span></span><span class="line"><span class="cl">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span class="line"><span class="cl">    inet 127.0.0.1/8 scope host lo
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span><span class="line"><span class="cl">    inet6 ::1/128 scope host noprefixroute
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span><span class="line"><span class="cl">2: enp8s0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span class="m">1500</span> qdisc pfifo_fast state UP group default qlen <span class="m">1000</span>
+</span></span><span class="line"><span class="cl">    link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff
+</span></span><span class="line"><span class="cl">    inet 192.168.1.107/24 metric <span class="m">100</span> brd 192.168.0.255 scope global dynamic enp8s0
+</span></span><span class="line"><span class="cl">       valid_lft 123456sec preferred_lft 123456sec
+</span></span><span class="line"><span class="cl">    inet6 fd3f:1234:5678:9abc:0011:22ff:fe33:4455/64 scope global dynamic mngtmpaddr noprefixroute
+</span></span><span class="line"><span class="cl">       valid_lft 1688sec preferred_lft 1688sec
+</span></span><span class="line"><span class="cl">    inet6 fe80::0011:22ff:fe33:4455/64 scope link
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span></code></pre></td></tr></table></div></div><p>自 <strong>Ubuntu 17.10</strong> 起，網路統一改由 netplan 管理。可使用下列指令檢查 <code>/etc/netplan</code> 內的設定檔，常見的檔案名稱可能是 <code>01-netcfg.yaml</code> 或 <code>50-cloud-init.yaml</code>：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ls /etc/netplan
+</span></span></code></pre></td></tr></table></div></div><p>在 Netplan 配置中，<code>01-netcfg.yaml</code> 的優先權較高，若該檔案存在，系統將優先套用其設定。目前我的伺服器只有 <code>50-cloud-init.yaml</code> 這個設定檔，可用以下指令編輯：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/netplan/50-cloud-init.yaml<span class="sb">`</span>
+</span></span></code></pre></td></tr></table></div></div><p>在檔案中填入以下設定，此範例將 enp8s0 設為透過 DHCP 自動取得 IP 位址，並使用 1.1.1.1 和 8.8.8.8 作為 DNS 伺服器。請依自己的網路環境調整：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp8s0</span><span class="p">:</span><span class="w">  </span><span class="c"># 需要根據自身的網卡名稱</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>若需要固定 IP 位址，可改用以下範例，並依實際子網路調整：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp0s31f6</span><span class="p">:</span><span class="w">  </span><span class="c"># 需要根據自身的網卡名稱</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">no</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="m">192.168.88.123</span><span class="l">/24    </span><span class="w"> </span><span class="c"># 填入想要的固定 IP 位址</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">gateway4</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.88.254</span><span class="w">  </span><span class="c"># 填入閘道</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">addresses</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">1.1.1.1</span><span class="p">,</span><span class="w"> </span><span class="m">8.8.8.8</span><span class="p">]</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>編輯完成後，用以下指令把設定套用到系統：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo netplan apply
+</span></span></code></pre></td></tr></table></div></div><p>成功後，請以 <code>ping</code> 命令測試外網聯通狀態，例如：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ping google.com
+</span></span></code></pre></td></tr></table></div></div><p>正常情況會輸出類似下列訊息，表示網路已就緒：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">PING google.com <span class="o">(</span>173.194.174.101<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from td-in-f101.1e100.net <span class="o">(</span>173.194.174.101<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">1</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">103</span> <span class="nv">time</span><span class="o">=</span>17.7 ms
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from td-in-f101.1e100.net <span class="o">(</span>173.194.174.101<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">2</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">103</span> <span class="nv">time</span><span class="o">=</span>21.9 ms
+</span></span></code></pre></td></tr></table></div></div><p>以上步驟就能確認網路連線是否正常。</p><h2 id="確保系統與套件處於最新狀態">確保系統與套件處於最新狀態</h2><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 更新套件清單後，升級已安裝的套件。</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt upgrade
+</span></span></code></pre></td></tr></table></div></div><h2 id="遠端環境建立">遠端環境建立</h2><p>伺服器連上網際網路後，接著安裝 Tailscale 與 SSH，之後就能遠端開發。</p><h3 id="安裝-tailscale">安裝 Tailscale</h3><p>若需要遠端連線此電腦，強烈建議使用 Tailscale，而非直接將伺服器暴露於公共網際網路。</p><p>詳細安裝說明請參考：《<a class="link" href="/post/tailscale/">使用 Tailscale 輕鬆建立安全且私密的隧道</a>》。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 安裝</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://tailscale.com/install.sh <span class="p">|</span> sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 啟動伺服器</span>
+</span></span><span class="line"><span class="cl">sudo tailscale up
+</span></span></code></pre></td></tr></table></div></div><p>執行 <code>sudo tailscale up</code> 後，終端機會顯示一個網址。請使用瀏覽器或是第三方裝置開啟該網址以完成登入 Tailscale 帳戶，完成身分驗證後，系統將自動將此裝置加入到你的 tailnet 私有內網。</p><blockquote><p>⚠️ 我在安裝 Tailscale 後，有遇到網卡名稱異動或 DNS 設定被 Tailscale 控制，導致無法正常 ping 出去的問題。</p><p>建議安裝後重新啟動系統，並檢查網路連線是否正常。如有需要，請更新網路設定。</p></blockquote><h3 id="配置-ssh">配置 SSH</h3><p>請參考《<a class="link" href="/post/ssh-connection/">使用 SSH 金鑰進行無密碼遠端連線</a>》。</p><p>上述配置完畢後，應該就能用 Tailscale + SSH 從第三方裝置遠端連線操作。</p><h2 id="系統基礎設定與安裝">系統基礎設定與安裝</h2><h3 id="系統時區與語言設定">系統時區與語言設定</h3><p>使用以下指令將系統時區設定為 <strong>Asia/Taipei</strong>：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo timedatectl set-timezone Asia/Taipei
+</span></span></code></pre></td></tr></table></div></div><p>針對其他地區，可透過 <code>timedatectl list-timezones</code> 查詢所有可用時區，並使用 <code>grep</code> 過濾相關時區名稱，例如：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">timedatectl list-timezones <span class="p">|</span> grep Asia
+</span></span></code></pre></td></tr></table></div></div><p>執行以下指令產生 <code>zh_TW.UTF-8</code> 語言環境：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install language-pack-zh-hant
+</span></span><span class="line"><span class="cl">sudo locale-gen
+</span></span></code></pre></td></tr></table></div></div><p>可以透過 <code>locale -a</code> 檢查系統的可用語言，輸出如下：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">C
+</span></span><span class="line"><span class="cl">C.utf8
+</span></span><span class="line"><span class="cl">en_US.utf8
+</span></span><span class="line"><span class="cl">POSIX
+</span></span><span class="line"><span class="cl">zh_HK.utf8
+</span></span><span class="line"><span class="cl">zh_TW.utf8
+</span></span></code></pre></td></tr></table></div></div><p>使用 <code>update-locale</code> 指令來更新 <code>/etc/default/locale</code> 檔案，並將 <code>LANG</code> 設為 <code>zh_TW.UTF-8</code>：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo update-locale <span class="nv">LANG</span><span class="o">=</span>zh_TW.UTF-8
+</span></span></code></pre></td></tr></table></div></div><p>最後透過 <code>locale</code> 指令檢查，輸出如下：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">LANG</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LANGUAGE</span><span class="o">=</span>
+</span></span><span class="line"><span class="cl"><span class="nv">LC_CTYPE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_NUMERIC</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_TIME</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_COLLATE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MONETARY</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MESSAGES</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_PAPER</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_NAME</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_ADDRESS</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_TELEPHONE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MEASUREMENT</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_IDENTIFICATION</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_ALL</span><span class="o">=</span>
+</span></span></code></pre></td></tr></table></div></div><p>系統的預設語言和區域設定，涵蓋了字元編碼、時間格式、數字格式、貨幣格式等。設定為 zh_TW.UTF-8 表示系統使用繁體中文（臺灣）並且使用 UTF-8 編碼來處理字元。LANGUAGE 變數用來指定語言優先順序，控制翻譯語言的選擇。如果這個變數為空，系統將僅依賴 LANG 來設定語言環境。</p><h3 id="安裝-net-tools">安裝 Net tools</h3><p><code>Net-tools</code> 提供一套實用的網路管理與故障排除工具。不過，自 <strong>Ubuntu 18.10</strong> 起，該套件已 <strong>不再預設安裝</strong>，部分指令（如 <code>ifconfig</code> 和 <code>netstat</code>）亦逐步被更現代的工具（如 <code>ip</code> 和 <code>ss</code> 指令）取代。</p><p>如果仍需使用 <code>Net-tools</code>，可手動安裝：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install net-tools
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝建置工具包">安裝建置工具包</h3><p>部分開發工具依賴 GCC、G++、Make 等編譯工具，建議安裝 build-essential 套件，把基礎的開發與建置環境備齊。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install build-essential
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-blesh">安裝 ble.sh</h3><p><a class="link" href="https://github.com/akinomyoga/ble.sh" target="_blank" rel="noopener">ble.sh</a> 是一個為 Bash 提供即時語法突顯和更強大功能（如自動完成等）的腳本。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 透過 git 複製 ble.sh 後，編譯並安裝</span>
+</span></span><span class="line"><span class="cl">git clone --recursive --depth <span class="m">1</span> --shallow-submodules https://github.com/akinomyoga/ble.sh.git
+</span></span><span class="line"><span class="cl">make -C ble.sh install <span class="nv">PREFIX</span><span class="o">=</span>~/.local
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;source ~/.local/share/blesh/ble.sh&#39;</span> &gt;&gt; ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-homebrew">安裝 Homebrew</h3><p>Homebrew 為 macOS 提供了一種更快速的軟體包安裝方式，能夠方便地安裝、更新和管理軟體包。同樣，它也支援 Ubuntu 等 Linux 系統。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 安裝 Homebrew</span>
+</span></span><span class="line"><span class="cl">/bin/bash -c <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==&gt; Next steps:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - Run these two commands in your terminal to add Homebrew to your PATH:</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     (echo; echo &#39;eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;&#39;) &gt;&gt; /home/使用者/.bashrc</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>安裝後，會要求再執行兩行指令，讓 Bash 自動載入 Homebrew 的安裝目錄。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 設定每次打開 Bash 都會載入 homebrew 的安裝路徑</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>echo<span class="p">;</span> <span class="nb">echo</span> <span class="s1">&#39;eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;&#39;</span><span class="o">)</span> &gt;&gt; /home/使用者/.bashrc
+</span></span><span class="line"><span class="cl"><span class="nb">eval</span> <span class="s2">&#34;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew shellenv<span class="k">)</span><span class="s2">&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-fzf">安裝 fzf</h3><p><a class="link" href="https://github.com/junegunn/fzf" target="_blank" rel="noopener">fzf</a> 是一個命令列模糊搜尋工具，可以從檔案、命令歷史、Git 提交紀錄裡做模糊搜尋，在命令列下找東西快很多。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 使用 Homebrew 安裝</span>
+</span></span><span class="line"><span class="cl">brew install fzf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 未來更新可透過</span>
+</span></span><span class="line"><span class="cl">brew update<span class="p">;</span> brew upgrade fzf
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-nodejs">安裝 Node.js</h3><p>JavaScript 執行環境，有需要開發前後端再裝。</p><p><a class="link" href="https://nodejs.org/en/download/package-manager" target="_blank" rel="noopener">官網的安裝教學</a>寫得很清楚，建議用 nvm 安裝。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 安裝 nvm (Node 版本管理器)</span>
+</span></span><span class="line"><span class="cl">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh <span class="p">|</span> bash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 下載並安裝 Node.js（可能需要重新啟動終端）</span>
+</span></span><span class="line"><span class="cl">nvm install <span class="m">20</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 驗證正確的 Node.js 版本是否在環境中</span>
+</span></span><span class="line"><span class="cl">node -v <span class="c1"># 應顯示 `v20.14.0`</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 驗證正確的 NPM 版本是否在環境中</span>
+</span></span><span class="line"><span class="cl">npm -v <span class="c1"># 應顯示 `10.7.0`</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-tldr">安裝 tldr</h3><p><a class="link" href="https://github.com/tldr-pages/tldr" target="_blank" rel="noopener">tldr</a> 提供簡明易懂的命令列工具說明和實用範例，比起 Linux 下的 man 指令更加直觀。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install tlrc
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 或是有安裝 Node.js，可以用 npm 進行安裝。</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># npm install -g tldr</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># tldr --update</span>
+</span></span></code></pre></td></tr></table></div></div><p>使用方法只要 <code>tldr &lt;command></code> 即可。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tldr zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  Package and compress <span class="o">(</span>archive<span class="o">)</span> files into a Zip archive.
+</span></span><span class="line"><span class="cl">  See also: unzip.
+</span></span><span class="line"><span class="cl">  More information: https://manned.org/zip.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Add files/directories to a specific archive:
+</span></span><span class="line"><span class="cl">    zip -r path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Remove files/directories from a specific archive:
+</span></span><span class="line"><span class="cl">    zip --delete path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories e<span class="o">[</span>x<span class="o">]</span>cluding specified ones:
+</span></span><span class="line"><span class="cl">    zip path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ... --exclude path/to/excluded_files_or_directories
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories with a specific compression level <span class="o">(</span><span class="m">0</span> - the lowest, <span class="m">9</span> - the highest<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">    zip -r -0..9 path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Create an encrypted archive with a specific password:
+</span></span><span class="line"><span class="cl">    zip -r --encrypt path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories to a multi-part <span class="o">[</span>s<span class="o">]</span>plit Zip archive <span class="o">(</span>e.g. <span class="m">3</span> GB parts<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">    zip -r -s 3g path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Print a specific archive contents:
+</span></span><span class="line"><span class="cl">    zip -sf path/to/compressed.zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">See also: unzip
+</span></span></code></pre></td></tr></table></div></div><h3 id="更新-git-到最新版本">更新 Git 到最新版本</h3><p>Git 不一定要更新到最新版本，部分工具版本太舊，需要配合舊版的 Git，如果安裝最新版的 Git 可能會遇到版本相容的問題。</p><p>git-core/ppa 是一個 Personal Package Archive (PPA)，由 Git 社區維護，提供 Git 軟體的最新版本。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 新增 PPA</span>
+</span></span><span class="line"><span class="cl">sudo add-apt-repository ppa:git-core/ppa
+</span></span><span class="line"><span class="cl"><span class="c1"># Git 更新到最新版本</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt upgrade
+</span></span></code></pre></td></tr></table></div></div><h3 id="設定-git-使用者">設定 Git 使用者</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git config --global user.name <span class="s2">&#34;USER&#34;</span>
+</span></span><span class="line"><span class="cl">git config --global user.email <span class="s2">&#34;USER_MAIL&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="其他進階設定">其他進階設定</h2><h3 id="關閉-ipv6-連線">關閉 IPv6 連線</h3><p>如果 ISP 同時提供 IPv4 和 IPv6 位址，基於安全性或特定需求考量，建議僅使用 IPv4。這時可以關閉 IPv6，讓所有網路流量只走 IPv4，攻擊面也跟著變小。</p><h4 id="透過-sysctl-停用-ipv6">透過 sysctl 停用 IPv6</h4><p>在 Ubuntu 17.10 之前，系統沒有使用 Netplan，可以透過 <code>sysctl</code> 修改核心參數來關閉 IPv6：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/sysctl.conf
+</span></span></code></pre></td></tr></table></div></div><p>在檔案底部新增以下內容：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">net.ipv6.conf.all.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">net.ipv6.conf.default.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">net.ipv6.conf.lo.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span></code></pre></td></tr></table></div></div><p>儲存後，使用以下指令重新載入 sysctl 設定：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sysctl -p
+</span></span></code></pre></td></tr></table></div></div><h4 id="透過-netplan-停用-ipv6">透過 Netplan 停用 IPv6</h4><p>自 Ubuntu 17.10 起，網路管理統一改為 <code>Netplan</code>。如果需要停用特定網卡的 IPv6，可以用 Netplan 設定：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/netplan/50-cloud-init.yaml
+</span></span></code></pre></td></tr></table></div></div><p>在目標網卡（例如 <code>enp8s0</code>）的設定中，新增 <code>link-local: [ ipv4 ]</code>，範例如下：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp8s0</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">link-local</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="l">ipv4 ] </span><span class="w"> </span><span class="c"># 停用 IPv6</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>正式應用設定：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo netplan apply
+</span></span></code></pre></td></tr></table></div></div><p>最後透過 <code>ip a</code> 或是 <code>ifconfig</code> 檢查該網路介面狀態。會發現只剩下 IPv4 的位址。</p><h3 id="設定-vs-code-為-ssh-遠端開發的預設編輯器">設定 VS Code 為 SSH 遠端開發的預設編輯器</h3><p>透過 SSH 連線至 Ubuntu 時，可將 VS Code 設為預設編輯器，讓終端機內的編輯體驗更直覺，並可直接使用 code 指令開啟檔案。</p><p>首先需要修改 <code>.bashrc</code> 檔案（若使用 zsh，請修改 <code>~/.zshrc</code>）。執行以下指令，在 VS Code 中開啟 <code>.bashrc</code>：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">code ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><p>接著，在檔案底部新增以下內容，讓系統把 VS Code 當成預設編輯器：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">CODE_PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span> -v code 2&gt;/dev/null<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[[</span> -x <span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2">&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>  <span class="c1"># 確保 code 存在且可執行</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">VISUAL</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">EDITOR</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">SUDO_EDITOR</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span></code></pre></td></tr></table></div></div><p>完成後，儲存 (<code>Ctrl + S</code>) 並關閉檔案。</p><p>最後，執行以下指令重新載入設定，或直接開啟新的終端機讓變更生效：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">source</span> ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><p>如此一來，若需編輯需要權限的檔案，可用終端機中的 <code>sudoedit</code> 直接在 VS Code 中開啟、寫入；或是使用 <code>crontab -e</code> 編輯排程任務（cron jobs），同樣會自動開啟 VS Code 來編輯，遠端開發方便不少。</p><h3 id="設定-ubuntu-pro-安全性">設定 Ubuntu Pro 安全性</h3><p>啟用 Ubuntu Pro 可以更即時修補系統漏洞，安全性和穩定性都比較好。</p><p>首先在 Ubuntu 官網上註冊並獲取一個 Ubuntu Pro 免費訂閱，可以在 <a class="link" href="https://ubuntu.com/pro" target="_blank" rel="noopener">Ubuntu Pro</a> 頁面註冊。</p><p>註冊後，用 <code>sudo pro attach &lt;YOUR_TOKEN></code> 綁定 Ubuntu Pro 訂閱：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo pro attach YGBDmwR6Y2S
+</span></span></code></pre></td></tr></table></div></div><p>輸出如下：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Enabling Ubuntu Pro: ESM Apps
+</span></span><span class="line"><span class="cl">Ubuntu Pro: ESM Apps enabled
+</span></span><span class="line"><span class="cl">Enabling Ubuntu Pro: ESM Infra
+</span></span><span class="line"><span class="cl">Ubuntu Pro: ESM Infra enabled
+</span></span><span class="line"><span class="cl">Enabling Livepatch
+</span></span><span class="line"><span class="cl">Livepatch enabled
+</span></span><span class="line"><span class="cl">This machine is now attached to <span class="s1">&#39;Ubuntu Pro - free personal subscription&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">SERVICE          ENTITLED  STATUS       DESCRIPTION
+</span></span><span class="line"><span class="cl">anbox-cloud      yes       disabled     Scalable Android in the cloud
+</span></span><span class="line"><span class="cl">esm-apps         yes       enabled      Expanded Security Maintenance <span class="k">for</span> Applications
+</span></span><span class="line"><span class="cl">esm-infra        yes       enabled      Expanded Security Maintenance <span class="k">for</span> Infrastructure
+</span></span><span class="line"><span class="cl">landscape        yes       disabled     Management and administration tool <span class="k">for</span> Ubuntu
+</span></span><span class="line"><span class="cl">livepatch        yes       enabled      Canonical Livepatch service
+</span></span><span class="line"><span class="cl">realtime-kernel* yes       disabled     Ubuntu kernel with PREEMPT_RT patches integrated
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> * Service has variants
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NOTICES
+</span></span><span class="line"><span class="cl">Operation in progress: pro attach
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">For a list of all Ubuntu Pro services and variants, run <span class="s1">&#39;pro status --all&#39;</span>
+</span></span><span class="line"><span class="cl">Enable services with: pro <span class="nb">enable</span> &lt;service&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     Account: xxxxx@xxx.com
+</span></span><span class="line"><span class="cl">Subscription: Ubuntu Pro - free personal subscription
+</span></span></code></pre></td></tr></table></div></div><h2 id="結論">結論</h2><p>以上基本環境配置好後就可以快樂的遠端開發了🥳。</p><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://aws.amazon.com/tw/what-is/vps/" target="_blank" rel="noopener">什麼是 VPS？</a></li><li><a class="link" href="https://ubuntu.com/server/docs" target="_blank" rel="noopener">Ubuntu Server documentation</a></li><li><a class="link" href="https://help.ubuntu.com/community/DiskSpace" target="_blank" rel="noopener">DiskSpace - Community Help Wiki</a></li><li><a class="link" href="https://ubuntu.com/blog/ubuntu-bionic-netplan" target="_blank" rel="noopener">Ubuntu Bionic: Netplan</a></li><li><a class="link" href="https://github.com/akinomyoga/ble.sh" target="_blank" rel="noopener">ble.sh</a></li><li><a class="link" href="https://github.com/junegunn/fzf" target="_blank" rel="noopener">fzf</a></li><li><a class="link" href="https://github.com/tldr-pages/tldr" target="_blank" rel="noopener">tldr-pages/tldr</a></li><li><a class="link" href="https://git-scm.com/book/zh-tw/v2/%E9%96%8B%E5%A7%8B-%E5%88%9D%E6%AC%A1%E8%A8%AD%E5%AE%9A-Git" target="_blank" rel="noopener">初次設定 Git</a></li><li><a class="link" href="https://tailscale.com/kb/1077/secure-server-ubuntu-18-04?q=ufw+allow#step-1-ssh-into-your-new-ubuntu-server" target="_blank" rel="noopener">Use UFW to lock down an Ubuntu server</a></li><li><a class="link" href="https://superuser.com/questions/1037346/i-have-both-ipv4-and-ipv6-public-addresses-why" target="_blank" rel="noopener">networking - I have both IPv4 and IPv6 public addresses. Why?</a></li><li><a class="link" href="https://discourse.ubuntu.com/t/fine-tuning-the-ubuntu-24-04-kernel-for-low-latency-throughput-and-power-efficiency/44834" target="_blank" rel="noopener">Fine-Tuning the Ubuntu 24.04 Kernel for low latency, throughput, and power efficiency</a></li><li><a class="link" href="https://answers.launchpad.net/ubuntu/+source/netplan.io/+question/816875" target="_blank" rel="noopener">How to configurate a IPv4 disabled and IPv6 on...</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/linux/">Linux</a>
+<a href="/tags/ubuntu/">Ubuntu</a>
+<a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/%E6%9C%8D%E5%8B%99/">服務</a>
+<a href="/tags/%E7%B3%BB%E7%B5%B1/">系統</a>
+<a href="/tags/%E7%B6%B2%E8%B7%AF/">網路</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/ubuntu-no-network-on-boot/"><div class="article-image"><img alt="Featured image of post 解決 Ubuntu 24.04 網路線插入，但網路指示燈不亮且無網路的問題" height="150" loading="lazy" src="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp" srcset="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp 1x, /post/ubuntu-no-network-on-boot/cover_hu_d95a03bc103153c1.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#996b3f80 0%,#1a2a2bC0 100%)"><h2 class="article-title">解決 Ubuntu 24.04 網路線插入，但網路指示燈不亮且無網路的問題</h2></div></a></article><article class="has-image"><a href="/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置</h2></div></a></article><article class="has-image"><a href="/post/mdns-iot-device-discovery/"><div class="article-image"><img alt="Featured image of post mDNS 運作原理與 IoT 裝置發現機制" height="150" loading="lazy" src="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp" srcset="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp 1x, /post/mdns-iot-device-discovery/cover_hu_8f608671f48343b3.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c2c1b280 0%,#524332C0 100%)"><h2 class="article-title">mDNS 運作原理與 IoT 裝置發現機制</h2></div></a></article><article class="has-image"><a href="/post/generate-self-signed-cert/"><div class="article-image"><img alt="Featured image of post 內網 HTTPS 無痛升級：使用 OpenSSL 建立自簽署憑證" height="150" loading="lazy" src="/post/generate-self-signed-cert/cover_hu_c26d95563300f92.webp" srcset="/post/generate-self-signed-cert/cover_hu_c26d95563300f92.webp 1x, /post/generate-self-signed-cert/cover_hu_97e045c2e227d905.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a45b2180 0%,#47261cC0 100%)"><h2 class="article-title">內網 HTTPS 無痛升級：使用 OpenSSL 建立自簽署憑證</h2></div></a></article><article class="has-image"><a href="/post/ssh-connection/"><div class="article-image"><img alt="Featured image of post 使用 SSH 金鑰進行無密碼遠端連線" height="150" loading="lazy" src="/post/ssh-connection/cover_hu_383b24a9cea8f2c8.webp" srcset="/post/ssh-connection/cover_hu_383b24a9cea8f2c8.webp 1x, /post/ssh-connection/cover_hu_f74a22af6adde5c9.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#216b9180 0%,#193c4aC0 100%)"><h2 class="article-title">使用 SSH 金鑰進行無密碼遠端連線</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

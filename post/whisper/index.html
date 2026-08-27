@@ -1,0 +1,344 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="在本地端裝好 Faster Whisper，附一段腳本：貼上 YouTube 或 Bilibili 網址就自動下載影片，離線跑 Whisper 產生逐字稿與 SRT／TXT 字幕檔。"><title>使用 Faster Whisper 取得任何影片或音訊的原始字幕 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/whisper/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="使用 Faster Whisper 取得任何影片或音訊的原始字幕"><meta property='og:description' content="在本地端裝好 Faster Whisper，附一段腳本：貼上 YouTube 或 Bilibili 網址就自動下載影片，離線跑 Whisper 產生逐字稿與 SRT／TXT 字幕檔。"><meta property='og:url' content='https://wellstsai.com/post/whisper/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='AI'><meta property='article:tag' content='教學'><meta property='article:tag' content='GPT'><meta property='article:tag' content='生產力'><meta property='article:tag' content='自動化'><meta property='article:tag' content='腳本'><meta property='article:tag' content='軟體'><meta property='article:published_time' content='2025-07-08T21:30:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/whisper/cover.webp'><meta name="twitter:title" content="使用 Faster Whisper 取得任何影片或音訊的原始字幕"><meta name="twitter:description" content="在本地端裝好 Faster Whisper，附一段腳本：貼上 YouTube 或 Bilibili 網址就自動下載影片，離線跑 Whisper 產生逐字稿與 SRT／TXT 字幕檔。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/whisper/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/whisper/cover_hu_ab75c67866670264.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/whisper/cover_hu_9bbf7a5756798424.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/whisper/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/whisper/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/whisper/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/whisper/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"前言 當錄製好一段影片後，想要為影片加上字幕，最快的做法是什麼？\n或是透過 iPhone 錄製好開會紀錄的對話、訪談內容後，如何將其轉換為可閱讀的文字稿？\n當影片講述內容過於艱深或遇到語言障礙，如何把影片丟給 AI 分析後有條理的統整、並告知原因與結果？\n上述需求，都可以用 OpenAI 開源的 Whisper 自動語音辨識模型，或其高效衍生專案 Faster-Whisper，在本地端部署完成，做到影片／音訊的一鍵轉文字、字幕產生與後續內容分析。\n什麼是 Whisper？ Whisper 是在 2022 年 9 月由 OpenAI 正式發表並開源的語音辨識系統（automatic speech recognition，ASR）。截至 2025 年，Whisper 已經問世將近 3 年。\n主要功能 語音轉文字：可將錄音、影片等語音內容自動辨識並轉換為文字逐字稿。\n多語言支援：支援超過 57 種語言（如中英日法等），並能自動偵測語言。底層模型實際是用 98 種語言的資料做弱監督式訓練，官方只保證支援其中字錯率低於 50% 的 57 種語言。\n自動語言辨識：無需預先指定語言，模型可自動判斷語 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2025-07-08T21:30:00+08:00","description":"在本地端裝好 Faster Whisper，附一段腳本：貼上 YouTube 或 Bilibili 網址就自動下載影片，離線跑 Whisper 產生逐字稿與 SRT／TXT 字幕檔。","headline":"使用 Faster Whisper 取得任何影片或音訊的原始字幕","image":"https://wellstsai.com/post/whisper/cover.webp","keywords":["AI","教學","GPT","生產力","自動化","腳本","軟體"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/whisper/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/whisper/" selected>繁體中文</option><option value="/en/post/whisper/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#前言">前言</a></li><li><a href="#什麼是-whisper">什麼是 Whisper？</a><ol><li><a href="#主要功能">主要功能</a></li><li><a href="#技術特點">技術特點</a></li><li><a href="#應用場景">應用場景</a></li><li><a href="#其他版本">其他版本</a></li></ol></li><li><a href="#於本地部署-faster-whisper">於本地部署 faster-whisper</a><ol><li><a href="#安裝-python">安裝 Python</a></li><li><a href="#安裝-faster-whisper">安裝 faster-whisper</a></li><li><a href="#安裝-cuda-toolkit-12-與-cudnn選擇性">安裝 CUDA Toolkit 12 與 cuDNN（選擇性）</a></li></ol></li><li><a href="#使用腳本將影片語音轉文字逐字稿">使用腳本將影片語音轉文字逐字稿</a><ol><li><a href="#腳本下載">腳本下載</a></li><li><a href="#generate-srtbat">generate-srt.bat</a></li><li><a href="#generate-srtpy">generate-srt.py</a></li><li><a href="#參數設定txt">參數設定.txt</a></li></ol></li><li><a href="#使用範例">使用範例</a></li><li><a href="#獨立轉換本地檔案">獨立轉換本地檔案</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/whisper/" style="position:relative;display:block"><img src="/post/whisper/cover_hu_c9bad6f677b535ff.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/whisper/cover_hu_ab75c67866670264.webp"><source media="(min-width: 769px)" srcset="/post/whisper/cover_hu_9bbf7a5756798424.webp">
+<img src="/post/whisper/cover_hu_9bbf7a5756798424.webp" width="1536" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="使用 Faster Whisper 取得任何影片或音訊的原始字幕" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/whisper/">使用 Faster Whisper 取得任何影片或音訊的原始字幕</a></h2><h3 class="article-subtitle">在本地端裝好 Faster Whisper，附一段腳本：貼上 YouTube 或 Bilibili 網址就自動下載影片，離線跑 Whisper 產生逐字稿與 SRT／TXT 字幕檔。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2025-07-08T21:30:00+08:00'>2025/07/08</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：9 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/whisper/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#前言">前言</a></li><li><a href="#什麼是-whisper">什麼是 Whisper？</a><ol><li><a href="#主要功能">主要功能</a></li><li><a href="#技術特點">技術特點</a></li><li><a href="#應用場景">應用場景</a></li><li><a href="#其他版本">其他版本</a></li></ol></li><li><a href="#於本地部署-faster-whisper">於本地部署 faster-whisper</a><ol><li><a href="#安裝-python">安裝 Python</a></li><li><a href="#安裝-faster-whisper">安裝 faster-whisper</a></li><li><a href="#安裝-cuda-toolkit-12-與-cudnn選擇性">安裝 CUDA Toolkit 12 與 cuDNN（選擇性）</a></li></ol></li><li><a href="#使用腳本將影片語音轉文字逐字稿">使用腳本將影片語音轉文字逐字稿</a><ol><li><a href="#腳本下載">腳本下載</a></li><li><a href="#generate-srtbat">generate-srt.bat</a></li><li><a href="#generate-srtpy">generate-srt.py</a></li><li><a href="#參數設定txt">參數設定.txt</a></li></ol></li><li><a href="#使用範例">使用範例</a></li><li><a href="#獨立轉換本地檔案">獨立轉換本地檔案</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="前言">前言</h2><p>當錄製好一段影片後，想要為影片加上字幕，最快的做法是什麼？</p><p>或是透過 iPhone 錄製好開會紀錄的對話、訪談內容後，如何將其轉換為可閱讀的文字稿？</p><p>當影片講述內容過於艱深或遇到語言障礙，如何把影片丟給 AI 分析後有條理的統整、並告知原因與結果？</p><p>上述需求，都可以用 OpenAI 開源的 Whisper 自動語音辨識模型，或其高效衍生專案 Faster-Whisper，在本地端部署完成，做到影片／音訊的一鍵轉文字、字幕產生與後續內容分析。</p><h2 id="什麼是-whisper">什麼是 Whisper？</h2><p>Whisper 是在 2022 年 9 月由 OpenAI 正式發表並開源的語音辨識系統（automatic speech recognition，ASR）。截至 2025 年，Whisper 已經問世將近 3 年。</p><h3 id="主要功能">主要功能</h3><ul><li><p><strong>語音轉文字</strong>：可將錄音、影片等語音內容自動辨識並轉換為文字逐字稿。</p></li><li><p><strong>多語言支援</strong>：支援超過 57 種語言（如中英日法等），並能自動偵測語言。底層模型實際是用 98 種語言的資料做弱監督式訓練，官方只保證支援其中字錯率低於 50% 的 57 種語言。</p></li><li><p><strong>自動語言辨識</strong>：無需預先指定語言，模型可自動判斷語音所使用的語言。</p></li><li><p><strong>容錯能力</strong>：即使音質不佳、口音重或有背景雜訊，仍能維持較高辨識準確度。</p></li></ul><h3 id="技術特點">技術特點</h3><ul><li><p><strong>深度學習模型</strong>：採用 Transformer 架構，並用大規模的多語言語音轉文字對應資料做弱監督式訓練。</p></li><li><p><strong>開源可得</strong>：原始碼與模型權重皆免費開放於 GitHub，方便研究者與開發者做二次開發與客製化。</p></li><li><p><strong>跨平台支援</strong>：可在 Windows、macOS、Linux 等多種作業系統中部署。</p></li><li><p><strong>多種模型尺寸</strong>：提供從 <code>tiny</code> 到 <code>large-v3</code>、<code>turbo</code> 等多種模型規格，可依資源與精確度需求做選擇。</p></li></ul><h3 id="應用場景">應用場景</h3><ul><li><p><strong>影片字幕自動產生</strong>：快速產生影片逐字稿與字幕檔（SRT/TXT）。</p></li><li><p><strong>會議紀錄自動化</strong>：將線上／線下會議錄音語音轉文字，減少人工整理時間。</p></li><li><p><strong>語音搜尋與語音控制</strong>：支援語音查詢、命令辨識等使用場景。</p></li><li><p><strong>Podcast、訪談轉錄</strong>：將長篇語音內容快速語音轉文字稿，利於內容管理與尋找。</p></li></ul><h3 id="其他版本">其他版本</h3><p>除了原始 Whisper 模型外，社群還衍生出多個專案，以因應不同的效能與功能需求：</p><ol><li><p>faster-whisper：基於 Whisper 架構，採用 CTranslate2 作為推論引擎重寫，執行速度與資源效率都比原版好，適合需要高吞吐量或即時轉錄的應用場景。</p></li><li><p>WhisperX：在 faster-whisper 基礎上加入批次推論、強制對齊（forced alignment）、語者分離（diarization）、語音活動偵測（VAD）等進階功能，特別適用於長音檔或多說話人錄音的精準轉錄與分析。</p></li><li><p>Whisper.cpp：將 Whisper 模型以超輕量級 C/C++ 實現，可在各類邊緣裝置（如筆電、手機、IoT）中本地離線執行，並快速啟動，適合對即時性與可攜性有要求的場景。</p></li></ol><p>先前我轉字幕都是用 OpenAI 官方的 Whisper，後來發現在相同硬體資源下，faster-whisper 的辨識精度相當甚至更好，運算時間卻明顯縮短。所以這次教學優先採用 faster-whisper；若未來需要更高的對齊精度或多說話者分析，可再評估導入 WhisperX。</p><h2 id="於本地部署-faster-whisper">於本地部署 faster-whisper</h2><h3 id="安裝-python">安裝 Python</h3><p>需要安裝 Python 3.9 或更新的版本，這邊直接用 <a class="link" href="/post/awesome-windows/#%e5%ae%89%e8%a3%9d-winget">WinGet</a> 安裝：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">winget install -e --id Python.Python.3.9
+</span></span></code></pre></td></tr></table></div></div><p>透過 <code>python -V</code> 檢查版本，有回傳版本號表示安裝成功：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">wells</span><span class="p">&gt;</span> <span class="n">python</span> <span class="n">-V</span>
+</span></span><span class="line"><span class="cl"><span class="n">Python</span> <span class="mf">3.9</span><span class="p">.</span><span class="py">13</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-faster-whisper">安裝 faster-whisper</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">pip install faster-whisper
+</span></span></code></pre></td></tr></table></div></div><h3 id="安裝-cuda-toolkit-12-與-cudnn選擇性">安裝 CUDA Toolkit 12 與 cuDNN（選擇性）</h3><p>⚠️ 本步驟僅適用於搭載 NVIDIA 顯示卡且支援 CUDA 的系統。</p><p>若使用支援 CUDA 的 GPU，轉檔時間會差很多，文末附了 GPU 與純 CPU 的實測比較。以下為支援 CUDA 的 NVIDIA GPU 型號整理：</p><div class="table-wrapper"><table><thead><tr><th style="text-align:left">類別</th><th style="text-align:left">型號</th></tr></thead><tbody><tr><td style="text-align:left"><strong>資料中心與超級晶片</strong></td><td style="text-align:left">B200, B100, GH200, H200, H100, L40S, L40, L4, A100, A40, A30, A16, A10, A2, T4, V100</td></tr><tr><td style="text-align:left"><strong>工作站與專業卡</strong></td><td style="text-align:left">RTX PRO 6000, RTX PRO 5000, RTX PRO 4500, RTX PRO 4000, RTX 6000, RTX 5000, RTX 4500, RTX 4000, RTX 2000, RTX A6000, RTX A5500, RTX A5000, RTX A4500, RTX A4000, RTX A2000, Quadro RTX 8000/6000/5000/4000, Quadro GV100, Quadro T-Series</td></tr><tr><td style="text-align:left"><strong>GeForce</strong></td><td style="text-align:left"><strong>RTX 50:</strong> 5090, 5080, 5070 Ti, 5070, 5060 Ti, 5060 &lt;br> <strong>RTX 40:</strong> 4090, 4080, 4070 SUPER/Ti, 4070, 4060 Ti, 4060, 4050 &lt;br> <strong>RTX 30:</strong> 3090 Ti, 3090, 3080 Ti, 3080, 3070 Ti, 3070, 3060 Ti, 3060, 3050 Ti, 3050 &lt;br> <strong>RTX 20:</strong> 2080 Ti/Super, 2080, 2070 Super, 2070, 2060 Super, 2060 &lt;br> <strong>GTX 16:</strong> 1660 Ti/Super, 1660, 1650 Super/Ti, 1650 &lt;br> <strong>TITAN:</strong> Titan RTX, TITAN V</td></tr><tr><td style="text-align:left"><strong>Jetson SoC</strong></td><td style="text-align:left">Jetson AGX Orin, Jetson Orin NX, Jetson Orin Nano</td></tr></tbody></table></div><p>根據官方 <a class="link" href="https://developer.nvidia.com/cuda-12-0-0-download-archive?target_os=Windows&amp;target_arch=x86_64&amp;target_version=11&amp;target_type=exe_local" target="_blank" rel="noopener">CUDA Toolkit 12.0 Downloads 下載連結</a>，選擇對應的作業系統、版本。</p><p>在此，我目前下載的是 <code>cuda_12.9.1_576.57_windows.exe</code>，安裝過程全程採用預設設定。</p><p>安裝完成後，可於系統目錄 <code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA</code> 確認 CUDA 是否已安裝完成。</p><p><img alt="CUDA Toolkit 下載頁面" class="gallery-image" data-flex-basis="348px" data-flex-grow="145" decoding="async" fetchpriority="high" height="1614" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/download_cuda_toolkit_12.x.webp" srcset="/post/whisper/download_cuda_toolkit_12.x_hu_3e7c5eafd304d170.webp 800w, /post/whisper/download_cuda_toolkit_12.x_hu_b4c2bb20deab2c84.webp 1600w, /post/whisper/download_cuda_toolkit_12.x.webp 2341w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2341">
+<img alt="確定系統目錄中已經安裝 CUDA" class="gallery-image" data-flex-basis="983px" data-flex-grow="409" decoding="async" height="323" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/check_cuda_path.webp" srcset="/post/whisper/check_cuda_path_hu_f7109e6501a4a79e.webp 800w, /post/whisper/check_cuda_path.webp 1324w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1324"></p><p>接續於 <a class="link" href="https://developer.nvidia.com/cudnn-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=Agnostic&amp;cuda_version=12" target="_blank" rel="noopener">cuDNN 加速函式庫官方下載頁面</a> 下載相容的 cuDNN 版本。</p><p>下載後，取得的為 zip 壓縮檔，檔名為 cudnn-windows-x86_64-9.10.2.21_cuda12-archive.zip。</p><p>解壓縮後，將其中的 bin、include、lib 三個資料夾，全部複製到已安裝的 CUDA 目錄下。</p><p><img alt="cuDNN 下載頁面" class="gallery-image" data-flex-basis="361px" data-flex-grow="150" decoding="async" height="1533" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/download_cudnn.webp" srcset="/post/whisper/download_cudnn_hu_150a8bfc872254d6.webp 800w, /post/whisper/download_cudnn_hu_378555aebef1d11c.webp 1600w, /post/whisper/download_cudnn.webp 2312w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2312">
+<img alt="將 zip 內的 bin, include, lib 複製到 CUDA 目錄中" class="gallery-image" data-flex-basis="254px" data-flex-grow="105" decoding="async" height="1125" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/install_cudnn.webp" srcset="/post/whisper/install_cudnn_hu_702066760038f715.webp 800w, /post/whisper/install_cudnn.webp 1192w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1192"></p><p>上述 CUDA 及 cuDNN 的安裝與配置即已完成。</p><h2 id="使用腳本將影片語音轉文字逐字稿">使用腳本將影片語音轉文字逐字稿</h2><h3 id="腳本下載">腳本下載</h3><p>下載完整套件：<a class="link" href="generate-srt.zip">generate-srt.zip</a></p><p>解壓縮後，將整個資料夾放在任意目錄即可執行，資料夾內含三個檔案：</p><ol><li>generate-srt.bat（主程式）</li><li>generate-srt.py</li><li>參數設定.txt</li></ol><p>批次檔需要透過外部工具來下載影片，會需要使用到 <a class="link" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">yt-dlp</a> 下載 YouTube 影片，或是 <a class="link" href="https://github.com/iawia002/lux" target="_blank" rel="noopener">lux</a> 下載 bilibili 影片。</p><p>可以用 <a class="link" href="/post/awesome-windows/#%e5%ae%89%e8%a3%9d-winget">WinGet</a> 安裝 yt-dlp：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">winget install yt-dlp.yt-dlp
+</span></span></code></pre></td></tr></table></div></div><p>如果有轉換 Bilibili 影片的需求，則需使用 lux。請前往其官方發布頁面<a class="link" href="https://github.com/iawia002/lux/releases/download/v0.24.1/lux_0.24.1_Windows_x86_64.zip" target="_blank" rel="noopener">下載 lux.exe 執行檔</a>。</p><p>下載完畢後，解壓縮 lux.exe 到 generate-srt 資料夾內即可。</p><p><img alt="generate-srt 目錄" class="gallery-image" data-flex-basis="420px" data-flex-grow="175" decoding="async" height="429" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/generate-srt_with_lux.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="751"></p><h3 id="generate-srtbat">generate-srt.bat</h3><p>此批次檔負責整體「下載 → 轉寫 → 檔案整理」自動化，重點邏輯包括：</p><ol><li><p>設定區段（⚠️ 首次使用需要根據電腦調整）</p><ul><li>whisperModel：指定 Faster-Whisper 模型大小（tiny／base／small／medium／large-v3／turbo）</li><li>whisperDevice：運算裝置（cpu／cuda）</li><li>whisperTask：任務模式（transcribe：轉寫／translate：翻譯）</li><li>computeType：精度類型（float16／int8_float16／…）</li><li>openEditor：轉寫完成後開啟字幕檔的編輯器（none／notepad／code）</li><li>autoLoop：是否自動循環處理多支影片（true／false）</li></ul></li><li><p>環境檢查</p><ul><li>檢查 yt-dlp、lux 下載器是否安裝或存在於目前目錄</li><li>檢查 Python 是否可用、並能 import faster_whisper</li><li>檢查同層目錄是否含有 generate-srt.py</li></ul></li><li><p>使用 yt-dlp 或 lux 下載影片後，將影片路徑傳給 generate-srt.py 並輸出為字幕檔</p></li><li><p>最終使用文字編輯器開啟字幕檔</p></li></ol><h3 id="generate-srtpy">generate-srt.py</h3><p>此 Python 腳本採用 Faster-Whisper 套件執行語音辨識。其中核心參數可經由外部傳遞。基本上這個檔案不用改。</p><h3 id="參數設定txt">參數設定.txt</h3><p>檔案說明所有可調整參數、範例用法與建議設定，內容示例如下：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl"><span class="gh"># 參數設定說明
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperModel
+</span></span></span><span class="line"><span class="cl">可選：tiny, base, small, medium, large-v3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## openEditor
+</span></span></span><span class="line"><span class="cl">可選：none, notepad, code
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## autoLoop
+</span></span></span><span class="line"><span class="cl">true：轉換完自動重新開始
+</span></span><span class="line"><span class="cl">false：只執行一次
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperDevice
+</span></span></span><span class="line"><span class="cl">可選：cpu, cuda
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 若要使用 GPU 加速，需具備 NVIDIA 顯示卡，並安裝：
+</span></span><span class="line"><span class="cl">  <span class="k">-</span> CUDA 12
+</span></span><span class="line"><span class="cl">  <span class="k">-</span> cuDNN 9 for CUDA 12
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 重要：faster-whisper 最新版依賴的 ctranslate2 僅支援 CUDA 12。
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 若為 AMD GPU 或無 NVIDIA CUDA，請選擇 cpu。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperTask
+</span></span></span><span class="line"><span class="cl">可選：transcribe, translate
+</span></span><span class="line"><span class="cl"><span class="k">-</span> transcribe：將語音內容直接轉換為原語言的文字（即語音轉文字，ASR）。
+</span></span><span class="line"><span class="cl"><span class="k">-</span> translate：將語音內容翻譯成英文文字（即語音翻譯）。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## computeType
+</span></span></span><span class="line"><span class="cl">可選：auto, default, float16, int8_float16, int8, int8_float32, int8_bfloat16, int16, float32, bfloat16
+</span></span><span class="line"><span class="cl"><span class="k">-</span> NVIDIA 顯示卡（Compute Capability &gt;= 7.0）：float16 或 int8_float16（速度快且省記憶體）
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 只有 CPU（Intel/AMD）：int8_float32 或 int16（省記憶體，速度佳），或 auto
+</span></span><span class="line"><span class="cl"><span class="k">-</span> AMD GPU：建議用 auto 或 float32（AMD 支援有限，auto 會自動選最快）
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 不確定時可設 auto，系統會自動選擇最合適的計算設定
+</span></span><span class="line"><span class="cl"><span class="k">-</span> 參考：https://github.com/OpenNMT/CTranslate2/blob/master/docs/quantization.md
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>⚠️ 要開始使用前，務必根據自己電腦硬體修改 bat 批次檔，並將修改後結果更改於 generate-srt.bat 的同名變數區段。</p><p>whisperModel=turbo，是兼具轉換結果與效能，電腦性能差的可改為 base 或是 tiny。</p><p>whisperDevice=cpu，如果已經安裝 CUDA 支援，可以改為 cuda，轉換時間會少很多。</p><p>openEditor=none，想要轉換完畢自動開啟字幕檔，可以設定為 notepad 或是 code。</p></blockquote><h2 id="使用範例">使用範例</h2><ol><li><p>請先修改 <code>generate-srt.bat</code> 裡面的全域變數，如果已設定好 GPU 支援請改為 <code>SET "whisperDevice=cuda"</code>，可以加快轉換速度。</p></li><li><p>直接滑鼠點兩下 <code>generate-srt.bat</code>，系統將自動檢查執行環境是否符合需求。</p><p><img alt="執行 generate-srt.bat" class="gallery-image" data-flex-basis="425px" data-flex-grow="177" decoding="async" height="2159" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/run_generate-srt.webp" srcset="/post/whisper/run_generate-srt_hu_bd6b25b9bb4400ab.webp 800w, /post/whisper/run_generate-srt_hu_d0611d0f22ec40a3.webp 1600w, /post/whisper/run_generate-srt_hu_7cd679f9fbf9c890.webp 2400w, /post/whisper/run_generate-srt.webp 3832w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="3832"></p></li><li><p>輸入 Youtube 網址，以 《<a class="link" href="https://www.youtube.com/watch?v=RnkcNjeA-rU" target="_blank" rel="noopener">台江國家公園－黑面琵鷺保育及棲息環境</a>》 為例子。本身影片為內嵌字幕，且不提供其他語言的字幕。</p><p><img alt="下載並轉換為字幕" class="gallery-image" data-flex-basis="425px" data-flex-grow="177" decoding="async" height="2159" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/downloaded_and_converting.webp" srcset="/post/whisper/downloaded_and_converting_hu_53b83cdc3ad31154.webp 800w, /post/whisper/downloaded_and_converting_hu_8989e94913071beb.webp 1600w, /post/whisper/downloaded_and_converting_hu_3be04c238263c1e2.webp 2400w, /post/whisper/downloaded_and_converting.webp 3832w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="3832"></p></li><li><p>轉換完成後，可於 <code>output</code> 資料夾中找到產生之 <code>.srt</code> 字幕檔。</p><p><img alt="轉換結果" class="gallery-image" data-flex-basis="672px" data-flex-grow="280" decoding="async" height="333" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/image.webp" srcset="/post/whisper/image_hu_b9ad830c31d4254c.webp 800w, /post/whisper/image.webp 933w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="933"></p></li></ol><p>逐字稿轉換結果：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">1
+</span></span><span class="line"><span class="cl">00:00:00,690 --&gt; 00:00:05,969
+</span></span><span class="line"><span class="cl">台江國家公園是 2009 年的 12 月 28 號成立
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">2
+</span></span><span class="line"><span class="cl">00:00:05,969 --&gt; 00:00:11,269
+</span></span><span class="line"><span class="cl">它是一個以濕地為主的一個國家公園
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">3
+</span></span><span class="line"><span class="cl">00:00:11,269 --&gt; 00:00:13,710
+</span></span><span class="line"><span class="cl">有紀錄的鳥類將近 300 種
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">4
+</span></span><span class="line"><span class="cl">00:00:13,710 --&gt; 00:00:16,710
+</span></span><span class="line"><span class="cl">當然最主要是水鳥
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">5
+</span></span><span class="line"><span class="cl">00:00:16,710 --&gt; 00:00:20,789
+</span></span><span class="line"><span class="cl">當然包括雁鴨類或鷺鷥類
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">6
+</span></span><span class="line"><span class="cl">00:00:20,789 --&gt; 00:00:22,269
+</span></span><span class="line"><span class="cl">當然還有黑面琵鷺
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">7
+</span></span><span class="line"><span class="cl">00:00:22,269 --&gt; 00:00:26,429
+</span></span><span class="line"><span class="cl">我們全世界黑面琵鷺大概有 3000 多隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">8
+</span></span><span class="line"><span class="cl">00:00:26,429 --&gt; 00:00:30,589
+</span></span><span class="line"><span class="cl">可是來臺灣去年已經超過了 2000 隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">9
+</span></span><span class="line"><span class="cl">00:00:30,589 --&gt; 00:00:36,149
+</span></span><span class="line"><span class="cl">當中的 90% 是在我們曾文溪口
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">10
+</span></span><span class="line"><span class="cl">00:00:36,149 --&gt; 00:00:45,530
+</span></span><span class="line"><span class="cl">在我們來的第二年數量大概減少了四五百隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">11
+</span></span><span class="line"><span class="cl">00:00:45,530 --&gt; 00:00:52,130
+</span></span><span class="line"><span class="cl">我們推斷的原因可能是它度冬期間的食物來源不足
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">12
+</span></span><span class="line"><span class="cl">00:00:52,130 --&gt; 00:00:56,130
+</span></span><span class="line"><span class="cl">所以我們提倡淺坪式的魚塭
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">13
+</span></span><span class="line"><span class="cl">00:00:56,130 --&gt; 00:00:57,350
+</span></span><span class="line"><span class="cl">為什麼要淺坪呢
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">14
+</span></span><span class="line"><span class="cl">00:00:57,350 --&gt; 00:01:00,990
+</span></span><span class="line"><span class="cl">就是水深大概是一公尺以內
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">15
+</span></span><span class="line"><span class="cl">00:01:00,990 --&gt; 00:01:04,549
+</span></span><span class="line"><span class="cl">陽光照射到魚塭裡面它會自然的
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">16
+</span></span><span class="line"><span class="cl">00:01:04,549 --&gt; 00:01:06,549
+</span></span><span class="line"><span class="cl">產生藻類
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">17
+</span></span><span class="line"><span class="cl">00:01:06,549 --&gt; 00:01:09,549
+</span></span><span class="line"><span class="cl">再適時的加以一些飼料
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">18
+</span></span><span class="line"><span class="cl">00:01:09,549 --&gt; 00:01:11,549
+</span></span><span class="line"><span class="cl">虱目魚就可以長得很好
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">19
+</span></span><span class="line"><span class="cl">00:01:11,549 --&gt; 00:01:16,549
+</span></span><span class="line"><span class="cl">所以虱目魚在一般四月份開始養殖
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">20
+</span></span><span class="line"><span class="cl">00:01:16,549 --&gt; 00:01:18,549
+</span></span><span class="line"><span class="cl">一直到十月份收成
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">21
+</span></span><span class="line"><span class="cl">00:01:18,549 --&gt; 00:01:22,549
+</span></span><span class="line"><span class="cl">以後還有一些小魚小蝦它要洩水
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">22
+</span></span><span class="line"><span class="cl">00:01:22,549 --&gt; 00:01:27,549
+</span></span><span class="line"><span class="cl">這個地方就變成黑面琵鷺最喜歡的這個覓食場所
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">23
+</span></span><span class="line"><span class="cl">00:01:27,549 --&gt; 00:01:30,549
+</span></span><span class="line"><span class="cl">也強調人用半年鳥用半年
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">24
+</span></span><span class="line"><span class="cl">00:01:30,549 --&gt; 00:01:34,430
+</span></span><span class="line"><span class="cl">我們想到這樣子的方式去推動以後
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">25
+</span></span><span class="line"><span class="cl">00:01:34,430 --&gt; 00:01:37,430
+</span></span><span class="line"><span class="cl">那也得到 BirdLife International
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">26
+</span></span><span class="line"><span class="cl">00:01:37,430 --&gt; 00:01:40,430
+</span></span><span class="line"><span class="cl">世界上最大的鳥類保育組織的認同
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">27
+</span></span><span class="line"><span class="cl">00:01:40,430 --&gt; 00:01:44,430
+</span></span><span class="line"><span class="cl">來給我們頒授這個保育的成就獎
+</span></span></code></pre></td></tr></table></div></div><h2 id="獨立轉換本地檔案">獨立轉換本地檔案</h2><p>若不需要用 bat 檔下載影片，本機已經有音訊檔，可直接執行下列指令轉出字幕：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">python generate-srt.py [input.mp3] --model_size turbo --device cuda --task transcribe --compute_type float16
+</span></span></code></pre></td></tr></table></div></div><h2 id="結論">結論</h2><p>將影音內容轉換為文字後，可以把逐字稿丟給大型語言模型（如 ChatGPT 或 Gemini）做摘要、分析或重點整理，短時間內就能掌握影片的重點，也能跳過冗長或離題的段落。</p><p>我在測試上發現 base 輸出內容蠻多不正確的，容易把專有名詞輸出錯誤，但丟給 GPT 分析統整是沒什麼大問題。而 turbo 與 large-v3 我個人覺得差不多，但 turbo 勝在轉換速度極快。所以日常使用上基本會以 turbo 為主。</p><p>最後分享兩台電腦，針對 18 分鐘影片轉換結果，一台使用 NVIDIA 的 GPU，另一台純 CPU 的時間比較供有需要的人參考。</p><div class="table-wrapper"><table><thead><tr><th>硬體組態</th><th>模型版本</th><th>GPU 使用</th><th>轉檔耗時</th></tr></thead><tbody><tr><td>NVIDIA RTX 3060 Ti</td><td><code>base</code></td><td>是</td><td><strong>01 分 16 秒</strong></td></tr><tr><td>NVIDIA RTX 3060 Ti</td><td><code>large-v3-turbo</code></td><td>是</td><td><strong>01 分 42 秒</strong></td></tr><tr><td>NVIDIA RTX 3060 Ti</td><td><code>large-v3</code></td><td>是</td><td><strong>06 分 43 秒</strong></td></tr><tr><td>AMD Ryzen 5 3500X</td><td><code>base</code></td><td>否</td><td><strong>03 分 17 秒</strong></td></tr><tr><td>AMD Ryzen 5 3500X</td><td><code>large-v3-turbo</code></td><td>否</td><td><strong>11 分 29 秒</strong></td></tr></tbody></table></div><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://github.com/openai/whisper" target="_blank" rel="noopener">openai/whisper</a></li><li><a class="link" href="https://platform.openai.com/docs/guides/speech-to-text" target="_blank" rel="noopener">Speech to text - OpenAI API</a></li><li><a class="link" href="https://en.wikipedia.org/wiki/Word_error_rate" target="_blank" rel="noopener">Word error rate</a></li><li><a class="link" href="https://github.com/SYSTRAN/faster-whisper" target="_blank" rel="noopener">SYSTRAN/faster-whisper</a></li><li><a class="link" href="https://github.com/m-bain/whisperX" target="_blank" rel="noopener">m-bain/whisperX: WhisperX</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/ai/">AI</a>
+<a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/gpt/">GPT</a>
+<a href="/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/">生產力</a>
+<a href="/tags/%E8%87%AA%E5%8B%95%E5%8C%96/">自動化</a>
+<a href="/tags/%E8%85%B3%E6%9C%AC/">腳本</a>
+<a href="/tags/%E8%BB%9F%E9%AB%94/">軟體</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/yobi-free-ai-automation/"><div class="article-image"><img alt="Featured image of post Yobi：用內建瀏覽器操作網頁版 AI 的自動化工具，打造專屬 Agent" height="150" loading="lazy" src="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp" srcset="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp 1x, /post/yobi-free-ai-automation/cover_hu_d3c50b8b2713ea5a.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#504a4280 0%,#d6ceb4C0 100%)"><h2 class="article-title">Yobi：用內建瀏覽器操作網頁版 AI 的自動化工具，打造專屬 Agent</h2></div></a></article><article class="has-image"><a href="/post/agentic-workflow-guide/"><div class="article-image"><img alt="Featured image of post 實戰 Agentic Workflow：從規劃到實作的專案開發全攻略" height="150" loading="lazy" src="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp" srcset="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp 1x, /post/agentic-workflow-guide/img/cover_hu_c1d69f4e3cceb740.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d6ccbd80 0%,#3f332dC0 100%)"><h2 class="article-title">實戰 Agentic Workflow：從規劃到實作的專案開發全攻略</h2></div></a></article><article class="has-image"><a href="/post/using-google-antigravity/"><div class="article-image"><img alt="Featured image of post Antigravity vs. GitHub Copilot：功能比較、效能與成本分析" height="150" loading="lazy" src="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp" srcset="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp 1x, /post/using-google-antigravity/anti_meow_hu_7230a257bcb439c2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebac080 0%,#162232C0 100%)"><h2 class="article-title">Antigravity vs. GitHub Copilot：功能比較、效能與成本分析</h2></div></a></article><article class="has-image"><a href="/post/ai-summary-deploy/"><div class="article-image"><img alt="Featured image of post AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署" height="150" loading="lazy" src="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp" srcset="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp 1x, /post/ai-summary-deploy/cover_hu_f4a263386c4d8d96.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c8cb80 0%,#3c382eC0 100%)"><h2 class="article-title">AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署</h2></div></a></article><article class="has-image"><a href="/post/using-github-copilot-vscode/"><div class="article-image"><img alt="Featured image of post 使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗" height="150" loading="lazy" src="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp" srcset="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp 1x, /post/using-github-copilot-vscode/cover_hu_b27652e6f2f39b8c.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a0561980 0%,#34341dC0 100%)"><h2 class="article-title">使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

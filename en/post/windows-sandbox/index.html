@@ -1,0 +1,340 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Enabling and configuring Windows Sandbox: turn on virtualization in BIOS, map folders with a .wsb file, and let a startup script install 7-Zip and VS Code and build desktop shortcuts."><title>Windows Sandbox Guide: Build a Secure Isolated Environment - WellWells</title><link rel="canonical" href="https://wellstsai.com/en/post/windows-sandbox/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Windows Sandbox Guide: Build a Secure Isolated Environment"><meta property='og:description' content="Enabling and configuring Windows Sandbox: turn on virtualization in BIOS, map folders with a .wsb file, and let a startup script install 7-Zip and VS Code and build desktop shortcuts."><meta property='og:url' content='https://wellstsai.com/en/post/windows-sandbox/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Tutorial'><meta property='article:tag' content='System'><meta property='article:tag' content='Security'><meta property='article:tag' content='Virtualization'><meta property='article:tag' content='DevTools'><meta property='article:tag' content='Windows'><meta property='article:tag' content='Automation'><meta property='article:published_time' content='2025-01-14T11:48:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/windows-sandbox/cover.webp'><meta name="twitter:title" content="Windows Sandbox Guide: Build a Secure Isolated Environment"><meta name="twitter:description" content="Enabling and configuring Windows Sandbox: turn on virtualization in BIOS, map folders with a .wsb file, and let a startup script install 7-Zip and VS Code and build desktop shortcuts."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/windows-sandbox/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/windows-sandbox/cover_hu_4f60674e18c9d69f.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/windows-sandbox/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/windows-sandbox/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/windows-sandbox/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/windows-sandbox/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"Introduction In Windows, the built-in Sandbox feature uses virtualization to isolate potential threats, so applications run in a restricted environment without touching the host system. It is a good fit for testing unknown applications or for experimental development.\nKey advantages of Windows Sandbox:\nLightweight isolation: A secure desktop environment that doesn't affect the host system. Complete reset on reboot: Each launch gives you a fresh Windows, fully isolated from the host. No extra …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2025-01-14T11:48:00+08:00","description":"Enabling and configuring Windows Sandbox: turn on virtualization in BIOS, map folders with a .wsb file, and let a startup script install 7-Zip and VS Code and build desktop shortcuts.","headline":"Windows Sandbox Guide: Build a Secure Isolated Environment","image":"https://wellstsai.com/post/windows-sandbox/cover.webp","keywords":["Tutorial","System","Security","Virtualization","DevTools","Windows","Automation"],"mainEntityOfPage":{"@id":"https://wellstsai.com/en/post/windows-sandbox/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/en/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/en/">WellWells</a></h1><h2 class="site-description">Unexpected valuables in the well</h2></div></header><ol class="menu" id="main-menu"><li><a href='/en/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>Home</span></a></li><li><a href='/en/about/'><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href='/en/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>Archive</span></a></li><li><a href='/en/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>Sponsor</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/windows-sandbox/">繁體中文</option><option value="/en/post/windows-sandbox/" selected>English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">Table of Contents</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#enabling-virtualization-in-bios">Enabling Virtualization in BIOS</a><ol><li><a href="#identifying-the-motherboard-model">Identifying the Motherboard Model</a></li><li><a href="#how-to-enable-virtualization">How to Enable Virtualization</a></li><li><a href="#verifying-virtualization-is-enabled">Verifying Virtualization is Enabled</a></li></ol></li><li><a href="#installing-windows-sandbox">Installing Windows Sandbox</a></li><li><a href="#configuring-windows-sandbox-wsb">Configuring Windows Sandbox (.wsb)</a><ol><li><a href="#creating-the-sandbox-working-directory">Creating the Sandbox Working Directory</a></li><li><a href="#creating-a-wsb-configuration-file">Creating a WSB Configuration File</a></li><li><a href="#creating-a-startup-script">Creating a Startup Script</a></li><li><a href="#automatically-adding-shortcuts-to-the-desktop">Automatically Adding Shortcuts to the Desktop</a></li></ol></li><li><a href="#using-wsb-to-launch-the-sandbox">Using WSB to Launch the Sandbox</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/en/post/windows-sandbox/" style="position:relative;display:block"><img src="/post/windows-sandbox/cover_hu_2a9848b210696561.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/windows-sandbox/cover_hu_4f60674e18c9d69f.webp"><source media="(min-width: 769px)" srcset="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp">
+<img src="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Windows Sandbox Guide: Build a Secure Isolated Environment" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/en/post/windows-sandbox/">Windows Sandbox Guide: Build a Secure Isolated Environment</a></h2><h3 class="article-subtitle">Enabling and configuring Windows Sandbox: turn on virtualization in BIOS, map folders with a .wsb file, and let a startup script install 7-Zip and VS Code and build desktop shortcuts.</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2025-01-14T11:48:00+08:00'>2025/01/14</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">9 Minutes Read</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/post/windows-sandbox/" class="link">繁體中文</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>Table of Contents</span></div></summary><nav class="toc-nav"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#enabling-virtualization-in-bios">Enabling Virtualization in BIOS</a><ol><li><a href="#identifying-the-motherboard-model">Identifying the Motherboard Model</a></li><li><a href="#how-to-enable-virtualization">How to Enable Virtualization</a></li><li><a href="#verifying-virtualization-is-enabled">Verifying Virtualization is Enabled</a></li></ol></li><li><a href="#installing-windows-sandbox">Installing Windows Sandbox</a></li><li><a href="#configuring-windows-sandbox-wsb">Configuring Windows Sandbox (.wsb)</a><ol><li><a href="#creating-the-sandbox-working-directory">Creating the Sandbox Working Directory</a></li><li><a href="#creating-a-wsb-configuration-file">Creating a WSB Configuration File</a></li><li><a href="#creating-a-startup-script">Creating a Startup Script</a></li><li><a href="#automatically-adding-shortcuts-to-the-desktop">Automatically Adding Shortcuts to the Desktop</a></li></ol></li><li><a href="#using-wsb-to-launch-the-sandbox">Using WSB to Launch the Sandbox</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></details></aside><section class="article-content"><h2 id="introduction">Introduction</h2><p>In Windows, the built-in Sandbox feature uses virtualization to isolate potential threats, so applications run in a restricted environment without touching the host system. It is a good fit for testing unknown applications or for experimental development.</p><p><strong>Key advantages of Windows Sandbox:</strong></p><ul><li><strong>Lightweight isolation:</strong> A secure desktop environment that doesn't affect the host system.</li><li><strong>Complete reset on reboot:</strong> Each launch gives you a fresh Windows, fully isolated from the host.</li><li><strong>No extra downloads:</strong> No extra software, no ISO, no Windows reinstall.</li><li><strong>Hardware-based security:</strong> Core isolation through hardware virtualization, so security is higher.</li><li><strong>Optimized performance:</strong> Intelligent resource allocation for smooth operation.</li></ul><p>By default, though, Sandbox only offers basic functionality, and newer Windows 11 versions may lack even simple apps like Notepad. This guide explains how to configure Sandbox to support the tools you need (e.g., VS Code or portable apps) so it becomes a complete testing environment.</p><h2 id="enabling-virtualization-in-bios">Enabling Virtualization in BIOS</h2><p>To use the Windows Sandbox feature, you first need virtualization enabled in the BIOS or UEFI settings.</p><h3 id="identifying-the-motherboard-model">Identifying the Motherboard Model</h3><ol><li>Identify your motherboard model by opening the <code>Command Prompt</code> and entering the following command to retrieve the motherboard information:</li></ol><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">powershell <span class="s2">&#34;Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product, Version, SerialNumber&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start="2"><li>After executing the command, detailed information about the motherboard will be displayed. For example:</li></ol><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Manufacturer          Product                      Version  SerialNumber
+</span></span><span class="line"><span class="cl">------------          -------                      -------  ------------
+</span></span><span class="line"><span class="cl">ASUSTeK COMPUTER INC. TUF GAMING B760-PLUS WIFI D4 Rev 1.xx 230418721200683
+</span></span></code></pre></td></tr></table></div></div><h3 id="how-to-enable-virtualization">How to Enable Virtualization</h3><p>Based on your motherboard model, you can quickly find relevant tutorials for enabling virtualization using the following methods:</p><ol><li><p><strong>Search by Model Keywords</strong>
+Use the motherboard model as a keyword, such as <code>TUF GAMING B760-PLUS WIFI D4 virtualization</code>, to locate specific guides.</p></li><li><p><strong>Refer to Official Resources or Video Tutorials</strong>
+Visit the official website of your motherboard brand or search for related YouTube tutorials to find step-by-step instructions.</p></li><li><p><strong>Search by Brand Name</strong>
+If you know the brand of your motherboard, search for terms like <code>ASUS virtualization</code> or <code>Lenovo virtualization</code> to find brand-specific guidance.</p></li></ol><p>Here are some common virtualization guides provided by the major motherboard manufacturers:</p><ul><li><a class="link" href="https://www.asus.com/support/faq/1043786/" target="_blank" rel="noopener">ASUS - How to enable Intel(VMX) Virtualization Technology in the BIOS</a></li><li><a class="link" href="https://www.asus.com/support/faq/1043992/" target="_blank" rel="noopener">ASUS - How to enable or disable AMD Virtualization (AMD-V™) technology?</a></li><li><a class="link" href="https://support.lenovo.com/us/en/solutions/ht500006-how-to-enable-virtualization-technology-on-lenovo-computers" target="_blank" rel="noopener">Lenovo - How to enable Virtualization Technology on Lenovo PC computers</a></li><li><a class="link" href="https://www.dell.com/support/kbdoc/en-us/000195978/how-to-enable-or-disable-hardware-virtualization-on-dell-systems" target="_blank" rel="noopener">Dell - How To Enable or Disable Hardware Virtualization on Dell Systems</a></li><li><a class="link" href="https://support.hp.com/us-en/document/ish_5637142-5637191-16" target="_blank" rel="noopener">HP PCs - Enable Virtualization Technology in the BIOS</a></li><li><a class="link" href="https://www.msi.com/faq/faq-5390" target="_blank" rel="noopener">MSI - Intel Virtualization Technology Support</a></li><li><a class="link" href="https://www.msi.com/faq/nb-1627" target="_blank" rel="noopener">MSI - Enable/Disable AMD virtualization in BIOS</a></li><li><a class="link" href="https://youtu.be/46DfLwX5AFQ?si=XV39KURhF78UFg4s&amp;t=36" target="_blank" rel="noopener">Gigabyte - Hardware Virtualization in AMD Machine with Gigabyte Mother Board</a></li></ul><h3 id="verifying-virtualization-is-enabled">Verifying Virtualization is Enabled</h3><p>After completing the configuration, restart into Windows. Open <strong>Task Manager</strong> (shortcut: <code>Ctrl + Shift + Esc</code>), navigate to the <strong>Performance</strong> tab, and check if <strong>Virtualization</strong> is displayed as "Enabled."</p><p><img alt="Check Virtualization Status in Task Manager" class="gallery-image" data-flex-basis="375px" data-flex-grow="156" decoding="async" fetchpriority="high" height="1331" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/check_virtualization_in_taskmgr.webp" srcset="/post/windows-sandbox/check_virtualization_in_taskmgr_hu_41a1e8149e9124e8.webp 800w, /post/windows-sandbox/check_virtualization_in_taskmgr_hu_52e71ff901f7ae8a.webp 1600w, /post/windows-sandbox/check_virtualization_in_taskmgr.webp 2084w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2084"></p><h2 id="installing-windows-sandbox">Installing Windows Sandbox</h2><p>By default, only Professional, Enterprise, or Education editions of Windows support Windows Sandbox. If you use the Home edition, refer to <a class="link" href="https://www.tenforums.com/tutorials/131437-enable-windows-sandbox-feature-windows-10-home-edition.html" target="_blank" rel="noopener">Enable Windows Sandbox Feature in Windows 10 Home Edition</a>.</p><p>To enable the Windows Sandbox feature, run <strong>Command Prompt</strong> or <strong>PowerShell</strong> as an administrator and enter the following command:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">powershell -Command <span class="s2">&#34;Enable-WindowsOptionalFeature -FeatureName &#39;Containers-DisposableClientVM&#39; -All -Online&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>After installation, you can find Windows Sandbox in the Start menu:</p><p><img alt="Find Windows Sandbox in the Start Menu" class="gallery-image" data-flex-basis="303px" data-flex-grow="126" decoding="async" height="2106" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/check_sandbox_installation.webp" srcset="/post/windows-sandbox/check_sandbox_installation_hu_2fba4587f5eb93d9.webp 800w, /post/windows-sandbox/check_sandbox_installation_hu_39a437fe795d8eab.webp 1600w, /post/windows-sandbox/check_sandbox_installation_hu_94c3e4fd395e0a6d.webp 2400w, /post/windows-sandbox/check_sandbox_installation.webp 2666w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2666"></p><p>When you launch Windows Sandbox, you will see a clean virtual environment:</p><p><img alt="Launch Windows Sandbox" class="gallery-image" data-flex-basis="467px" data-flex-grow="194" decoding="async" height="1026" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/direct_run_sandbox.webp" srcset="/post/windows-sandbox/direct_run_sandbox_hu_64ae29bceb91559e.webp 800w, /post/windows-sandbox/direct_run_sandbox_hu_c328c5669c426118.webp 1600w, /post/windows-sandbox/direct_run_sandbox.webp 2000w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2000"></p><h2 id="configuring-windows-sandbox-wsb">Configuring Windows Sandbox (.wsb)</h2><h3 id="creating-the-sandbox-working-directory">Creating the Sandbox Working Directory</h3><p>To maintain a consistent environment, it is recommended to create a dedicated working directory for the Sandbox. Folder names and default paths can be adjusted as needed, but remember to update the script paths to match:</p><ol><li><strong><code>C:\Sandbox</code></strong>: Maps to the main directory in the Sandbox, read and write.</li><li><strong><code>C:\Sandbox\Apps</code></strong>: Stores installed or portable applications, similar to the <code>C:\Program Files</code> directory.</li><li><strong><code>C:\Sandbox\Install</code></strong>: Holds original installation files for manual installation if necessary.</li><li><strong><code>C:\Sandbox\boot.bat</code></strong>: A script executed automatically at Sandbox startup to perform basic configurations.</li><li><strong><code>C:\Sandbox\create_paths.ps1</code></strong>: A PowerShell script for generating desktop shortcuts from applications in the <code>Apps</code> directory.</li></ol><h3 id="creating-a-wsb-configuration-file">Creating a WSB Configuration File</h3><p>Windows Sandbox handles basic initialization with an XML configuration file. Create a <code>boot.wsb</code> file on your desktop using VS Code or any other text editor. Below is an example configuration:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;Configuration&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;MappedFolders&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;HostFolder&gt;</span>C:\Sandbox<span class="nt">&lt;/HostFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;SandboxFolder&gt;</span>C:\Sandbox<span class="nt">&lt;/SandboxFolder&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;/MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;HostFolder&gt;</span>C:\Users\wells\Downloads<span class="nt">&lt;/HostFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;SandboxFolder&gt;</span>C:\Users\WDAGUtilityAccount\Downloads<span class="nt">&lt;/SandboxFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;ReadOnly&gt;</span>true<span class="nt">&lt;/ReadOnly&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;/MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/MappedFolders&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;LogonCommand&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;Command&gt;</span>cmd /c &#34;C:\Sandbox\boot.bat&#34;<span class="nt">&lt;/Command&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/LogonCommand&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/Configuration&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>The above configuration mainly includes the following:</p><ol><li><strong>Main Directory Mapping</strong>: Maps the host's <code>C:\Sandbox</code> to <code>C:\Sandbox</code> within the Sandbox, with read/write permissions.</li><li><strong>Downloads Folder Mapping</strong>: Maps the host's <code>C:\Users\wells\Downloads</code> to <code>C:\Users\WDAGUtilityAccount\Downloads</code> within the Sandbox, with read-only access.</li><li><strong>Auto-Execution Script</strong>: Automatically executes <code>C:\Sandbox\boot.bat</code> upon Sandbox login to complete necessary initialization.</li></ol><h3 id="creating-a-startup-script">Creating a Startup Script</h3><p>Create a <code>boot.bat</code> file in the <strong><code>C:\Sandbox</code></strong> directory on the host machine. This script will automatically initialize the Sandbox environment upon startup. Its main functions include:</p><ul><li><strong>Creating Desktop Shortcuts</strong> (Line 4)</li><li><strong>Installing 7-zip</strong> (Line 7)</li><li><strong>Configuring Windows Basic Options</strong> (Lines 9–58)</li><li><strong>Setting File Associations</strong> (Lines 60–78)</li></ul><p>You can adjust this script yourself. For instance, if you need to install <strong><code>Notepad++</code></strong>, place the installer in <strong><code>C:\Sandbox\Install</code></strong> and add the following command to the script:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl"><span class="s2">&#34;C:\Sandbox\Install\npp.8.4.6.Installer.x64.exe&#34;</span> /S
+</span></span></code></pre></td></tr></table></div></div><p>If using a portable version, extract it to a designated path (e.g., <strong><code>C:\Sandbox\Apps</code></strong>) and set up automatic desktop shortcut creation in subsequent steps.</p><p>C:\Sandbox\boot.bat:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl"><span class="p">@</span><span class="k">echo</span> off
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Execute the PowerShell script to create paths</span>
+</span></span><span class="line"><span class="cl">powershell -NoProfile -ExecutionPolicy Bypass -Command <span class="s2">&#34;&amp; &#39;C:\Sandbox\create_paths.ps1&#39;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Silently install 7-zip</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;C:\Sandbox\Install\7z1900.exe&#34;</span> /S
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Enable Sudo simulation feature</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKLM\Software\Microsoft\Windows\CurrentVersion\Sudo&#34;</span> /v <span class="s2">&#34;Enabled&#34;</span> /t REG_DWORD /d 3 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Show &#34;Run as different user&#34; in the application context menu</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer&#34;</span> /v <span class="s2">&#34;ShowRunAsDifferentUserInStart&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the default delegation for the console to Windows Console</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Console\</span><span class="se">%%</span><span class="s2">Startup&#34;</span> /v <span class="s2">&#34;DelegationConsole&#34;</span> /t REG_SZ /d <span class="s2">&#34;{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the default delegation for the terminal to Windows Terminal</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Console\</span><span class="se">%%</span><span class="s2">Startup&#34;</span> /v <span class="s2">&#34;DelegationTerminal&#34;</span> /t REG_SZ /d <span class="s2">&#34;{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Enable &#34;End Task&#34; in the taskbar menu</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings&#34;</span> /v <span class="s2">&#34;TaskbarEndTask&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set Alt+Tab multitasking to display all windows</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MultiTaskingAltTabFilter&#34;</span> /t REG_DWORD /d 3 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Show seconds in the system clock</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;ShowSecondsInSystemClock&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Align taskbar icons to the left</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;TaskbarAl&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Disable grouping of identical application windows in the taskbar</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;TaskbarGlomLevel&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Disable grouping of taskbar items in multi-monitor setups</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MMTaskbarGlomLevel&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Pin applications to the taskbar on the current screen in multi-monitor setups</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MMTaskbarMode&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Enable custom layouts in the Start menu</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Start_Layout&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Disable suggested items in the Start menu</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Start_IrisRecommendations&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Show file extensions for known file types</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;HideFileExt&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Show hidden files and folders</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Hidden&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Restore the classic Windows context menu</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32&#34;</span> /f /ve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the default path for File Explorer&#39;s Win+E to &#34;This PC&#34;</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;LaunchTo&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the .txt file association type to txt_auto_file</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.txt&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.js&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.inf&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Configure the open command for txt_auto_file to set VSCode as the default editor</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\vscode_file\shell\open\command&#34;</span> /ve /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34; \&#34;</span><span class="nv">%1</span>\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Configure the open command for VSCode (Code.exe)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">REM Create registry entries for the Code.exe application</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set DefaultIcon for VSCode with its icon path</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\DefaultIcon&#34;</span> /ve /d <span class="s2">&#34;C:\\Sandbox\\Apps\\VSCode\\resources\\app\\resources\\win32\\default.ico&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM Create shell registry entry for VSCode</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the icon for the &#34;open&#34; command in VSCode</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell\open&#34;</span> /v <span class="s2">&#34;Icon&#34;</span> /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM Set the open\command registry entry to use VSCode for opening files</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell\open\command&#34;</span> /ve /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34; \&#34;</span><span class="nv">%1</span>\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM Restart File Explorer to apply changes</span>
+</span></span><span class="line"><span class="cl">taskkill /f /im explorer.exe
+</span></span><span class="line"><span class="cl"><span class="k">start</span> explorer.exe
+</span></span></code></pre></td></tr></table></div></div><h3 id="automatically-adding-shortcuts-to-the-desktop">Automatically Adding Shortcuts to the Desktop</h3><p>Create a <code>create_paths.ps1</code> file in the <strong><code>C:\Sandbox</code></strong> directory on the host machine. This script will be used to create desktop shortcuts when the Sandbox starts.</p><p>To add new shortcuts, simply update the <code>$Apps</code> array with the application paths and names. For example, I currently have <strong>VS Code</strong>, <strong>WeChat</strong>, and <strong>BaiduNetdisk</strong> stored in <strong><code>C:\Sandbox\Apps</code></strong>.</p><p>Here is the complete PowerShell script:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># Suppress progress messages</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$ProgressPreference</span><span class="p">=</span><span class="s1">&#39;Silent&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># Get the desktop path</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$DesktopPath</span> <span class="p">=</span> <span class="p">[</span><span class="no">Environment</span><span class="p">]::</span><span class="n">GetFolderPath</span><span class="p">(</span><span class="s2">&#34;Desktop&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># Define a function to create shortcuts</span>
+</span></span><span class="line"><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Create-Shortcut</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$ShortcutPath</span><span class="p">,</span>     <span class="c"># Path to save the shortcut</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$TargetPath</span><span class="p">,</span>       <span class="c"># Target application path</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$Description</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="c"># Optional description</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$IconLocation</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span> <span class="c"># Optional icon path</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$WScriptShell</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">-ComObject</span> <span class="n">WScript</span><span class="p">.</span><span class="py">Shell</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span> <span class="p">=</span> <span class="nv">$WScriptShell</span><span class="p">.</span><span class="py">CreateShortcut</span><span class="p">(</span><span class="nv">$ShortcutPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">TargetPath</span> <span class="p">=</span> <span class="nv">$TargetPath</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">Description</span> <span class="p">=</span> <span class="nv">$Description</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$IconLocation</span> <span class="o">-ne</span> <span class="s2">&#34;&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">IconLocation</span> <span class="p">=</span> <span class="nv">$IconLocation</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">Save</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># Define the application paths and shortcut names</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$Apps</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\BaiduNetdisk\BaiduNetdisk.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;BaiduNetdisk&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\WeChat\WeChat.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;WeChat&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\VSCode\Code.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;VSCode&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># Create desktop shortcuts for each application</span>
+</span></span><span class="line"><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$App</span> <span class="k">in</span> <span class="nv">$Apps</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$ShortcutPath</span> <span class="p">=</span> <span class="nb">Join-Path</span> <span class="n">-Path</span> <span class="nv">$DesktopPath</span> <span class="n">-ChildPath</span> <span class="p">(</span><span class="s2">&#34;</span><span class="p">$(</span><span class="nv">$App</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span><span class="s2">.lnk&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">Create-Shortcut</span> <span class="n">-ShortcutPath</span> <span class="nv">$ShortcutPath</span> <span class="n">-TargetPath</span> <span class="nv">$App</span><span class="p">.</span><span class="py">Path</span> <span class="n">-Description</span> <span class="s2">&#34;Launch </span><span class="p">$(</span><span class="nv">$App</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="using-wsb-to-launch-the-sandbox">Using WSB to Launch the Sandbox</h2><p>Click the <code>boot.wsb</code> file on your desktop to quickly start the Sandbox environment. With the configuration file written in advance, the Sandbox loads those settings on every launch (shown below), so there is no downloading or installing the same software again.</p><p><img alt="Run the WSB File" class="gallery-image" data-flex-basis="207px" data-flex-grow="86" decoding="async" height="112" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/wsb_icon.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="97">
+<img alt="Run the Sandbox with Preconfigured Settings" class="gallery-image" data-flex-basis="467px" data-flex-grow="194" decoding="async" height="1026" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/init_sandbox_preconfig.webp" srcset="/post/windows-sandbox/init_sandbox_preconfig_hu_f09b6f6e88053c8e.webp 800w, /post/windows-sandbox/init_sandbox_preconfig_hu_892300db2f3831b7.webp 1600w, /post/windows-sandbox/init_sandbox_preconfig.webp 2000w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2000"></p><h2 id="conclusion">Conclusion</h2><p>Once the Sandbox environment and its preloaded software are ready, testing applications gets much faster, and it stays completely isolated from the host system. The Sandbox suits software from unknown sources, and it works for development too: a secure, independent workspace.</p><p>In my own use, the Sandbox mainly runs Chinese applications like WeChat and BaiduNetdisk. These may make undocumented modifications to the system, and the Sandbox restores to its initial state quickly, so nothing they leave behind sticks around.</p><p>The Sandbox also suits testing software after compilation, especially when simulating a fresh Windows install. You can check whether the runtime environment a program needs is complete, which avoids errors when someone else runs your files on a machine that is missing something.</p><h2 id="references">References</h2><ol><li><a class="link" href="https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview" target="_blank" rel="noopener">Windows Sandbox</a></li><li><a class="link" href="https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file" target="_blank" rel="noopener">Windows Sandbox configuration</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/en/tags/tutorial/">Tutorial</a>
+<a href="/en/tags/system/">System</a>
+<a href="/en/tags/security/">Security</a>
+<a href="/en/tags/virtualization/">Virtualization</a>
+<a href="/en/tags/devtools/">DevTools</a>
+<a href="/en/tags/windows/">Windows</a>
+<a href="/en/tags/automation/">Automation</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>This article is licensed under a <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>Last Updated On 2026/08/15</span></section></footer></article><aside><h2 class="section-title">Related Content</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/en/post/using-google-antigravity/"><div class="article-image"><img alt="Featured image of post Antigravity vs. GitHub Copilot: Feature Comparison, Performance, and Cost Analysis" height="150" loading="lazy" src="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp" srcset="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp 1x, /post/using-google-antigravity/anti_meow_hu_7230a257bcb439c2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebac080 0%,#162232C0 100%)"><h2 class="article-title">Antigravity vs. GitHub Copilot: Feature Comparison, Performance, and Cost Analysis</h2></div></a></article><article class="has-image"><a href="/en/post/using-github-copilot-vscode/"><div class="article-image"><img alt="Featured image of post Boosting Coding Efficiency and Developer Experience with GitHub Copilot Agent Mode" height="150" loading="lazy" src="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp" srcset="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp 1x, /post/using-github-copilot-vscode/cover_hu_b27652e6f2f39b8c.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a0561980 0%,#34341dC0 100%)"><h2 class="article-title">Boosting Coding Efficiency and Developer Experience with GitHub Copilot Agent Mode</h2></div></a></article><article class="has-image"><a href="/en/post/awesome-windows/"><div class="article-image"><img alt="Featured image of post 2026 Awesome Windows: Essential Productivity & Dev Tools List" height="150" loading="lazy" src="/post/awesome-windows/cover_hu_b9bd220d37bdb26a.webp" srcset="/post/awesome-windows/cover_hu_b9bd220d37bdb26a.webp 1x, /post/awesome-windows/cover_hu_1ca23e927bb9c5ba.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c2bd80 0%,#433737C0 100%)"><h2 class="article-title">2026 Awesome Windows: Essential Productivity & Dev Tools List</h2></div></a></article><article class="has-image"><a href="/en/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit</h2></div></a></article><article class="has-image"><a href="/en/post/remap-copilot-key-to-ctrl/"><div class="article-image"><img alt="Featured image of post How to Remap the Copilot Key to Ctrl Using PowerToys" height="150" loading="lazy" src="/post/remap-copilot-key-to-ctrl/images/cover_hu_f40e681f3c1dc996.webp" srcset="/post/remap-copilot-key-to-ctrl/images/cover_hu_f40e681f3c1dc996.webp 1x, /post/remap-copilot-key-to-ctrl/images/cover_hu_d22452a60a1c1454.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#cec7b780 0%,#342a21C0 100%)"><h2 class="article-title">How to Remap the Copilot Key to Ctrl Using PowerToys</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","en"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">Copyright &copy;
+2023 -
+2026 WellWells</section><section class="powerby">Theme Stack designed by Jimmy</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.409fe41f76938f50142ab8f2959ffe0c989eda46761970d64bbd31bec3513bee.js" defer></script></body></html>

@@ -1,0 +1,292 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Building a Hugo static site from scratch: installing via Winget, snap or Homebrew, hugo new site, initializing the Git repo, adding the PaperMod theme, running hugo server locally, then building and pushing to GitHub Pages."><title>Hugo Site Building Notes - WellWells</title><link rel="canonical" href="https://wellstsai.com/en/post/build-hugo/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Hugo Site Building Notes"><meta property='og:description' content="Building a Hugo static site from scratch: installing via Winget, snap or Homebrew, hugo new site, initializing the Git repo, adding the PaperMod theme, running hugo server locally, then building and pushing to GitHub Pages."><meta property='og:url' content='https://wellstsai.com/en/post/build-hugo/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Website Building'><meta property='article:tag' content='Tutorial'><meta property='article:published_time' content='2023-11-27T15:30:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/build-hugo/cover.webp'><meta name="twitter:title" content="Hugo Site Building Notes"><meta name="twitter:description" content="Building a Hugo static site from scratch: installing via Winget, snap or Homebrew, hugo new site, initializing the Git repo, adding the PaperMod theme, running hugo server locally, then building and pushing to GitHub Pages."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/build-hugo/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/build-hugo/cover_hu_e54a6651d6b6ef2a.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/build-hugo/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/build-hugo/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/build-hugo/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/build-hugo/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"What is Hugo According to the official website, Hugo is a fast and modern static site generator written in Go. The advantages of static web pages include performance and security, which are the main attractions.\nWith Hugo, Markdown content is encoded into HTML pages. Since the HTML pages are pre-built, users can load them with almost zero latency.\nA key feature is that Hugo does not require backend programming or a database. This makes it more secure and less vulnerable compared to non-static …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2023-11-27T15:30:00+08:00","description":"Building a Hugo static site from scratch: installing via Winget, snap or Homebrew, hugo new site, initializing the Git repo, adding the PaperMod theme, running hugo server locally, then building and pushing to GitHub Pages.","headline":"Hugo Site Building Notes","image":"https://wellstsai.com/post/build-hugo/cover.webp","keywords":["Website Building","Tutorial"],"mainEntityOfPage":{"@id":"https://wellstsai.com/en/post/build-hugo/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/en/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/en/">WellWells</a></h1><h2 class="site-description">Unexpected valuables in the well</h2></div></header><ol class="menu" id="main-menu"><li><a href='/en/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>Home</span></a></li><li><a href='/en/about/'><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href='/en/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>Archive</span></a></li><li><a href='/en/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>Sponsor</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/build-hugo/">繁體中文</option><option value="/en/post/build-hugo/" selected>English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">Table of Contents</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#what-is-hugo">What is Hugo</a></li><li><a href="#dynamic-web-pages-vs-static-web-pages">Dynamic Web Pages vs. Static Web Pages</a></li><li><a href="#website-building-process">Website Building Process</a></li><li><a href="#getting-started-and-installation">Getting Started and Installation</a><ol><li><a href="#install-hugo-via-winget-windows">Install Hugo via Winget (Windows)</a></li><li><a href="#install-hugo-via-snap-linux">Install Hugo via Snap (Linux)</a></li><li><a href="#install-hugo-via-homebrew-macos-linux">Install Hugo via Homebrew (macOS, Linux)</a></li><li><a href="#install-git-via-winget-windows">Install Git via Winget (Windows)</a></li><li><a href="#check-executable-versions">Check Executable Versions</a></li></ol></li><li><a href="#start-a-new-site">Start a New Site</a></li><li><a href="#initialize-git-repo">Initialize Git Repo</a></li><li><a href="#install-hugo-theme">Install Hugo Theme</a></li><li><a href="#start-a-new-article">Start a New Article</a></li><li><a href="#website-configuration">Website Configuration</a></li><li><a href="#running-the-hugo-server">Running the Hugo Server</a></li><li><a href="#pushing-to-a-remote-server">Pushing to a Remote Server</a></li><li><a href="#building-and-publishing-the-website">Building and Publishing the Website</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/en/post/build-hugo/" style="position:relative;display:block"><img src="/post/build-hugo/cover_hu_f5e23f3baee91c15.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/build-hugo/cover_hu_e54a6651d6b6ef2a.webp"><source media="(min-width: 769px)" srcset="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp">
+<img src="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Hugo Site Building Notes" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/en/post/build-hugo/">Hugo Site Building Notes</a></h2><h3 class="article-subtitle">Building a Hugo static site from scratch: installing via Winget, snap or Homebrew, hugo new site, initializing the Git repo, adding the PaperMod theme, running hugo server locally, then building and pushing to GitHub Pages.</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2023-11-27T15:30:00+08:00'>2023/11/27</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">11 Minutes Read</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/post/build-hugo/" class="link">繁體中文</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>Table of Contents</span></div></summary><nav class="toc-nav"><ol><li><a href="#what-is-hugo">What is Hugo</a></li><li><a href="#dynamic-web-pages-vs-static-web-pages">Dynamic Web Pages vs. Static Web Pages</a></li><li><a href="#website-building-process">Website Building Process</a></li><li><a href="#getting-started-and-installation">Getting Started and Installation</a><ol><li><a href="#install-hugo-via-winget-windows">Install Hugo via Winget (Windows)</a></li><li><a href="#install-hugo-via-snap-linux">Install Hugo via Snap (Linux)</a></li><li><a href="#install-hugo-via-homebrew-macos-linux">Install Hugo via Homebrew (macOS, Linux)</a></li><li><a href="#install-git-via-winget-windows">Install Git via Winget (Windows)</a></li><li><a href="#check-executable-versions">Check Executable Versions</a></li></ol></li><li><a href="#start-a-new-site">Start a New Site</a></li><li><a href="#initialize-git-repo">Initialize Git Repo</a></li><li><a href="#install-hugo-theme">Install Hugo Theme</a></li><li><a href="#start-a-new-article">Start a New Article</a></li><li><a href="#website-configuration">Website Configuration</a></li><li><a href="#running-the-hugo-server">Running the Hugo Server</a></li><li><a href="#pushing-to-a-remote-server">Pushing to a Remote Server</a></li><li><a href="#building-and-publishing-the-website">Building and Publishing the Website</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></details></aside><section class="article-content"><h2 id="what-is-hugo">What is Hugo</h2><p>According to the <a class="link" href="https://gohugo.io/about/what-is-hugo/" target="_blank" rel="noopener">official website</a>, Hugo is a fast and modern static site generator written in Go. The advantages of static web pages include performance and security, which are the main attractions.</p><p>With Hugo, Markdown content is encoded into HTML pages. Since the HTML pages are pre-built, users can load them with almost zero latency.</p><p>A key feature is that Hugo does not require backend programming or a database. This makes it more secure and less vulnerable compared to non-static web pages.</p><h2 id="dynamic-web-pages-vs-static-web-pages">Dynamic Web Pages vs. Static Web Pages</h2><p>Dynamic web pages refer to web pages whose content is dynamically generated or updated based on user requests, interactions, or other specific conditions at the time of access.</p><p>Server-side scripting is the key technology behind dynamic web pages. The server runs the program logic, generates the corresponding content, and returns the result to the user's browser.</p><blockquote><p>Common server-side scripting languages, ranked by popularity: Node.js, PHP, Ruby on Rails, Go, Python, ASP.NET, JSP, CGI, etc.</p></blockquote><p>In the past, I have used WordPress, a content management system (CMS), when writing blogs. WordPress is developed in PHP and requires a host machine to set up, which can run on either Windows or Linux systems. The host can be deployed on cloud services or local environments, typically provided by hosting service providers. After setup, you connect using the FTP or SSH details the host gives you. On the host, Apache or Nginx must be installed to handle HTTP requests, as well as PHP to run WordPress. MySQL or MariaDB databases are required to store content. For convenient database management, graphical tools like phpMyAdmin can be installed (optional).</p><p>Once WordPress is installed and running, several configurations are typically performed, such as basic settings, SEO optimization, theme customization, and plugin installation. Currently, <strong>most travel blogs in Taiwan</strong> still widely use this system. When end users browse articles, the basic operation process for dynamic web pages is as follows:</p><blockquote><p>The user sends an HTTP Request via the browser → Apache processes the request and forwards it to PHP → PHP queries the database and generates HTML → Apache returns the HTML as an HTTP Response to the user.</p></blockquote><p>In contrast, static web pages only require Apache to handle user requests and responses. There is no need to rely on PHP or other server-side scripts to dynamically generate content. Static web pages are fast, secure, and capable of presenting content to users instantly without waiting for server-side programs to complete execution. The basic operation process for static web pages is as follows:</p><blockquote><p>The user sends an HTTP Request → Apache serves static HTML → Apache returns the HTTP Response to the user.</p></blockquote><p>The key difference between the two lies in whether the server needs to execute server-side scripts to generate content while the user is browsing. Static web pages do not require server-side program execution or database access to retrieve articles. Most content is pre-generated as single HTML files during deployment and served directly to users, making static web pages faster and simpler.</p><h2 id="website-building-process">Website Building Process</h2><p>Below is the basic process for building a website. You can refer to the diagram for the structure and follow the steps in order. Each step will be explained in detail later, and more in-depth content will be supplemented in future articles if needed:</p><ol><li><p><strong>Start and Install</strong>
+Install the necessary tools (e.g., Hugo and Git).</p></li><li><p><strong>Start a New Website</strong>
+Create a new website project using Hugo.</p></li><li><p><strong>Initialize Git Repo</strong>
+Initialize the project as a Git repository for version control.</p></li><li><p><strong>Install a Hugo Theme</strong>
+Choose and install a Hugo theme to change how the site looks.</p></li><li><p><strong>Create New Content</strong>
+Add new content, such as blog posts or pages.</p></li><li><p><strong>Configure Website Details</strong>
+Adjust the website's configuration file (e.g., <code>config.toml</code>), including the site title, description, and other parameters.</p></li><li><p><strong>Run Hugo Server</strong>
+Start the Hugo development server locally to preview the website.</p></li><li><p><strong>Push to Remote Repository</strong>
+Use Git to push the website project to a remote repository (e.g., GitHub).</p></li><li><p><strong>Build and Deploy the Website</strong>
+Use Hugo to compile the website into static files and deploy it to a hosting service or CDN.</p></li></ol><figure><img src="/post/build-hugo/hugo_flow.svg" alt="Flow chart to build Hugo sites" width="50%"><figcaption><h4>Flow chart to build Hugo sites</h4></figcaption></figure><h2 id="getting-started-and-installation">Getting Started and Installation</h2><p>Installing Hugo on Windows and Linux is quick. Use the command line, since it behaves the same way everywhere.</p><p>Besides installing Hugo, Windows users will also need to install Git for version control of source files.</p><p>When editing articles later, if anything breaks and needs to be reverted, Git can restore previous versions quickly.</p><h3 id="install-hugo-via-winget-windows">Install Hugo via Winget (Windows)</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">winget</span> <span class="n">install</span> <span class="n">Hugo</span><span class="p">.</span><span class="py">Hugo</span><span class="p">.</span><span class="py">Extended</span>
+</span></span></code></pre></td></tr></table></div></div><p>Result:</p><p><img alt="Use winget to install Hugo" class="gallery-image" data-flex-basis="408px" data-flex-grow="170" decoding="async" fetchpriority="high" height="539" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/winget_hugo.webp" srcset="/post/build-hugo/winget_hugo_hu_6d2a92b20d2ae6c8.webp 800w, /post/build-hugo/winget_hugo.webp 918w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="918"></p><h3 id="install-hugo-via-snap-linux">Install Hugo via Snap (Linux)</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo snap install hugo
+</span></span></code></pre></td></tr></table></div></div><p>Result:</p><p>wells@server:~$ sudo snap install hugo</p><p>[sudo] password for wells:</p><p>hugo 0.120.4 from Hugo Authors installed</p><h3 id="install-hugo-via-homebrew-macos-linux">Install Hugo via Homebrew (macOS, Linux)</h3><p>Before using brew, <a class="link" href="https://brew.sh/" target="_blank" rel="noopener">install Homebrew</a></p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install hugo
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-git-via-winget-windows">Install Git via Winget (Windows)</h3><p>Assuming Git is pre-installed on Linux or Mac, here is the Windows installation:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">winget</span> <span class="n">install</span> <span class="n">-e</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Git</span><span class="p">.</span><span class="py">Git</span>
+</span></span></code></pre></td></tr></table></div></div><p><img alt="Use winget to install Git" class="gallery-image" data-flex-basis="515px" data-flex-grow="214" decoding="async" height="305" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/winget_git.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="655"></p><h3 id="check-executable-versions">Check Executable Versions</h3><p>Verify successful installation and check versions. Currently installed versions are Hugo v0.120.4 and Git v2.43.0</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/wellwells_hugo$ hugo version
+</span></span><span class="line"><span class="cl">hugo v0.120.4-f11bca5fec2ebb3a02727fb2a5cfb08da96fd9df+extended linux/amd64 BuildDate=2023-11-08T11:18:07Z VendorInfo=snap:0.120.4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~/wellwells_hugo$ git --version
+</span></span><span class="line"><span class="cl">git version 2.43.0
+</span></span></code></pre></td></tr></table></div></div><h2 id="start-a-new-site">Start a New Site</h2><p>In a directory where you want to store your blog source files, choose your Home directory (~/) on Linux or the User directory (C:\Users\USER) on Windows. You can also choose other locations as desired. To start a new site, enter <code>hugo new site BLOG_NAME</code> and navigate into the directory. Here is an example using <code>my_blog</code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~$ hugo new site my_blog
+</span></span><span class="line"><span class="cl">Congratulations! Your new Hugo site was created in /home/wells/my_blog.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Just a few more steps...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">1. Change the current directory to /home/wells/my_blog.
+</span></span><span class="line"><span class="cl">2. Create or install a theme:
+</span></span><span class="line"><span class="cl">   - Create a new theme with the command &#34;hugo new theme &lt;THEMENAME&gt;&#34;
+</span></span><span class="line"><span class="cl">   - Install a theme from https://themes.gohugo.io/
+</span></span><span class="line"><span class="cl">3. Edit hugo.toml, setting the &#34;theme&#34; property to the theme name.
+</span></span><span class="line"><span class="cl">4. Create new content with the command &#34;hugo new content &lt;SECTIONNAME&gt;/&lt;FILENAME&gt;.&lt;FORMAT&gt;&#34;.
+</span></span><span class="line"><span class="cl">5. Start the embedded web server with the command &#34;hugo server --buildDrafts&#34;.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">See documentation at https://gohugo.io/.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~$ cd my_blog/
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ ls # List directory structure
+</span></span><span class="line"><span class="cl">archetypes  assets  content  data  hugo.toml  i18n  layouts  static  themes
+</span></span></code></pre></td></tr></table></div></div><p>A new blog site is created, which by default has no theme or content. Direct compilation will result in an empty site.</p><h2 id="initialize-git-repo">Initialize Git Repo</h2><p>Navigate to the blog directory (<code>~/my_blog</code>) and initialize a local Git repo with <code>git init</code>. Use <code>git status</code> to check Untracked files.</p><p>By default, Git does not track any files. Add <code>hugo.toml</code>, <code>archetypes</code>, and other relevant files to the index (<code>git add</code>).</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git init
+</span></span><span class="line"><span class="cl">hint: Using &#39;master&#39; as the name for the initial branch. This default branch name
+</span></span><span class="line"><span class="cl">hint: is subject to change. To configure the initial branch name to use in all
+</span></span><span class="line"><span class="cl">hint: of your new repositories, which will suppress this warning, call:
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint:   git config --global init.defaultBranch &lt;name&gt;
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint: Names commonly chosen instead of &#39;master&#39; are &#39;main&#39;, &#39;trunk&#39; and
+</span></span><span class="line"><span class="cl">hint: &#39;development&#39;. The just-created branch can be renamed via this command:
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint:   git branch -m &lt;name&gt;
+</span></span><span class="line"><span class="cl">Initialized empty Git repository in /home/wells/my_blog/.git/
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git status
+</span></span><span class="line"><span class="cl">On branch master
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">No commits yet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Untracked files:
+</span></span><span class="line"><span class="cl">  (use &#34;git add &lt;file&gt;...&#34; to include in what will be committed)
+</span></span><span class="line"><span class="cl">        .hugo_build.lock
+</span></span><span class="line"><span class="cl">        archetypes/
+</span></span><span class="line"><span class="cl">        hugo.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">nothing added to commit but untracked files present (use &#34;git add&#34; to track)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git add archetypes/ hugo.toml
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git status
+</span></span><span class="line"><span class="cl">On branch master
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">No commits yet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Changes to be committed:
+</span></span><span class="line"><span class="cl">  (use &#34;git rm --cached &lt;file&gt;...&#34; to unstage)
+</span></span><span class="line"><span class="cl">        new file:   archetypes/default.md
+</span></span><span class="line"><span class="cl">        new file:   hugo.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Untracked files:
+</span></span><span class="line"><span class="cl">  (use &#34;git add &lt;file&gt;...&#34; to include in what will be committed)
+</span></span><span class="line"><span class="cl">        .hugo_build.lock
+</span></span></code></pre></td></tr></table></div></div><h2 id="install-hugo-theme">Install Hugo Theme</h2><p>To install a Hugo theme, visit <a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener">Hugo Themes</a> and choose a theme. Theme authors usually include installation instructions.</p><p>Using <a class="link" href="https://themes.gohugo.io/themes/hugo-papermod/" target="_blank" rel="noopener">PaperMod</a> as an example, follow the <a class="link" href="https://github.com/adityatelange/hugo-PaperMod/wiki/Installation" target="_blank" rel="noopener">PaperMod - Installation</a> guide. Method 1 involves git cloning in the site directory.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git clone https://github.com/adityatelange/hugo-PaperMod themes/PaperMod --depth=1
+</span></span><span class="line"><span class="cl">Cloning into &#39;themes/PaperMod&#39;...
+</span></span><span class="line"><span class="cl">remote: Enumerating objects: 134, done.
+</span></span><span class="line"><span class="cl">remote: Counting objects: 100% (134/134), done.
+</span></span><span class="line"><span class="cl">remote: Compressing objects: 100% (113/113), done.
+</span></span><span class="line"><span class="cl">remote: Total 134 (delta 33), reused 57 (delta 15), pack-reused 0
+</span></span><span class="line"><span class="cl">Receiving objects: 100% (134/134), 263.32 KiB | 1.61 MiB/s, done.
+</span></span><span class="line"><span class="cl">Resolving deltas: 100% (33/33), done.
+</span></span></code></pre></td></tr></table></div></div><p>Edit <code>~/my_blog/hugo.toml</code> and add the following line at the end to apply the theme. Note that the case is important:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">baseURL = &#39;https://example.org/&#39;
+</span></span><span class="line"><span class="cl">languageCode = &#39;en-us&#39;
+</span></span><span class="line"><span class="cl">title = &#39;My New Hugo Site&#39;
+</span></span><span class="line"><span class="cl">theme = &#39;PaperMod&#39;
+</span></span></code></pre></td></tr></table></div></div><h2 id="start-a-new-article">Start a New Article</h2><p>With the following command, you can create a new article:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ hugo new content posts/my-first-post.md
+</span></span><span class="line"><span class="cl">Content &#34;/home/wells/my_blog/content/posts/my-first-post.md&#34; created
+</span></span></code></pre></td></tr></table></div></div><p>Editing <code>~/my_blog/content/posts/my-first-post.md</code> is equivalent to writing an article. The syntax used is Markdown. Remember to change <code>draft = true</code> to <code>draft = false</code>, or the article will never actually publish.</p><p>my-first-post.md</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">+++
+</span></span><span class="line"><span class="cl">title = &#39;My First Post&#39;
+</span></span><span class="line"><span class="cl">date = 2023-11-27T10:58:32+08:00
+</span></span><span class="line"><span class="cl">draft = false
+</span></span><span class="line"><span class="cl">+++
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Hello, My Site
+</span></span><span class="line"><span class="cl">I&#39;m Wells
+</span></span></code></pre></td></tr></table></div></div><h2 id="website-configuration">Website Configuration</h2><p>At this stage, the Hugo server can already be run, and the blog can be viewed. However, before running the server, you may consider configuring some basic settings for the website, such as:</p><ol><li>Editing the language in <code>~/my_blog/hugo.toml</code>.</li><li>Setting the blog name.</li><li>Enabling or disabling emoji support (<code>enableEmoji</code>).</li><li>Configuring the website's favicon.</li><li>Adding a website summary.</li><li>Other configuration options...</li></ol><p>Since there are numerous configuration options, you can also choose to adjust them dynamically after running the server.</p><p>For more configuration details, refer to the official documentation: <a class="link" href="https://gohugo.io/getting-started/configuration/" target="_blank" rel="noopener">Configure Hugo</a>. You can also convert <code>hugo.toml</code> to <code>hugo.yaml</code> if you prefer.</p><p>Different Hugo themes may require specific configurations. Check the theme's documentation and adjust the corresponding settings in the <code>config</code> file.</p><h2 id="running-the-hugo-server">Running the Hugo Server</h2><p>According to the official website, Hugo is a high-performance web server, though it is mainly convenient for local testing. You can run the server with the following command:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">hugo server -D
+</span></span></code></pre></td></tr></table></div></div><p>Including the <code>-D</code> flag will also build draft articles. By default, the final build will not compile draft articles.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ hugo server -D
+</span></span><span class="line"><span class="cl">port 1313 already in use, attempting to use an available port
+</span></span><span class="line"><span class="cl">Watching for changes in /home/wells/my_blog/{archetypes,assets,content,data,i18n,layouts,static,themes}
+</span></span><span class="line"><span class="cl">Watching for config changes in /home/wells/my_blog/hugo.yaml
+</span></span><span class="line"><span class="cl">Start building sites …
+</span></span><span class="line"><span class="cl">hugo v0.120.4-f11bca5fec2ebb3a02727fb2a5cfb08da96fd9df+extended linux/amd64 BuildDate=2023-11-08T11:18:07Z VendorInfo=snap:0.120.4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                   | ZH-TW
+</span></span><span class="line"><span class="cl">-------------------+--------
+</span></span><span class="line"><span class="cl">  Pages            |    10
+</span></span><span class="line"><span class="cl">  Paginator pages  |     0
+</span></span><span class="line"><span class="cl">  Non-page files   |     0
+</span></span><span class="line"><span class="cl">  Static files     |     0
+</span></span><span class="line"><span class="cl">  Processed images |     0
+</span></span><span class="line"><span class="cl">  Aliases          |     2
+</span></span><span class="line"><span class="cl">  Sitemaps         |     1
+</span></span><span class="line"><span class="cl">  Cleaned          |     0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Built in 25 ms
+</span></span><span class="line"><span class="cl">Environment: &#34;development&#34;
+</span></span><span class="line"><span class="cl">Serving pages from memory
+</span></span><span class="line"><span class="cl">Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+</span></span><span class="line"><span class="cl">Web Server is available at http://localhost:46651/ (bind address 127.0.0.1)
+</span></span><span class="line"><span class="cl">Press Ctrl+C to stop
+</span></span></code></pre></td></tr></table></div></div><p>After starting the server, you can open <a class="link" href="http://localhost:46651" target="_blank" rel="noopener">http://localhost:46651</a> in your browser to view the blog and articles. Any subsequent edits to the configuration or modifications to the articles will be updated in real-time.</p><p><img alt="Running the Hugo Server" class="gallery-image" data-flex-basis="275px" data-flex-grow="114" decoding="async" height="590" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/build_my_blog.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="678"></p><h2 id="pushing-to-a-remote-server">Pushing to a Remote Server</h2><p>After installing the theme, adding articles, and editing the configuration files, the next step is to use Git to manage the changes in the directory and push these changes to a remote server for management and maintenance.</p><p>Since only <code>git init</code> was executed earlier, the remote server connection has not been configured yet.</p><p>Assuming you have already created a corresponding repository (repo) on GitHub or another server, you will receive an SSH connection string, such as:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git@github.com:USER/private.repo.git
+</span></span></code></pre></td></tr></table></div></div><p>You can add and check the current local repository's remote status using <code>git remote add</code> and <code>git remote -v</code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git remote add main git@github.com:USER/private.repo.git
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git remote -v
+</span></span><span class="line"><span class="cl">main    git@github.com:USER/private.repo.git (fetch)
+</span></span><span class="line"><span class="cl">main    git@github.com:USER/private.repo.git (push)
+</span></span></code></pre></td></tr></table></div></div><p><strong>Make sure every modified file is staged with <code>git add</code> and committed with <code>git commit</code>. After that, <code>git push</code> sends the whole set of local changes up to the remote server.</strong></p><h2 id="building-and-publishing-the-website">Building and Publishing the Website</h2><p>Building the website is straightforward. Simply enter the command <code>hugo</code>, and it will generate the <code>~/my_blog/public</code> directory. The HTML files within this <code>public</code> directory can be uploaded to a server for others to view. There are several free static site hosting services available online, such as:</p><ol><li><a class="link" href="https://pages.github.com/" target="_blank" rel="noopener">GitHub pages</a></li><li><a class="link" href="https://pages.cloudflare.com/" target="_blank" rel="noopener">Cloudflare pages</a></li><li><a class="link" href="https://docs.netlify.com/" target="_blank" rel="noopener">Netlify</a></li></ol><p>I'm currently on GitHub Pages, which supports custom domains and integrates with repositories and GitHub Actions.</p><p>Once the repo is pushed, the site builds and deploys to GitHub Pages automatically, and the <a class="link" href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages" target="_blank" rel="noopener">free monthly quota</a> is fairly generous.</p><h2 id="conclusion">Conclusion</h2><p>Creating a Hugo static website is not particularly difficult. The steps are straightforward: install Hugo and Git → install a theme → add articles → publish.</p><p>Git sits in the middle of that so changes to the site can be tracked and rolled back. Skipping <code>git init</code> is technically possible, <strong>but I really don't recommend it</strong>. Reverting by hand is painful once the site is accidentally broken.</p><h2 id="references">References</h2><ol><li><a class="link" href="https://gohugo.io/getting-started/quick-start/" target="_blank" rel="noopener">Hugo - Quick start</a></li><li><a class="link" href="https://gohugo.io/about/benefits/" target="_blank" rel="noopener">Benefits of static site generators</a></li><li><a class="link" href="https://gohugo.io/getting-started/configuration/" target="_blank" rel="noopener">Configure Hugo</a></li><li><a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener">Hugo Themes</a></li><li><a class="link" href="https://github.com/adityatelange/hugo-PaperMod/wiki" target="_blank" rel="noopener">PaperMod's wiki</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/en/tags/website-building/">Website Building</a>
+<a href="/en/tags/tutorial/">Tutorial</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>This article is licensed under a <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>Last Updated On 2026/08/15</span></section></footer></article><aside><h2 class="section-title">Related Content</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/en/post/transfer-domain-to-cloudflare/"><div class="article-image"><img alt="Featured image of post Transferring a Domain from Squarespace to Cloudflare: A Complete Walkthrough" height="150" loading="lazy" src="/post/transfer-domain-to-cloudflare/cover_hu_a25f6656044c2e79.webp" srcset="/post/transfer-domain-to-cloudflare/cover_hu_a25f6656044c2e79.webp 1x, /post/transfer-domain-to-cloudflare/cover_hu_fe19d086d488b778.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#e3cfb280 0%,#482d18C0 100%)"><h2 class="article-title">Transferring a Domain from Squarespace to Cloudflare: A Complete Walkthrough</h2></div></a></article><article class="has-image"><a href="/en/post/ai-summary-deploy/"><div class="article-image"><img alt="Featured image of post AI Website Tutorial: Auto-Deploy Tailwind HTML via GitHub Actions" height="150" loading="lazy" src="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp" srcset="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp 1x, /post/ai-summary-deploy/cover_hu_f4a263386c4d8d96.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c8cb80 0%,#3c382eC0 100%)"><h2 class="article-title">AI Website Tutorial: Auto-Deploy Tailwind HTML via GitHub Actions</h2></div></a></article><article class="has-image"><a href="/en/post/code-tag-translation-fix/"><div class="article-image"><img alt="Featured image of post Fix Edge Browser Translation Issues with <code> Tags" height="150" loading="lazy" src="/post/code-tag-translation-fix/cover_hu_137c62743477ad46.webp" srcset="/post/code-tag-translation-fix/cover_hu_137c62743477ad46.webp 1x, /post/code-tag-translation-fix/cover_hu_4ef977a5242f5520.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#4ab0c680 0%,#332c4dC0 100%)"><h2 class="article-title">Fix Edge Browser Translation Issues with &lt;code> Tags</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","en"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">Copyright &copy;
+2023 -
+2026 WellWells</section><section class="powerby">Theme Stack designed by Jimmy</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.409fe41f76938f50142ab8f2959ffe0c989eda46761970d64bbd31bec3513bee.js" defer></script></body></html>

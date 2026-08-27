@@ -1,0 +1,294 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="從零把 Hugo 靜態網站架起來：用 Winget／snap／Homebrew 安裝、hugo new site、初始化 Git repo、裝 PaperMod 主題、本機跑 hugo server，最後編譯推上 GitHub Pages。"><title>Hugo 建站筆記 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/build-hugo/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Hugo 建站筆記"><meta property='og:description' content="從零把 Hugo 靜態網站架起來：用 Winget／snap／Homebrew 安裝、hugo new site、初始化 Git repo、裝 PaperMod 主題、本機跑 hugo server，最後編譯推上 GitHub Pages。"><meta property='og:url' content='https://wellstsai.com/post/build-hugo/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='建站'><meta property='article:tag' content='教學'><meta property='article:published_time' content='2023-11-27T15:30:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/build-hugo/cover.webp'><meta name="twitter:title" content="Hugo 建站筆記"><meta name="twitter:description" content="從零把 Hugo 靜態網站架起來：用 Winget／snap／Homebrew 安裝、hugo new site、初始化 Git repo、裝 PaperMod 主題、本機跑 hugo server，最後編譯推上 GitHub Pages。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/build-hugo/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/build-hugo/cover_hu_e54a6651d6b6ef2a.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/build-hugo/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/build-hugo/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/build-hugo/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/build-hugo/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"什麼是 Hugo 根據官網所描述，是一個基於 Go 語言所撰寫的快速且現代的靜態網站產生器（static site generator），其中靜態網頁（static web pages）的好處在於性能以及安全性是吸引人的主要原因。\nHugo 會把撰寫的 Markdown 編碼成 HTML 頁面。由於 HTML 頁面已經建構好，使用者在瀏覽時可以幾乎零延遲的載入。\n其特點不需要後端程式或是資料庫（database）。也因為相較於非靜態網頁來得安全、漏洞更少。\n動態網頁與靜態網頁 動態網頁（dynamic web page）是指當使用者存取網頁時，其內容可以根據使用者的請求、操作，或其他特定條件而動態產生或更新的網頁。\n伺服器端語言（server-side scripting）是動態網頁的關鍵技術，由伺服器執行相關程式邏輯，產生對應的內容，再把結果回傳給使用者瀏覽器。\n常見的伺服器端語言依熱門程度排序為：Node.js、PHP、Ruby on Rails、Go、Python、ASP.NET、JSP、CGI 等。\n在過去撰寫部落格時，我曾使用過 WordPress 這個內容管理系統 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2023-11-27T15:30:00+08:00","description":"從零把 Hugo 靜態網站架起來：用 Winget／snap／Homebrew 安裝、hugo new site、初始化 Git repo、裝 PaperMod 主題、本機跑 hugo server，最後編譯推上 GitHub Pages。","headline":"Hugo 建站筆記","image":"https://wellstsai.com/post/build-hugo/cover.webp","keywords":["建站","教學"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/build-hugo/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/build-hugo/" selected>繁體中文</option><option value="/en/post/build-hugo/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#什麼是-hugo">什麼是 Hugo</a></li><li><a href="#動態網頁與靜態網頁">動態網頁與靜態網頁</a></li><li><a href="#建站流程">建站流程</a></li><li><a href="#開始與安裝">開始與安裝</a><ol><li><a href="#透過-winget-安裝-hugo-windows">透過 Winget 安裝 Hugo (Windows)</a></li><li><a href="#透過-snap-安裝-hugo-linux">透過 snap 安裝 Hugo (Linux)</a></li><li><a href="#透過-homebrew-安裝-hugo-macos-linux">透過 Homebrew 安裝 Hugo (macOS, Linux)</a></li><li><a href="#透過-winget-安裝-git-windows">透過 Winget 安裝 Git (Windows)</a></li><li><a href="#檢查執行檔版本">檢查執行檔版本</a></li></ol></li><li><a href="#開始新的網站">開始新的網站</a></li><li><a href="#初始化-git-repo">初始化 Git Repo</a></li><li><a href="#安裝-hugo-主題">安裝 Hugo 主題</a></li><li><a href="#開始新的文章">開始新的文章</a></li><li><a href="#設定網站細節">設定網站細節</a></li><li><a href="#執行-hugo-伺服器">執行 Hugo 伺服器</a></li><li><a href="#推送到遠端伺服器">推送到遠端伺服器</a></li><li><a href="#編譯並發布網站">編譯並發布網站</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/build-hugo/" style="position:relative;display:block"><img src="/post/build-hugo/cover_hu_f5e23f3baee91c15.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/build-hugo/cover_hu_e54a6651d6b6ef2a.webp"><source media="(min-width: 769px)" srcset="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp">
+<img src="/post/build-hugo/cover_hu_98fa227eb90d7dbd.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Hugo 建站筆記" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/build-hugo/">Hugo 建站筆記</a></h2><h3 class="article-subtitle">從零把 Hugo 靜態網站架起來：用 Winget／snap／Homebrew 安裝、hugo new site、初始化 Git repo、裝 PaperMod 主題、本機跑 hugo server，最後編譯推上 GitHub Pages。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2023-11-27T15:30:00+08:00'>2023/11/27</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：8 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/build-hugo/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#什麼是-hugo">什麼是 Hugo</a></li><li><a href="#動態網頁與靜態網頁">動態網頁與靜態網頁</a></li><li><a href="#建站流程">建站流程</a></li><li><a href="#開始與安裝">開始與安裝</a><ol><li><a href="#透過-winget-安裝-hugo-windows">透過 Winget 安裝 Hugo (Windows)</a></li><li><a href="#透過-snap-安裝-hugo-linux">透過 snap 安裝 Hugo (Linux)</a></li><li><a href="#透過-homebrew-安裝-hugo-macos-linux">透過 Homebrew 安裝 Hugo (macOS, Linux)</a></li><li><a href="#透過-winget-安裝-git-windows">透過 Winget 安裝 Git (Windows)</a></li><li><a href="#檢查執行檔版本">檢查執行檔版本</a></li></ol></li><li><a href="#開始新的網站">開始新的網站</a></li><li><a href="#初始化-git-repo">初始化 Git Repo</a></li><li><a href="#安裝-hugo-主題">安裝 Hugo 主題</a></li><li><a href="#開始新的文章">開始新的文章</a></li><li><a href="#設定網站細節">設定網站細節</a></li><li><a href="#執行-hugo-伺服器">執行 Hugo 伺服器</a></li><li><a href="#推送到遠端伺服器">推送到遠端伺服器</a></li><li><a href="#編譯並發布網站">編譯並發布網站</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="什麼是-hugo">什麼是 Hugo</h2><p>根據<a class="link" href="https://gohugo.io/about/what-is-hugo/" target="_blank" rel="noopener">官網</a>所描述，是一個基於 Go 語言所撰寫的快速且現代的靜態網站產生器（static site generator），其中靜態網頁（static web pages）的好處在於性能以及安全性是吸引人的主要原因。</p><p>Hugo 會把撰寫的 Markdown 編碼成 HTML 頁面。由於 HTML 頁面已經建構好，使用者在瀏覽時可以幾乎零延遲的載入。</p><p>其特點不需要後端程式或是資料庫（database）。也因為相較於非靜態網頁來得安全、漏洞更少。</p><h2 id="動態網頁與靜態網頁">動態網頁與靜態網頁</h2><p>動態網頁（dynamic web page）是指當使用者存取網頁時，其內容可以根據使用者的請求、操作，或其他特定條件而動態產生或更新的網頁。</p><p>伺服器端語言（server-side scripting）是動態網頁的關鍵技術，由伺服器執行相關程式邏輯，產生對應的內容，再把結果回傳給使用者瀏覽器。</p><blockquote><p>常見的伺服器端語言依熱門程度排序為：Node.js、PHP、Ruby on Rails、Go、Python、ASP.NET、JSP、CGI 等。</p></blockquote><p>在過去撰寫部落格時，我曾使用過 WordPress 這個內容管理系統（Content Management System，CMS）。WordPress 是以 PHP 語言開發的，架設 WordPress 需要有一台主機，主機可以是 Windows 或 Linux 系統，並部署在某個位置，例如雲端或本地環境，通常由主機服務商提供。完成設定後，要用主機服務商給的 FTP 或 SSH 連線資訊連上去。在主機上，需要安裝 Apache 或 Nginx 來處理 HTTP 請求，並安裝 PHP 執行 WordPress。同時，為了儲存文章內容，還需安裝 MySQL 或 MariaDB 資料庫。如果需要方便地管理資料庫，則可以選擇安裝圖形化管理工具，例如 phpMyAdmin（非必要）。</p><p>當 WordPress 安裝完成並正常運作後，通常還會做一系列操作，包括基本設定、SEO 最佳化、主題美化，以及部分外掛的安裝。目前，<strong>臺灣主流的旅遊網誌</strong>仍然普遍採用這套系統。終端使用者在瀏覽文章時，其動態網頁的基本運作流程為：</p><blockquote><p>使用者透過瀏覽器發送 HTTP Request → Apache 處理請求並交給 PHP → PHP 查詢資料庫後，產生 HTML → Apache 回傳 HTML 作為 HTTP Response 給使用者。</p></blockquote><p>相較之下，靜態網頁僅需由 Apache 處理使用者的 Request 和 Response，無需依賴 PHP 或其他後端程式來動態產生內容。靜態網頁的特點在於快速、安全，且能即時將內容呈現給使用者，因為不需要等待後端程式執行完成。靜態網頁的基本運作流程為：</p><blockquote><p>使用者發送 HTTP Request → Apache 傳送靜態 HTML → Apache 回傳 HTTP Response 給使用者。</p></blockquote><p>兩者的差異在於伺服器端是否需要在使用者瀏覽時執行伺服器端的程式來產生內容。靜態網頁不需要伺服器端執行任何程式，也不依賴資料庫來存取文章。大多數文章內容在部署前已經被產生為單一的 HTML 檔案，直接提供給使用者，這使得靜態網頁更加快速且簡單。</p><h2 id="建站流程">建站流程</h2><p>以下是建站的基本流程，可參考下圖的架構，並依序完成各步驟。後續將逐一講解每個步驟的細節，若需要更深入的內容，會在未來文章中補充說明：</p><ol><li><p><strong>開始與安裝</strong>
+安裝必要工具（例如 Hugo 和 Git）。</p></li><li><p><strong>開始新的網站</strong>
+使用 Hugo 建立全新的網站專案。</p></li><li><p><strong>初始化 Git Repo</strong>
+將專案初始化為 Git 儲存庫，方便版本控制。</p></li><li><p><strong>安裝 Hugo 主題</strong>
+選擇並安裝適合的 Hugo 主題以美化網站外觀。</p></li><li><p><strong>開始新的文章</strong>
+新增內容，例如部落格文章或頁面。</p></li><li><p><strong>設定網站細節</strong>
+調整網站的設定檔（如 <code>config.toml</code>），包括網站標題、描述及其他參數。</p></li><li><p><strong>執行 Hugo 伺服器</strong>
+本地啟動 Hugo 開發伺服器，預覽網站效果。</p></li><li><p><strong>推送到遠端伺服器</strong>
+使用 Git 將網站專案推送至遠端儲存庫（如 GitHub）。</p></li><li><p><strong>編譯並發布網站</strong>
+使用 Hugo 將網站編譯為靜態檔案，並部署至主機或 CDN 上。</p></li></ol><figure><img src="/post/build-hugo/hugo_flow.svg" alt="Flow chart to build Hugo sites" width="50%"><figcaption><h4>Flow chart to build Hugo sites</h4></figcaption></figure><h2 id="開始與安裝">開始與安裝</h2><p>在 Windows 與 Linux 上安裝 Hugo 很快，建議用命令列，操作比較一致。</p><p>除了安裝 Hugo，Windows 使用者還需要額外安裝 Git，用來管理原始檔案的版本。</p><p>未來在編輯文章時，若出現任何錯誤需要復原，都可以用 Git 快速回溯。</p><h3 id="透過-winget-安裝-hugo-windows">透過 Winget 安裝 Hugo (Windows)</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">winget</span> <span class="n">install</span> <span class="n">Hugo</span><span class="p">.</span><span class="py">Hugo</span><span class="p">.</span><span class="py">Extended</span>
+</span></span></code></pre></td></tr></table></div></div><p>安裝結果:</p><p><img alt="Use winget to install Hugo" class="gallery-image" data-flex-basis="408px" data-flex-grow="170" decoding="async" fetchpriority="high" height="539" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/winget_hugo.webp" srcset="/post/build-hugo/winget_hugo_hu_6d2a92b20d2ae6c8.webp 800w, /post/build-hugo/winget_hugo.webp 918w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="918"></p><h3 id="透過-snap-安裝-hugo-linux">透過 snap 安裝 Hugo (Linux)</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo snap install hugo
+</span></span></code></pre></td></tr></table></div></div><p>安裝結果:</p><p>wells@server:~$ sudo snap install hugo</p><p>[sudo] password for wells:</p><p>hugo 0.120.4 from Hugo Authors installed</p><h3 id="透過-homebrew-安裝-hugo-macos-linux">透過 Homebrew 安裝 Hugo (macOS, Linux)</h3><p>在使用 brew 指令前，需要先 <a class="link" href="https://brew.sh/" target="_blank" rel="noopener"><strong>安裝 Homebrew</strong></a></p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install hugo
+</span></span></code></pre></td></tr></table></div></div><h3 id="透過-winget-安裝-git-windows">透過 Winget 安裝 Git (Windows)</h3><p>預設 Linux 或 Mac 已經安裝好 Git 指令，故這裡只提及 Windows 上的安裝</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">winget</span> <span class="n">install</span> <span class="n">-e</span> <span class="p">-</span><span class="n">-id</span> <span class="n">Git</span><span class="p">.</span><span class="py">Git</span>
+</span></span></code></pre></td></tr></table></div></div><p><img alt="Use winget to install Git" class="gallery-image" data-flex-basis="515px" data-flex-grow="214" decoding="async" height="305" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/winget_git.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="655"></p><h3 id="檢查執行檔版本">檢查執行檔版本</h3><p>安裝後可以檢查是否安裝成功，順便檢查版本號，目前安裝的 Hugo 版本為 v0.120.4，Git 為 v2.43.0</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/wellwells_hugo$ hugo version
+</span></span><span class="line"><span class="cl">hugo v0.120.4-f11bca5fec2ebb3a02727fb2a5cfb08da96fd9df+extended linux/amd64 BuildDate=2023-11-08T11:18:07Z VendorInfo=snap:0.120.4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~/wellwells_hugo$ git --version
+</span></span><span class="line"><span class="cl">git version 2.43.0
+</span></span></code></pre></td></tr></table></div></div><h2 id="開始新的網站">開始新的網站</h2><p>在一個可以存放網誌原始檔的地方，Linux 可選擇個人的 Home 目錄（~/），Windows 可選擇使用者目錄（C:\Users\USER），想儲存在其他區域也是都可以的，要開始新的網站，輸入 <code>hugo new site BLOG_NAME</code>，並進入到該目錄即可，這邊以 my_blog 為例子：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~$ hugo new site my_blog
+</span></span><span class="line"><span class="cl">Congratulations! Your new Hugo site was created in /home/wells/my_blog.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Just a few more steps...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">1. Change the current directory to /home/wells/my_blog.
+</span></span><span class="line"><span class="cl">2. Create or install a theme:
+</span></span><span class="line"><span class="cl">   - Create a new theme with the command &#34;hugo new theme &lt;THEMENAME&gt;&#34;
+</span></span><span class="line"><span class="cl">   - Install a theme from https://themes.gohugo.io/
+</span></span><span class="line"><span class="cl">3. Edit hugo.toml, setting the &#34;theme&#34; property to the theme name.
+</span></span><span class="line"><span class="cl">4. Create new content with the command &#34;hugo new content &lt;SECTIONNAME&gt;/&lt;FILENAME&gt;.&lt;FORMAT&gt;&#34;.
+</span></span><span class="line"><span class="cl">5. Start the embedded web server with the command &#34;hugo server --buildDrafts&#34;.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">See documentation at https://gohugo.io/.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~$ cd my_blog/
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ ls # 列出目錄結構
+</span></span><span class="line"><span class="cl">archetypes  assets  content  data  hugo.toml  i18n  layouts  static  themes
+</span></span></code></pre></td></tr></table></div></div><p>如此一來就建立好了一個新的網誌，而這個網誌預設是沒有安裝主題與文章的，所以直接編譯的話是沒有內容的。</p><h2 id="初始化-git-repo">初始化 Git Repo</h2><p>在進入到網誌目錄底下（<code>~/my_blog</code>），輸入 <code>git init</code> 便可以初始化本地的 local repo。後續可以用 <code>git status</code> 查看 Untracked files。</p><p>預設 Git 是沒有追蹤任何檔案的，可以把 <code>hugo.toml</code>、<code>archetypes</code> 等相關檔案加入至索引對象（<code>git add</code>）。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git init
+</span></span><span class="line"><span class="cl">hint: Using &#39;master&#39; as the name for the initial branch. This default branch name
+</span></span><span class="line"><span class="cl">hint: is subject to change. To configure the initial branch name to use in all
+</span></span><span class="line"><span class="cl">hint: of your new repositories, which will suppress this warning, call:
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint:   git config --global init.defaultBranch &lt;name&gt;
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint: Names commonly chosen instead of &#39;master&#39; are &#39;main&#39;, &#39;trunk&#39; and
+</span></span><span class="line"><span class="cl">hint: &#39;development&#39;. The just-created branch can be renamed via this command:
+</span></span><span class="line"><span class="cl">hint:
+</span></span><span class="line"><span class="cl">hint:   git branch -m &lt;name&gt;
+</span></span><span class="line"><span class="cl">Initialized empty Git repository in /home/wells/my_blog/.git/
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git status
+</span></span><span class="line"><span class="cl">On branch master
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">No commits yet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Untracked files:
+</span></span><span class="line"><span class="cl">  (use &#34;git add &lt;file&gt;...&#34; to include in what will be committed)
+</span></span><span class="line"><span class="cl">        .hugo_build.lock
+</span></span><span class="line"><span class="cl">        archetypes/
+</span></span><span class="line"><span class="cl">        hugo.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">nothing added to commit but untracked files present (use &#34;git add&#34; to track)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git add archetypes/ hugo.toml
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git status
+</span></span><span class="line"><span class="cl">On branch master
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">No commits yet
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Changes to be committed:
+</span></span><span class="line"><span class="cl">  (use &#34;git rm --cached &lt;file&gt;...&#34; to unstage)
+</span></span><span class="line"><span class="cl">        new file:   archetypes/default.md
+</span></span><span class="line"><span class="cl">        new file:   hugo.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Untracked files:
+</span></span><span class="line"><span class="cl">  (use &#34;git add &lt;file&gt;...&#34; to include in what will be committed)
+</span></span><span class="line"><span class="cl">        .hugo_build.lock
+</span></span></code></pre></td></tr></table></div></div><h2 id="安裝-hugo-主題">安裝 Hugo 主題</h2><p>要安裝 Hugo 主題，可以先到 <a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener">Hugo Themes</a> 找一個喜歡的主題，主題的作者通常會附上安裝方式。</p><p>這裡以 <a class="link" href="https://themes.gohugo.io/themes/hugo-papermod/" target="_blank" rel="noopener">PaperMod</a> 主題為例子。從 <a class="link" href="https://github.com/adityatelange/hugo-PaperMod/wiki/Installation" target="_blank" rel="noopener">PaperMod - Installation</a> 文件中可以得知安裝有不同方法。</p><p>Method 1 是在 site 目錄下 <code>git clone</code> 即可。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git clone https://github.com/adityatelange/hugo-PaperMod themes/PaperMod --depth=1
+</span></span><span class="line"><span class="cl">Cloning into &#39;themes/PaperMod&#39;...
+</span></span><span class="line"><span class="cl">remote: Enumerating objects: 134, done.
+</span></span><span class="line"><span class="cl">remote: Counting objects: 100% (134/134), done.
+</span></span><span class="line"><span class="cl">remote: Compressing objects: 100% (113/113), done.
+</span></span><span class="line"><span class="cl">remote: Total 134 (delta 33), reused 57 (delta 15), pack-reused 0
+</span></span><span class="line"><span class="cl">Receiving objects: 100% (134/134), 263.32 KiB | 1.61 MiB/s, done.
+</span></span><span class="line"><span class="cl">Resolving deltas: 100% (33/33), done.
+</span></span></code></pre></td></tr></table></div></div><p>編輯 <code>~/my_blog/hugo.toml</code>，並在後方新增一行 <code>theme = 'PaperMod'</code> 即可套用該主題，注意大小寫是有差異的。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">baseURL = &#39;https://example.org/&#39;
+</span></span><span class="line"><span class="cl">languageCode = &#39;en-us&#39;
+</span></span><span class="line"><span class="cl">title = &#39;My New Hugo Site&#39;
+</span></span><span class="line"><span class="cl">theme = &#39;PaperMod&#39;
+</span></span></code></pre></td></tr></table></div></div><h2 id="開始新的文章">開始新的文章</h2><p>用以下指令，便可新增一篇新文章</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ hugo new content posts/my-first-post.md
+</span></span><span class="line"><span class="cl">Content &#34;/home/wells/my_blog/content/posts/my-first-post.md&#34; created
+</span></span></code></pre></td></tr></table></div></div><p>編輯 <code>~/my_blog/content/posts/my-first-post.md</code> 就等同於在寫文章了，其中語法為 Markdown，記得把 <code>draft = true</code> 改為 <code>false</code>，這篇才會真的發布出去。</p><p>my-first-post.md</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">+++
+</span></span><span class="line"><span class="cl">title = &#39;My First Post&#39;
+</span></span><span class="line"><span class="cl">date = 2023-11-27T10:58:32+08:00
+</span></span><span class="line"><span class="cl">draft = false
+</span></span><span class="line"><span class="cl">+++
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Hello, My Site
+</span></span><span class="line"><span class="cl">I&#39;m Wells
+</span></span></code></pre></td></tr></table></div></div><h2 id="設定網站細節">設定網站細節</h2><p>在此階段，其實已經可以執行 Hugo Server 並看到網誌的效果。不過在執行伺服器前，可以先做一些網站的基本設定，例如：</p><ol><li>編輯 <code>~/my_blog/hugo.toml</code> 的語言。</li><li>設定網誌名稱。</li><li>啟用或停用 emoji（<code>enableEmoji</code>）。</li><li>設定網站的 favicon。</li><li>加入網站摘要。</li><li>其他設定選項...</li></ol><p>這些設定選項繁多，因此可以選擇在執行伺服器後再動態調整。</p><p>更多設定可參考官方文件：<a class="link" href="https://gohugo.io/getting-started/configuration/" target="_blank" rel="noopener">Configure Hugo</a>。也可以依自己的習慣把 <code>hugo.toml</code> 轉成 <code>hugo.yaml</code>。</p><p>不同的 Hugo 主題可能需要特定的配置，這通常要看主題文件，並在對應的 <code>config</code> 檔案中調整。</p><h2 id="執行-hugo-伺服器">執行 Hugo 伺服器</h2><p>根據官網描述，是一個高效能 Web 伺服器，不過更多來說是方便 Local 端的測試，可以透過以下指令來執行伺服器。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">hugo server -D
+</span></span></code></pre></td></tr></table></div></div><p>其中 <code>-D</code> 也會建置 draft 的文章，最終建置預設是不會編譯 draft 文章。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ hugo server -D
+</span></span><span class="line"><span class="cl">port 1313 already in use, attempting to use an available port
+</span></span><span class="line"><span class="cl">Watching for changes in /home/wells/my_blog/{archetypes,assets,content,data,i18n,layouts,static,themes}
+</span></span><span class="line"><span class="cl">Watching for config changes in /home/wells/my_blog/hugo.yaml
+</span></span><span class="line"><span class="cl">Start building sites …
+</span></span><span class="line"><span class="cl">hugo v0.120.4-f11bca5fec2ebb3a02727fb2a5cfb08da96fd9df+extended linux/amd64 BuildDate=2023-11-08T11:18:07Z VendorInfo=snap:0.120.4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                   | ZH-TW
+</span></span><span class="line"><span class="cl">-------------------+--------
+</span></span><span class="line"><span class="cl">  Pages            |    10
+</span></span><span class="line"><span class="cl">  Paginator pages  |     0
+</span></span><span class="line"><span class="cl">  Non-page files   |     0
+</span></span><span class="line"><span class="cl">  Static files     |     0
+</span></span><span class="line"><span class="cl">  Processed images |     0
+</span></span><span class="line"><span class="cl">  Aliases          |     2
+</span></span><span class="line"><span class="cl">  Sitemaps         |     1
+</span></span><span class="line"><span class="cl">  Cleaned          |     0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Built in 25 ms
+</span></span><span class="line"><span class="cl">Environment: &#34;development&#34;
+</span></span><span class="line"><span class="cl">Serving pages from memory
+</span></span><span class="line"><span class="cl">Running in Fast Render Mode. For full rebuilds on change: hugo server --disableFastRender
+</span></span><span class="line"><span class="cl">Web Server is available at http://localhost:46651/ (bind address 127.0.0.1)
+</span></span><span class="line"><span class="cl">Press Ctrl+C to stop
+</span></span></code></pre></td></tr></table></div></div><p>建立後，可以於瀏覽器中打開 <a class="link" href="http://localhost:46651" target="_blank" rel="noopener">http://localhost:46651</a>，並看到部落格與文章。後續編輯設定或是修改文章都會看到即時的更新。</p><p><img alt="執行 Hugo Server" class="gallery-image" data-flex-basis="275px" data-flex-grow="114" decoding="async" height="590" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/build-hugo/build_my_blog.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="678"></p><h2 id="推送到遠端伺服器">推送到遠端伺服器</h2><p>安裝好主題、新增文章並編輯設定檔後，接下來要做的就是使用 Git 來管理目錄下的變更，並把這些變更推送到遠端伺服器管理與維護。</p><p>由於先前只執行了 <code>git init</code>，尚未設定遠端伺服器的連接。</p><p>假設你已在 GitHub 或其他伺服器上建立了對應的儲存庫（repo），接著會取得一段 SSH 連接方式，例如：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git@github.com:USER/private.repo.git
+</span></span></code></pre></td></tr></table></div></div><p>用 <code>git remote add</code> 與 <code>git remote -v</code> 可以新增與檢查目前本地端 repo 的 remote 狀態：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~/my_blog$ git remote add main git@github.com:USER/private.repo.git
+</span></span><span class="line"><span class="cl">wells@server:~/my_blog$ git remote -v
+</span></span><span class="line"><span class="cl">main    git@github.com:USER/private.repo.git (fetch)
+</span></span><span class="line"><span class="cl">main    git@github.com:USER/private.repo.git (push)
+</span></span></code></pre></td></tr></table></div></div><p><strong>確定本地端修改的檔案都已經用 <code>git add</code> 加入索引、並且用 <code>git commit</code> 建立好預期的 commit 之後，就可以用 <code>git push</code> 把本地端的修改整個推送到遠端伺服器上。</strong></p><h2 id="編譯並發布網站">編譯並發布網站</h2><p>編譯網站很簡單，只要輸入指令 <code>hugo</code> 就會產出 <code>~/my_blog/public</code> 目錄，該 public 裡面的 HTML 就可以放到伺服器上供他人預覽。網路上有幾個免費的靜態網頁託管（hosting），像是：</p><ol><li><a class="link" href="https://pages.github.com/" target="_blank" rel="noopener">GitHub pages</a></li><li><a class="link" href="https://pages.cloudflare.com/" target="_blank" rel="noopener">Cloudflare pages</a></li><li><a class="link" href="https://docs.netlify.com/" target="_blank" rel="noopener">Netlify</a></li></ol><p>其中目前使用的是 GitHub pages，支援自訂網域，可以整合 repo 與 GitHub Actions。</p><p>推送 repo 之後就會全自動編譯並 push 到 GitHub Pages，在每個月 <a class="link" href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages" target="_blank" rel="noopener">免費的額度</a> 下其實是蠻充裕的。</p><h2 id="結論">結論</h2><p>整個建立 Hugo 靜態網頁其實沒有很困難，就是安裝 Hugo 與 Git → 安裝主題 → 新增文章 → 發布</p><p>中間引入 Git，是為了讓修改網頁的過程能夠回溯，如果真的不需要其實不用 <code>git init</code>，<strong>但也非常不建議</strong>。因為網頁突然不小心改壞了，要復原會有一定難度。</p><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://gohugo.io/getting-started/quick-start/" target="_blank" rel="noopener">Hugo - Quick start</a></li><li><a class="link" href="https://gohugo.io/about/benefits/" target="_blank" rel="noopener">Benefits of static site generators</a></li><li><a class="link" href="https://gohugo.io/getting-started/configuration/" target="_blank" rel="noopener">Configure Hugo</a></li><li><a class="link" href="https://themes.gohugo.io/" target="_blank" rel="noopener">Hugo Themes</a></li><li><a class="link" href="https://github.com/adityatelange/hugo-PaperMod/wiki" target="_blank" rel="noopener">PaperMod's wiki</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/%E5%BB%BA%E7%AB%99/">建站</a>
+<a href="/tags/%E6%95%99%E5%AD%B8/">教學</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/transfer-domain-to-cloudflare/"><div class="article-image"><img alt="Featured image of post 從 Squarespace 轉移網域到 Cloudflare：完整教學與注意事項" height="150" loading="lazy" src="/post/transfer-domain-to-cloudflare/cover_hu_a25f6656044c2e79.webp" srcset="/post/transfer-domain-to-cloudflare/cover_hu_a25f6656044c2e79.webp 1x, /post/transfer-domain-to-cloudflare/cover_hu_fe19d086d488b778.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#e3cfb280 0%,#482d18C0 100%)"><h2 class="article-title">從 Squarespace 轉移網域到 Cloudflare：完整教學與注意事項</h2></div></a></article><article class="has-image"><a href="/post/ai-summary-deploy/"><div class="article-image"><img alt="Featured image of post AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署" height="150" loading="lazy" src="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp" srcset="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp 1x, /post/ai-summary-deploy/cover_hu_f4a263386c4d8d96.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c8cb80 0%,#3c382eC0 100%)"><h2 class="article-title">AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署</h2></div></a></article><article class="has-image"><a href="/post/code-tag-translation-fix/"><div class="article-image"><img alt="Featured image of post 修復 Edge 瀏覽器翻譯 <code> 標籤問題" height="150" loading="lazy" src="/post/code-tag-translation-fix/cover_hu_137c62743477ad46.webp" srcset="/post/code-tag-translation-fix/cover_hu_137c62743477ad46.webp 1x, /post/code-tag-translation-fix/cover_hu_4ef977a5242f5520.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#4ab0c680 0%,#332c4dC0 100%)"><h2 class="article-title">修復 Edge 瀏覽器翻譯 &lt;code> 標籤問題</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

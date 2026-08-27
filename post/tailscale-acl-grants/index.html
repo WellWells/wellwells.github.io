@@ -1,0 +1,499 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="用 grants 語法設定 Tailscale 存取控制，從免費方案的群組限制、第一條規則怎麼寫、hosts 為什麼不能省略，到用 tests 鎖住重要連線、用標籤把伺服器從個人帳號轉移出去，並實作 Tailscale SSH 的免金鑰登入。"><title>Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/tailscale-acl-grants/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入"><meta property='og:description' content="用 grants 語法設定 Tailscale 存取控制，從免費方案的群組限制、第一條規則怎麼寫、hosts 為什麼不能省略，到用 tests 鎖住重要連線、用標籤把伺服器從個人帳號轉移出去，並實作 Tailscale SSH 的免金鑰登入。"><meta property='og:url' content='https://wellstsai.com/post/tailscale-acl-grants/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='教學'><meta property='article:tag' content='Tailscale'><meta property='article:tag' content='VPN'><meta property='article:tag' content='SSH'><meta property='article:tag' content='零信任'><meta property='article:tag' content='網路'><meta property='article:published_time' content='2026-08-13T05:30:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/tailscale-acl-grants/cover.webp'><meta name="twitter:title" content="Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入"><meta name="twitter:description" content="用 grants 語法設定 Tailscale 存取控制，從免費方案的群組限制、第一條規則怎麼寫、hosts 為什麼不能省略，到用 tests 鎖住重要連線、用標籤把伺服器從個人帳號轉移出去，並實作 Tailscale SSH 的免金鑰登入。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/tailscale-acl-grants/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/tailscale-acl-grants/cover_hu_6c4748ba4d3729df.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/tailscale-acl-grants/cover_hu_bbecbf91fc35b0f0.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/tailscale-acl-grants/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/tailscale-acl-grants/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/tailscale-acl-grants/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/tailscale-acl-grants/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"引言 Tailscale 前面寫過兩篇，《使用 Tailscale 輕鬆建立安全且私密的隧道》講原理與安裝，《Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定》講檔案傳輸、出口節點與子網路路由。\n裝完之後，同一個 tailnet 裡每台裝置都連得到其他每台裝置，這個前提兩篇都沒講。手機能連伺服器，公司筆電能直接開家裡的 NAS，連當初借給朋友、後來就沒再管過的那台舊電腦也一樣。Tailscale 預設就是全開。\n而 tailnet 裡不會只有自己的裝置。Tailscale 本來就設計成讓多個使用者一起組網，可以邀請別人用他們自己的帳號加入同一個 tailnet，免費版最多 6 個使用者。\n不管是一家六口共用，還是幾個人合租一台伺服器，狀況都一樣，裝置一旦進到同一個 tailnet 就預設全部互通。多數時候這沒什麼問題，但只要有一台機器放了不該給所有人看的東西，就得把範圍收回來。\n我在《零信任全面解析：理念、現況與未來》談過零信任的理念與 VPN 的問題，那篇偏理論。要在 Tailscale 上真的做到，靠的是存取控制清單（access control …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2026-08-13T05:30:00+08:00","description":"用 grants 語法設定 Tailscale 存取控制，從免費方案的群組限制、第一條規則怎麼寫、hosts 為什麼不能省略，到用 tests 鎖住重要連線、用標籤把伺服器從個人帳號轉移出去，並實作 Tailscale SSH 的免金鑰登入。","headline":"Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入","image":"https://wellstsai.com/post/tailscale-acl-grants/cover.webp","keywords":["教學","Tailscale","VPN","SSH","零信任","網路"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/tailscale-acl-grants/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/tailscale-acl-grants/" selected>繁體中文</option><option value="/en/post/tailscale-acl-grants/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#引言">引言</a></li><li><a href="#tailscale-acl-基本觀念">Tailscale ACL 基本觀念</a></li><li><a href="#政策檔與-json-editor">政策檔與 JSON editor</a><ol><li><a href="#預設的政策檔">預設的政策檔</a></li><li><a href="#grants-還是-acls">grants 還是 acls</a></li></ol></li><li><a href="#用-grants-寫第一條規則">用 grants 寫第一條規則</a><ol><li><a href="#hosts-區塊不能省略">hosts 區塊不能省略</a></li><li><a href="#確認規則有生效">確認規則有生效</a></li><li><a href="#用-tests-釘住不能斷的連線">用 tests 釘住不能斷的連線</a></li></ol></li><li><a href="#用群組與標籤管理權限">用群組與標籤管理權限</a><ol><li><a href="#用群組管理使用者">用群組管理使用者</a></li><li><a href="#用標籤管理伺服器">用標籤管理伺服器</a></li></ol></li><li><a href="#tailscale-ssh-免金鑰登入">Tailscale SSH 免金鑰登入</a></li><li><a href="#子網路路由與出口節點">子網路路由與出口節點</a></li><li><a href="#金鑰過期會讓伺服器失聯">金鑰過期會讓伺服器失聯</a></li><li><a href="#完整的政策檔範例">完整的政策檔範例</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/tailscale-acl-grants/" style="position:relative;display:block"><img src="/post/tailscale-acl-grants/cover_hu_3300a749b2648bc8.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/tailscale-acl-grants/cover_hu_6c4748ba4d3729df.webp"><source media="(min-width: 769px)" srcset="/post/tailscale-acl-grants/cover_hu_bbecbf91fc35b0f0.webp">
+<img src="/post/tailscale-acl-grants/cover_hu_bbecbf91fc35b0f0.webp" width="1500" height="1000" fetchpriority="high" loading="eager" decoding="async" alt="Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/tailscale-acl-grants/">Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入</a></h2><h3 class="article-subtitle">用 grants 語法設定 Tailscale 存取控制，從免費方案的群組限制、第一條規則怎麼寫、hosts 為什麼不能省略，到用 tests 鎖住重要連線、用標籤把伺服器從個人帳號轉移出去，並實作 Tailscale SSH 的免金鑰登入。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2026-08-13T05:30:00+08:00'>2026/08/13</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：15 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/tailscale-acl-grants/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#引言">引言</a></li><li><a href="#tailscale-acl-基本觀念">Tailscale ACL 基本觀念</a></li><li><a href="#政策檔與-json-editor">政策檔與 JSON editor</a><ol><li><a href="#預設的政策檔">預設的政策檔</a></li><li><a href="#grants-還是-acls">grants 還是 acls</a></li></ol></li><li><a href="#用-grants-寫第一條規則">用 grants 寫第一條規則</a><ol><li><a href="#hosts-區塊不能省略">hosts 區塊不能省略</a></li><li><a href="#確認規則有生效">確認規則有生效</a></li><li><a href="#用-tests-釘住不能斷的連線">用 tests 釘住不能斷的連線</a></li></ol></li><li><a href="#用群組與標籤管理權限">用群組與標籤管理權限</a><ol><li><a href="#用群組管理使用者">用群組管理使用者</a></li><li><a href="#用標籤管理伺服器">用標籤管理伺服器</a></li></ol></li><li><a href="#tailscale-ssh-免金鑰登入">Tailscale SSH 免金鑰登入</a></li><li><a href="#子網路路由與出口節點">子網路路由與出口節點</a></li><li><a href="#金鑰過期會讓伺服器失聯">金鑰過期會讓伺服器失聯</a></li><li><a href="#完整的政策檔範例">完整的政策檔範例</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="引言">引言</h2><p>Tailscale 前面寫過兩篇，《<a class="link" href="https://wellstsai.com/post/tailscale/" target="_blank" rel="noopener">使用 Tailscale 輕鬆建立安全且私密的隧道</a>》講原理與安裝，《<a class="link" href="https://wellstsai.com/post/tailscale-advanced-guides/" target="_blank" rel="noopener">Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定</a>》講檔案傳輸、出口節點與子網路路由。</p><p><strong>裝完之後，同一個 tailnet 裡每台裝置都連得到其他每台裝置</strong>，這個前提兩篇都沒講。手機能連伺服器，公司筆電能直接開家裡的 NAS，連當初借給朋友、後來就沒再管過的那台舊電腦也一樣。Tailscale 預設就是全開。</p><p>而 tailnet 裡<strong>不會只有自己的裝置</strong>。Tailscale 本來就設計成讓多個使用者一起組網，可以邀請別人用他們自己的帳號加入同一個 tailnet，免費版最多 6 個使用者。</p><p>不管是一家六口共用，還是幾個人合租一台伺服器，狀況都一樣，裝置一旦進到同一個 tailnet 就<strong>預設全部互通</strong>。多數時候這沒什麼問題，但只要有一台機器放了不該給所有人看的東西，就得把範圍收回來。</p><p>我在《<a class="link" href="https://wellstsai.com/post/zero-trust-overview/" target="_blank" rel="noopener">零信任全面解析：理念、現況與未來</a>》談過零信任的理念與 VPN 的問題，那篇偏理論。要在 Tailscale 上真的做到，靠的是<strong>存取控制清單（access control lists，ACL）</strong>。這篇補的就是實作這一段，直接從政策檔開始。</p><h2 id="tailscale-acl-基本觀念">Tailscale ACL 基本觀念</h2><p>加入 tailnet 之後，所有裝置就進到同一個虛擬區域網路，網內任意兩台可以直接互連。拿大樓來想，<strong>tailnet 是整棟樓</strong>，每台裝置是一個房間。</p><p>房間當然有鎖，NAS 有帳號密碼、伺服器有 SSH 金鑰，沒鑰匙就開不了門。問題是出廠狀態下，任何人只要進得了大樓，就能走到每一扇門前面把門把轉一遍，而鎖不是永遠可靠的，未修補的漏洞和外洩的密碼就等於破鎖工具跟萬能鑰匙。ACL 管的是誰刷得到哪幾層樓，刷不到的樓層，門鎖好不好根本不重要，因為走不到門前面。零信任的態度就在這裡：連門鎖本身都不預設可信。</p><p>有兩個常見的誤解要先排掉：</p><ul><li><strong>Tailscale 是預設拒絕的。</strong> 政策檔裡列的是白名單而不是黑名單，所以規則裡只有允許這個動作，沒有拒絕可以寫。現在之所以全都能通，是因為出廠時放了一條全部允許的規則，收緊權限就是把那條拿掉，換成真正需要的幾條。</li><li><strong>ACL 不是拿來取代帳號密碼的。</strong> 兩層是互補的：帳密守應用層，ACL 守網路層。少一台走得到 NAS 登入頁的機器，就少一個被掃描、被暴力破解的來源。至於為什麼待在內網這件事本身不構成信任，前面那篇零信任寫過，這裡不重複。</li></ul><p>方案方面，ACL、標籤、Tailscale SSH 免費版全都有，裝置數也不限，唯一會卡住的是自訂群組數量，等下面用到群組時再說。</p><h2 id="政策檔與-json-editor">政策檔與 JSON editor</h2><p>登入 <a class="link" href="https://login.tailscale.com/admin/acls" target="_blank" rel="noopener">Tailscale Admin Console</a>，展開左側的 <strong>Access controls</strong>，點 <strong>JSON editor</strong> 就能看到目前的政策檔（tailnet policy file）。</p><p><img alt="Tailscale console 的 JSON editor 與預設政策檔" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" fetchpriority="high" height="900" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/json_editor_default_policy.webp" srcset="/post/tailscale-acl-grants/json_editor_default_policy_hu_3794f2d0d3d8f81f.webp 800w, /post/tailscale-acl-grants/json_editor_default_policy.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>同一區還有三個視覺化頁面：<strong>Policies</strong> 用表格列出目前生效的規則、<strong>Tests</strong> 管理測試、<strong>Definitions</strong> 管理群組、標籤與 hosts。兩邊編輯的是同一份檔案，這篇以 JSON editor 為主。</p><p>檔案格式是 <strong>HuJSON</strong>，跟一般 JSON 幾乎一樣，差別是它允許寫註解，結尾也允許多一個逗號。編輯器有語法檢查，括號沒收好會直接標紅字，存不下去。</p><p><strong>規則是在每一台裝置本機執行的，不是由中央伺服器把關</strong>。存檔之後，政策檔會推送到每個節點各自套用。</p><p>所以<strong>改動幾乎即時生效</strong>。按下存檔的當下，正在進行的 SSH 連線就會被切斷；改回來，連線又馬上恢復。不用等裝置重連，也不用重開 Tailscale。</p><p>改壞了想還原有兩條路：</p><ul><li>把整個文字框清空，右側會出現 <strong>Reset to default policy</strong>，回到出廠預設。</li><li>到 <strong>Logs</strong> 的 <strong>Configuration logs</strong> 看設定變更紀錄，展開任何一筆 Update policy file for tailnet，它會用類似 git diff 的方式顯示前後差異，確認是想回去的版本後按 <strong>Revert to previous version…</strong>。</li></ul><p><img alt="Configuration logs 用 git diff 的方式顯示政策檔前後差異" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/config_log_diff.webp" srcset="/post/tailscale-acl-grants/config_log_diff_hu_e9a0754747618fc5.webp 800w, /post/tailscale-acl-grants/config_log_diff.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>紀錄保留 90 天，紅色是改動前、綠色是改動後，連註解都會逐行比對。這是改壞之後最快的退路，比自己憑印象把檔案改回去可靠。</p><h3 id="預設的政策檔">預設的政策檔</h3><p>剛建立的 tailnet，政策檔大致長這樣：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;acls&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*:*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>src</code> 是來源，<code>*</code> 代表任何裝置。<code>dst</code> 是目標，<code>*:*</code> 代表任何裝置的任何連接埠。這就是前面說的那條全開規則。</p><p>實際的檔案會再多幾段：<code>randomizeClientPort</code>、一組讓每個人都能用 Tailscale SSH 連自己裝置的 <code>ssh</code> 規則，以及 <code>groups</code>、<code>tagOwners</code>、<code>tests</code> 的註解範本。換到 Policies 頁面看，這條全開規則就是一列表格。</p><p><img alt="Policies 頁面把預設的全開規則列成一列表格" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/policies_default_rule.webp" srcset="/post/tailscale-acl-grants/policies_default_rule_hu_31c02faee06a17ac.webp 800w, /post/tailscale-acl-grants/policies_default_rule.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>Sources、can access destinations、on port and protocol 三欄都是 All，跟 <code>{"src": ["*"], "dst": ["*:*"]}</code> 是同一件事，只是換個讀法。</p><h3 id="grants-還是-acls">grants 還是 acls</h3><p>Tailscale 現在有兩套語法：舊的 <code>acls</code> 和新的 <code>grants</code>。</p><p>官方的說法是 ACL 會無限期支援、不會移除，但<strong>新功能只加在 grants 上</strong>。所以新寫的設定直接用 grants 就好。兩者可以在同一份政策檔共存，不用為了換語法把整份翻掉。</p><p>不過 console 的用字比文件強硬，JSON editor 右側那塊 <strong>Convert ACLs to grants</strong> 直接把舊語法稱為 deprecated，還附一顆一鍵轉換的按鈕。</p><p><img alt="JSON editor 右側的 Convert ACLs to grants 面板" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/convert_acls_to_grants.webp" srcset="/post/tailscale-acl-grants/convert_acls_to_grants_hu_aee3704661d22821.webp 800w, /post/tailscale-acl-grants/convert_acls_to_grants.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>要轉的話它會把整份 <code>acls</code> 改寫成 <code>grants</code>，轉壞了也能從前面說的 Configuration logs 還原。</p><p>差別是 grants 把目標和連接埠拆成兩個欄位，讀起來清楚很多：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="c1">// 舊的 acls：連接埠黏在 dst 後面，多開一個埠就要把目標再寫一次
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:web:80&#34;</span><span class="p">,</span> <span class="s2">&#34;tag:web:443&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 新的 grants：dst 只放目標，連接埠集中在 ip
+</span></span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:web&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;80&#34;</span><span class="p">,</span> <span class="s2">&#34;443&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>action</code> 欄位在 grants 裡消失了，因為它只能填 <code>accept</code>，寫了也是多餘。</p><p>本文以下全部用 grants。全開規則用 grants 寫是這樣：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="用-grants-寫第一條規則">用 grants 寫第一條規則</h2><p>先寫一條最小的規則：只有我的筆電能用 SSH 連到 NAS，其他裝置一律不行。</p><p>完整的政策檔如下，直接複製改成自己的 IP 位址就能用：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;hosts&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;my-laptop&#34;</span><span class="p">:</span> <span class="s2">&#34;100.64.12.34&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;my-nas&#34;</span><span class="p">:</span>    <span class="s2">&#34;100.84.25.76&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-laptop&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>三個欄位分別是誰要連（<code>src</code>）、連去哪（<code>dst</code>）、開哪個連接埠（<code>ip</code>），這裡的 <code>tcp:22</code> 就是 SSH。</p><p>裝置的 Tailscale IP 位址可以用 <code>tailscale status</code> 查，或在 admin console 的 Machines 頁面直接看。</p><p>按 Save 之前先切到 <strong>Preview changes</strong>，它會把改動前後並排比對：</p><p><img alt="Preview changes 並排顯示政策檔改動前後的差異" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/preview_changes_diff.webp" srcset="/post/tailscale-acl-grants/preview_changes_diff_hu_93de50ceb9cfc08e.webp 800w, /post/tailscale-acl-grants/preview_changes_diff.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>左邊紅色是要被拿掉的預設全開規則，右邊綠色是新寫的 <code>hosts</code> 與 <code>grants</code>。收緊權限這種改動一存檔就可能把自己關在門外，存之前先確認差異跟預期一致。</p><h3 id="hosts-區塊不能省略">hosts 區塊不能省略</h3><p>政策檔不認裝置名稱，只認 IP 位址。就算裝置在 admin console 上顯示的名字就是 <code>my-nas</code>，直接寫進 <code>dst</code> 一樣會在存檔時被擋下來，錯誤訊息會說這不是合法的位址。<code>hosts</code> 的作用就是把名稱對應到 IP 位址，後面的規則才能用好記的名字來寫。</p><p>裝置名稱是使用者自己可以改的。假設政策檔認得名稱，一條讓 <code>my-laptop</code> 連 NAS 的規則，就會變成任何人只要把自己的電腦改名叫 <code>my-laptop</code> 就拿得到權限，整套權限控管形同虛設。在 <code>hosts</code> 裡明確綁定 IP 位址，等於把命名權從使用者手上收回到管理者手上，名字對應到哪台機器由管理者決定。</p><p>這裡最容易跟 <a class="link" href="https://wellstsai.com/post/tailscale/" target="_blank" rel="noopener">MagicDNS</a> 搞混。MagicDNS 能用裝置名稱連線，但<strong>那裡能用名稱，不代表政策檔裡也能用</strong>：<code>ping my-nas</code> 會通，不代表政策檔寫 <code>my-nas</code> 就有效，兩者是不同的機制。</p><p>存檔之後，這些對應會出現在 <strong>Definitions</strong> 的 <strong>Hosts</strong> 分頁，之後要改哪個名字指到哪台機器，在這裡改跟在 JSON editor 裡改是同一件事：</p><p><img alt="Definitions 的 Hosts 分頁列出名稱與 IP 位址的對應" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/definitions_hosts.webp" srcset="/post/tailscale-acl-grants/definitions_hosts_hu_92419b517ff4ddf9.webp 800w, /post/tailscale-acl-grants/definitions_hosts.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>順帶一提，<code>hosts</code> 也可以綁整個網段：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;hosts&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;home-lan&#34;</span><span class="p">:</span> <span class="s2">&#34;192.168.100.0/24&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="確認規則有生效">確認規則有生效</h3><p>存檔之後，找一台不在規則裡的裝置去 SSH 連 NAS，應該要連不上。用筆電連則正常。</p><p>想更直接感受的話，把 <code>ip</code> 從 <code>["tcp:22"]</code> 改成 <code>["tcp:443"]</code> 再存檔，正在連線中的 SSH 會立刻斷掉；改回 <code>22</code>，馬上又通了。</p><p>這也剛好示範了這套機制最危險的地方。<strong>規則即時生效，所以在自己還連著的時候，一次存檔就可能把自己踢出去</strong>，下一節要處理的就是這件事。</p><h3 id="用-tests-釘住不能斷的連線">用 tests 釘住不能斷的連線</h3><p>政策檔一旦超過幾十行，很容易改 A 規則的時候不小心弄壞 B 的連線，而且通常是幾天後有人回報連不上才發現。</p><p>Tailscale 內建的 <code>tests</code> 區塊可以擋掉這件事：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;tests&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="s2">&#34;my-laptop&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;proto&#34;</span><span class="p">:</span> <span class="s2">&#34;tcp&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;accept&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas:22&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;deny&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas:443&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>意思是從 <code>my-laptop</code> 出發走 TCP，<strong>必須</strong>連得到 <code>my-nas:22</code>，<strong>必須</strong>連不到 <code>my-nas:443</code>。</p><p>重點是這不是事後檢查，而是<strong>存檔前的閘門</strong>。只要改動讓測試不成立，政策檔根本存不下去，錯誤直接顯示在編輯器裡：</p><p><img alt="tests 不成立時政策檔存不下去，編輯器直接顯示錯誤" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/tests_block_save.webp" srcset="/post/tailscale-acl-grants/tests_block_save_hu_b658fd0187516479.webp 800w, /post/tailscale-acl-grants/tests_block_save.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>上圖是我把規則的 <code>tcp:22</code> 改成 <code>tcp:443</code> 之後按 Save 的結果。錯誤訊息會直接指出是哪個來源、哪個位址、預期跟實際差在哪：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Error: test(s) failed
+</span></span><span class="line"><span class="cl">test(s) failed for user: my-laptop
+</span></span><span class="line"><span class="cl">    [acl test error]: address &#34;my-nas:22&#34; (protocol &#34;tcp&#34;): want: Accept, got: Drop
+</span></span><span class="line"><span class="cl">    [acl test error]: address &#34;my-nas:443&#34; (protocol &#34;tcp&#34;): want: Drop, got: Accept
+</span></span></code></pre></td></tr></table></div></div><p>兩條斷言同時失敗：<code>tcp:22</code> 被拿掉所以第一條連不上，而改開的 <code>tcp:443</code> 讓第二條原本該被擋的連線反而通了。存檔被擋下來，原本那條 SSH 連線也沒有被切斷。規則和測試寫在同一次存檔裡送出也一樣有效，不需要分兩次。</p><p>存進去的測試會列在 <strong>Tests</strong> 頁面，一列就是一條斷言：</p><p><img alt="Tests 頁面把政策檔裡的測試列成表格" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/tests_page.webp" srcset="/post/tailscale-acl-grants/tests_page_hu_4433420f1af62781.webp 800w, /post/tailscale-acl-grants/tests_page.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>對於不能斷的連線，例如 CI 伺服器必須連得到部署目標，或是自己正在遠端操作的那台機器，寫一條測試釘住它，之後不管誰改政策檔都不會誤傷。</p><h2 id="用群組與標籤管理權限">用群組與標籤管理權限</h2><p>一台一台把 IP 位址寫進規則，裝置一多就會失控。Tailscale 的解法是先分類再寫規則：群組把人打包，標籤把機器打包，規則寫的是分類而不是個體。</p><h3 id="用群組管理使用者">用群組管理使用者</h3><p><code>groups</code> 可以把使用者打包：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;groups&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;group:admin&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;wells@example.com&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;group:dev&#34;</span><span class="p">:</span>   <span class="p">[</span><span class="s2">&#34;dave@example.com&#34;</span><span class="p">,</span> <span class="s2">&#34;laura@example.com&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>定義好就能直接放進 <code>src</code>：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>免費版的自訂群組上限是 3 組，這也是整個 ACL 功能裡唯一會卡住個人使用者的數字：</p><div class="table-wrapper"><table><thead><tr><th></th><th>Personal（免費）</th><th>Standard</th><th>Premium</th></tr></thead><tbody><tr><td>價格</td><td>免費</td><td>USD 8 / 人 / 月</td><td>USD 18 / 人 / 月</td></tr><tr><td>使用者人數</td><td>最多 6 人</td><td>不限</td><td>不限</td></tr><tr><td><strong>自訂 ACL 群組</strong></td><td><strong>最多 3 組</strong></td><td>最多 10 組</td><td>最多 300 組</td></tr><tr><td>裝置數量</td><td>不限</td><td>不限</td><td>不限</td></tr><tr><td>標籤資源</td><td>50 個起</td><td>50 個起</td><td>50 個起</td></tr></tbody></table></div><p>3 組聽起來還好，實際上很快就用完。像上面那樣分出 <code>group:admin</code>、<code>group:dev</code>，再加一個 <code>group:ci</code> 就滿了，想留一個 <code>group:contractor</code> 給外包廠商就沒位置。小團隊或工作室要認真規劃權限的話，Standard 的 10 組比較實際。</p><p>這個限制只算在 <code>groups</code> 區塊自己定義的群組。內建的 <code>autogroup:</code> 不佔額度，能用內建的就別自訂，常用的有這些：</p><div class="table-wrapper"><table><thead><tr><th>autogroup</th><th>意義</th></tr></thead><tbody><tr><td><code>autogroup:member</code></td><td>tailnet 內的一般成員</td></tr><tr><td><code>autogroup:admin</code></td><td>有管理員角色的成員</td></tr><tr><td><code>autogroup:tagged</code></td><td>任何帶標籤的裝置</td></tr><tr><td><code>autogroup:shared</code></td><td>透過分享邀請加入的裝置</td></tr><tr><td><code>autogroup:self</code></td><td>使用者自己的裝置（只能當目標）</td></tr><tr><td><code>autogroup:internet</code></td><td>經由出口節點連外（只能當目標）</td></tr></tbody></table></div><p>除了表上這幾個，Definitions 的 Groups 頁面還會列出 <code>autogroup:owner</code>、<code>autogroup:it-admin</code>、<code>autogroup:network-admin</code>、<code>autogroup:billing-admin</code>、<code>autogroup:device-admin</code>、<code>autogroup:auditor</code>，都是按角色自動分類，同樣不佔額度。</p><p><strong>新舊寫法不能混用</strong>，這點很容易撞到。Tailscale 出廠的政策檔在 <code>ssh</code> 與 <code>nodeAttrs</code> 用的是舊式複數 <code>autogroup:members</code>，而 grants 的範例用的是新式單數 <code>autogroup:member</code>。把範例貼進預設檔就會存不下去：</p><p><img alt="混用 autogroup:member 與 autogroup:members 會被擋下存檔" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/autogroup_mix_error.webp" srcset="/post/tailscale-acl-grants/autogroup_mix_error_hu_609805ec109396e6.webp 800w, /post/tailscale-acl-grants/autogroup_mix_error.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Error: ACLs contain a mix of old-style &#34;autogroup:members&#34; and new-style &#34;autogroup:member&#34;; use one or the other.
+</span></span></code></pre></td></tr></table></div></div><p>解法是整份統一，全部改成單數的 <code>autogroup:member</code> 就好，包含原本 <code>ssh</code> 與 <code>nodeAttrs</code> 裡面那幾個。</p><p><code>autogroup:self</code> 特別好用，一條就做到每個人都連得到自己的裝置、但碰不到別人的，而且不佔群組額度：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:member&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:self&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="用標籤管理伺服器">用標籤管理伺服器</h3><p>節點預設由當初把它加入 tailnet 的人擁有，在 Machines 頁面的裝置名稱下方可以看到擁有者帳號。</p><p>伺服器掛在個人帳號下是有風險的，那個人離職、帳號被停用，機器的權限就跟著出問題。<strong>標籤（tag）的作用就是把所有權從人身上轉到標籤上。</strong></p><p>先在 <code>tagOwners</code> 宣告誰有權指派標籤：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;tagOwners&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:prod&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:dev&#34;</span><span class="p">:</span>  <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">,</span> <span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:ci&#34;</span><span class="p">:</span>   <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>存檔後回到 Machines 頁面，在裝置右側的 <code>⋯</code> 選單裡選 <strong>Edit ACL tags…</strong>，剛剛宣告的標籤就會出現在下拉選單裡：</p><p><img alt="Machines 頁面的 Edit ACL tags 對話框，可以選到政策檔裡宣告的標籤" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/edit_acl_tags.webp" srcset="/post/tailscale-acl-grants/edit_acl_tags_hu_59ebb77ae4b813cd.webp 800w, /post/tailscale-acl-grants/edit_acl_tags.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>對話框上那句話講得很白：指派標籤會把這台裝置的擁有權從個人帳號轉移到標籤上。反過來說，如果政策檔還沒宣告 <code>tagOwners</code>，這裡會是空的，只會出現一顆跳到 Access controls 的按鈕，順序不能顛倒。</p><p>裝置一旦被標記，Machines 頁面的擁有者欄位就會從使用者變成該標籤。</p><p>標籤有個回不去的地方：<strong>節點被標記之後，唯一能完全取消標籤、把所有權還給個人的方式，是把節點從 tailnet 刪除再重新加入一次。</strong> 不是在介面上取消勾選就好。所以指派之前先把分類想好，之後要重來成本不低。</p><p>標籤配群組就能組出實際的權限結構：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 開發者可以連開發機的 SSH 與網頁服務
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">,</span> <span class="s2">&#34;tcp:80&#34;</span><span class="p">,</span> <span class="s2">&#34;tcp:443&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 只有管理員能碰正式環境
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:prod&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// CI 機器只能連正式環境的部署連接埠
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:ci&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:prod&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="tailscale-ssh-免金鑰登入">Tailscale SSH 免金鑰登入</h2><p>Tailscale SSH 是我自己很常用的功能。它在 Tailscale 服務程式裡另外跑一個 SSH 伺服器，攔截走 Tailscale 介面進來的連線，直接拿已經通過 tailnet 驗證這件事當身分依據。</p><p>好處是<strong>沒有 SSH 金鑰要管</strong>。不用產生金鑰對，也不用把公鑰佈到每台機器的 <code>authorized_keys</code>。最有感的是有人離職的時候，不必再一台一台登進去把他的公鑰挖出來刪掉。</p><p>在要被連入的裝置上啟用：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tailscale <span class="nb">set</span> --ssh
+</span></span></code></pre></td></tr></table></div></div><p>權限規則寫在獨立的 <code>ssh</code> 區塊，不在 <code>grants</code> 裡面。新 tailnet 出廠就帶了一條，寫法是這樣：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;ssh&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">//&#34;action&#34;: &#34;check&#34;,
+</span></span></span><span class="line"><span class="cl">      <span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:members&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:self&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:nonroot&#34;</span><span class="p">,</span> <span class="s2">&#34;root&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>注意生效的是 <code>accept</code>，<code>check</code> 被註解在上面一行，官方擺明是想更嚴的時候把註解對調。換到 Policies 的 <strong>Tailscale SSH</strong> 分頁看就是這樣一列：</p><p><img alt="Policies 的 Tailscale SSH 分頁列出 SSH 規則" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/policies_tailscale_ssh.webp" srcset="/post/tailscale-acl-grants/policies_tailscale_ssh_hu_3dd873ac75d2cac2.webp 800w, /post/tailscale-acl-grants/policies_tailscale_ssh.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>欄位說明：</p><ul><li><strong><code>action</code></strong>：只有 <code>accept</code> 跟 <code>check</code>。<code>accept</code> 是連上 tailnet 就放行，<code>check</code> 會要求重新驗證身分。</li><li><strong><code>checkPeriod</code></strong>：搭配 <code>check</code>，多久要重新驗證一次，預設 12 小時，範圍是 1 分鐘到 168 小時，也可以填 <code>always</code> 表示每次都要。</li><li><strong><code>users</code></strong>：允許登入的系統帳號，<code>autogroup:nonroot</code> 代表所有非 root 帳號。</li></ul><p><code>check</code> 在公司環境是合理的，多一道驗證。但自己家裡的機器每 12 小時跳一次瀏覽器驗證滿煩的，維持出廠的 <code>accept</code> 就好。</p><p>要收更緊可以指定到單一帳號：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;ssh&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;deploy&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>這樣 <code>group:dev</code> 的成員連進 <code>tag:dev</code> 的機器時只能用 <code>deploy</code> 帳號，連不了 root。</p><p>要注意 <code>users</code> 只管 Tailscale 這一層。實際能不能登入還要看目標機器本身的 SSH 設定允不允許，兩邊都放行才會通。</p><p><code>ssh</code> 區塊也有自己的測試。Tests 頁面下半部的 <strong>SSH tests</strong> 跟前面的 tests 是分開的兩組，專門驗證誰能用哪個系統帳號登入哪台機器，一樣是存檔前的閘門。要把 root 登入鎖死，除了寫 <code>users</code>，再補一條 SSH test 會更保險。</p><h2 id="子網路路由與出口節點">子網路路由與出口節點</h2><p>子網路路由與出口節點怎麼開，《<a class="link" href="https://wellstsai.com/post/tailscale-advanced-guides/" target="_blank" rel="noopener">Tailscale 進階應用教學</a>》那篇寫過了，這裡只補上權限這一段。一旦宣告 <code>--advertise-routes=192.168.100.0/24</code>，整個網段就對 tailnet 全開。要收回來，在 <code>dst</code> 直接寫網段：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;192.168.100.0/24&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>出口節點則是用 <code>autogroup:internet</code> 當目標。沒有這條規則的話，就算裝置端已經選好出口節點，流量還是出不去：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:internet&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>另外，預設每次有裝置宣告子網路或出口節點，管理者都要到 admin console 手動核准一次。用 <code>autoApprovers</code> 可以省掉這個步驟：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;autoApprovers&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;routes&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;192.168.100.0/24&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:subnet-router&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;exitNode&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:exit&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>寫進去之後，Policies 的 <strong>Auto approvers</strong> 分頁就會把這些自動核准列出來：</p><p><img alt="Policies 的 Auto approvers 分頁分成 Routes、Services、Exit nodes 三塊" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/policies_auto_approvers.webp" srcset="/post/tailscale-acl-grants/policies_auto_approvers_hu_9785861ba1496c4e.webp 800w, /post/tailscale-acl-grants/policies_auto_approvers.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>這頁分成三塊，<code>routes</code> 和 <code>exitNode</code> 分別對應 Routes 與 Exit nodes，中間的 Services 是政策檔裡的 <code>autoApprovers.services</code>，用來自動核准裝置加入某個服務。沒設定的時候三塊都是空的，設定過就會在這裡看到是哪個標籤被授權。</p><h2 id="金鑰過期會讓伺服器失聯">金鑰過期會讓伺服器失聯</h2><p>Tailscale 的節點金鑰<strong>預設 180 天到期</strong>，到期後這台裝置的連線全部停止運作。</p><p>筆電手機還好，跳出來重新登入就恢復。麻煩的是<strong>子網路路由器和出口節點</strong>，這類機器通常放在機房或家裡角落沒人在看，金鑰一過期整段內網就失聯，而且往往是別人回報連不上才發現。更糟的是如果那台機器只開放 Tailscale 連線，金鑰過期等於把自己鎖在門外。</p><p>處理方式是到 Machines 頁面找到該裝置，點右側的 <code>⋯</code> 選單選 <strong>Disable key expiry</strong>。伺服器類的機器建議一律關掉。</p><p><img alt="Machines 頁面裝置選單裡的 Disable key expiry" class="gallery-image" data-flex-basis="384px" data-flex-grow="160" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/tailscale-acl-grants/machine_menu_key_expiry.webp" srcset="/post/tailscale-acl-grants/machine_menu_key_expiry_hu_528f3f13b636da81.webp 800w, /post/tailscale-acl-grants/machine_menu_key_expiry.webp 1440w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1440"></p><p>關掉之後，裝置名稱下方會多一個 <strong>Expiry disabled</strong> 標籤，掃一眼列表就知道哪幾台處理過、哪幾台還沒。</p><p>如果已經過期而且還能操作到機器：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tailscale up --force-reauth
+</span></span></code></pre></td></tr></table></div></div><p>這個指令會讓裝置短暫斷線，透過 SSH 或遠端桌面下的時候要小心，有可能一按下去就把自己踢出來。</p><h2 id="完整的政策檔範例">完整的政策檔範例</h2><p>前面的片段拆開講比較好懂，但實際使用時是一份檔案。把上面每一段組起來大概是這樣，複製之後把 IP 位址、email 和標籤換成自己的就能用：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 1. 把常用裝置與網段的 IP 位址綁成好記的名字
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;hosts&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;my-laptop&#34;</span><span class="p">:</span> <span class="s2">&#34;100.64.12.34&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;my-nas&#34;</span><span class="p">:</span>    <span class="s2">&#34;100.84.25.76&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;home-lan&#34;</span><span class="p">:</span>  <span class="s2">&#34;192.168.100.0/24&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 2. 宣告標籤，把伺服器的所有權從個人帳號轉出去
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;tagOwners&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:prod&#34;</span><span class="p">:</span>          <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:dev&#34;</span><span class="p">:</span>           <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">,</span> <span class="s2">&#34;group:dev&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:ci&#34;</span><span class="p">:</span>            <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:subnet-router&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;tag:exit&#34;</span><span class="p">:</span>          <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 3. 把使用者分類，免費版最多 3 組
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;groups&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;group:admin&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;wells@example.com&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;group:dev&#34;</span><span class="p">:</span>   <span class="p">[</span><span class="s2">&#34;dave@example.com&#34;</span><span class="p">,</span> <span class="s2">&#34;laura@example.com&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 4. 誰可以連到什麼、走哪些連接埠
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;grants&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 每個人都連得到自己的裝置，但碰不到別人的
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:member&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:self&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 只有我的筆電能用 SSH 連 NAS
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-laptop&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 開發者可以連開發機的 SSH 與網頁服務
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:dev&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">,</span> <span class="s2">&#34;tcp:80&#34;</span><span class="p">,</span> <span class="s2">&#34;tcp:443&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 只有管理員能碰正式環境
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:prod&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// CI 機器只能連正式環境的部署連接埠
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:ci&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:prod&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tcp:22&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 管理員可以連子網路路由後面的家用網段
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:admin&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;home-lan&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 開發者可以經出口節點連外
+</span></span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:internet&#34;</span><span class="p">],</span> <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">]}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 5. Tailscale SSH：自己的裝置照舊，開發機只給 deploy 帳號
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;ssh&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span> <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:member&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:self&#34;</span><span class="p">],</span> <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;autogroup:nonroot&#34;</span><span class="p">,</span> <span class="s2">&#34;root&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;action&#34;</span><span class="p">:</span> <span class="s2">&#34;accept&#34;</span><span class="p">,</span> <span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;group:dev&#34;</span><span class="p">],</span> <span class="nt">&#34;dst&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:dev&#34;</span><span class="p">],</span> <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;deploy&#34;</span><span class="p">]}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 6. 子網路路由與出口節點免手動核准
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;autoApprovers&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;routes&#34;</span><span class="p">:</span>   <span class="p">{</span><span class="nt">&#34;192.168.100.0/24&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:subnet-router&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;exitNode&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;tag:exit&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// 7. 把不能斷的連線釘死
+</span></span></span><span class="line"><span class="cl">  <span class="nt">&#34;tests&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span><span class="nt">&#34;src&#34;</span><span class="p">:</span> <span class="s2">&#34;my-laptop&#34;</span><span class="p">,</span> <span class="nt">&#34;proto&#34;</span><span class="p">:</span> <span class="s2">&#34;tcp&#34;</span><span class="p">,</span> <span class="nt">&#34;accept&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas:22&#34;</span><span class="p">],</span> <span class="nt">&#34;deny&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;my-nas:443&#34;</span><span class="p">]}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><p>有幾個地方是實測踩過才確定的。<code>autoApprovers</code> 用到的 <code>tag:subnet-router</code> 與 <code>tag:exit</code> <strong>必須先在 <code>tagOwners</code> 宣告</strong>，漏了會存不下去。<code>autogroup:member</code> 全篇統一用單數，跟出廠檔案的複數混用會被擋。自訂群組只用了 2 組，留一組給免費版的額度。</p><h2 id="結論">結論</h2><p>Tailscale 預設全開是為了裝完就能用，但那跟零信任剛好相反。實際收緊的順序大概是先用 <code>hosts</code> 把常用裝置綁成好記的名字，再用 <code>tagOwners</code> 把伺服器從個人帳號轉出去，接著用 <code>groups</code> 分人（免費版只有 3 組），最後才是寫 grants 和補上 <code>tests</code>。新設定直接寫 grants 就好，舊的 <code>acls</code> 不會消失，但也不會再有新功能，兩種語法可以並存，不用一次翻完。</p><p>真正會踩到的坑其實只有兩個，而且我兩個都撞過。伺服器記得關掉金鑰過期，不然 180 天後子網路路由器會安靜地失聯；還有政策檔認的是 <code>hosts</code> 裡綁的 IP 位址，不是 MagicDNS 的名稱。</p><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://tailscale.com/docs/features/access-control" target="_blank" rel="noopener">Access control</a></li><li><a class="link" href="https://tailscale.com/docs/features/access-control/grants" target="_blank" rel="noopener">Grants</a></li><li><a class="link" href="https://tailscale.com/docs/reference/syntax/grants" target="_blank" rel="noopener">Grants syntax</a></li><li><a class="link" href="https://tailscale.com/docs/reference/migrate-acls-grants" target="_blank" rel="noopener">Migrate from ACLs to grants</a></li><li><a class="link" href="https://tailscale.com/docs/reference/syntax/policy-file" target="_blank" rel="noopener">Syntax reference for the tailnet policy file</a></li><li><a class="link" href="https://tailscale.com/kb/1193/tailscale-ssh" target="_blank" rel="noopener">Tailscale SSH</a></li><li><a class="link" href="https://tailscale.com/kb/1028/key-expiry" target="_blank" rel="noopener">Key expiry</a></li><li><a class="link" href="https://tailscale.com/kb/1081/magicdns" target="_blank" rel="noopener">MagicDNS</a></li><li><a class="link" href="https://tailscale.com/pricing" target="_blank" rel="noopener">Tailscale Pricing</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/tailscale/">Tailscale</a>
+<a href="/tags/vpn/">VPN</a>
+<a href="/tags/ssh/">SSH</a>
+<a href="/tags/%E9%9B%B6%E4%BF%A1%E4%BB%BB/">零信任</a>
+<a href="/tags/%E7%B6%B2%E8%B7%AF/">網路</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/tailscale-advanced-guides/"><div class="article-image"><img alt="Featured image of post Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定" height="150" loading="lazy" src="/post/tailscale-advanced-guides/cover_hu_53b6600b46464107.webp" srcset="/post/tailscale-advanced-guides/cover_hu_53b6600b46464107.webp 1x, /post/tailscale-advanced-guides/cover_hu_a83964a66e99b6e0.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#5a4f3880 0%,#d2cab9C0 100%)"><h2 class="article-title">Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定</h2></div></a></article><article class="has-image"><a href="/post/zero-trust-overview/"><div class="article-image"><img alt="Featured image of post 零信任全面解析：理念、現況與未來" height="150" loading="lazy" src="/post/zero-trust-overview/cover_hu_cf3a79335623dde5.webp" srcset="/post/zero-trust-overview/cover_hu_cf3a79335623dde5.webp 1x, /post/zero-trust-overview/cover_hu_965043bded70e043.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#3d414480 0%,#b5bfbbC0 100%)"><h2 class="article-title">零信任全面解析：理念、現況與未來</h2></div></a></article><article class="has-image"><a href="/post/tailscale/"><div class="article-image"><img alt="Featured image of post 使用 Tailscale 輕鬆建立安全且私密的隧道" height="150" loading="lazy" src="/post/tailscale/cover_hu_89cc7610fb33014e.webp" srcset="/post/tailscale/cover_hu_89cc7610fb33014e.webp 1x, /post/tailscale/cover_hu_853f11ae42984c46.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebfc780 0%,#27313aC0 100%)"><h2 class="article-title">使用 Tailscale 輕鬆建立安全且私密的隧道</h2></div></a></article><article class="has-image"><a href="/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置</h2></div></a></article><article class="has-image"><a href="/post/cloudflare-warp-wireguard-tutorial/"><div class="article-image"><img alt="Featured image of post 開始使用 Cloudflare WARP 隱藏真實 IP 以降低被追蹤風險並提升上網隱私" height="150" loading="lazy" src="/post/cloudflare-warp-wireguard-tutorial/cover_hu_f29110aed6192f81.webp" srcset="/post/cloudflare-warp-wireguard-tutorial/cover_hu_f29110aed6192f81.webp 1x, /post/cloudflare-warp-wireguard-tutorial/cover_hu_3b52d1f792b8a6ea.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#55424280 0%,#cbc7c1C0 100%)"><h2 class="article-title">開始使用 Cloudflare WARP 隱藏真實 IP 以降低被追蹤風險並提升上網隱私</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

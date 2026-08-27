@@ -1,0 +1,141 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    pad: 50
+  }
+}
+
+# Global Styles
+style: {
+  fill: "#F9FAFB"
+}
+
+# Modern Class Definitions
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+    }
+  }
+  modern_bypass: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+      stroke-dash: 5
+      opacity: 0.9
+    }
+  }
+}
+
+# User Device
+User: "User Device\n114.32.x.x\n(Your Home IP)" {
+  class: modern_node
+  style: {
+    fill: "#DBEAFE"
+    stroke: "#2563EB"
+    font-color: "#1E40AF"
+  }
+}
+
+# 🚧 ISP Firewall
+ISP: "🚧 ISP Firewall\nUnable to Decrypt\n(Detection Failed ❌)" {
+  class: modern_bypass
+  style: {
+    fill: "#FFE4E6"
+    stroke: "#E11D48"
+    font-color: "#BE123C"
+  }
+}
+
+# Secure Tunnel
+SecureTunnel: {
+  label: "🔒 WireGuard Tunnel"
+  style: {
+    stroke: "#A5B4FC"
+    fill: "#F5F3FF"
+    stroke-dash: 5
+    border-radius: 24
+    shadow: false
+    font-size: 20
+  }
+
+  Traffic: "📦 Encrypting Packets\nwellstsai.com" {
+    class: modern_node
+    style: {
+      fill: "#DDD6FE"
+      stroke: "#7C3AED"
+      font-color: "#5B21B6"
+    }
+  }
+}
+
+# Internet Environment
+InternetEnv: {
+  label: "🌍 Internet"
+  style: {
+    stroke: "#E5E7EB"
+    fill: "transparent"
+    stroke-dash: 3
+    border-radius: 20
+    font-size: 20
+  }
+
+  CloudflareNode: "☁️ Cloudflare\n104.28.200.XXX\n(WARP Egress)" {
+    class: modern_node
+    style: {
+      fill: "#D1FAE5"
+      stroke: "#059669"
+      font-color: "#047857"
+    }
+  }
+
+  WebsiteNode: "🌐 Target Website\n✅ Success" {
+    class: modern_node
+    style: {
+      fill: "#D1FAE5"
+      stroke: "#059669"
+      font-color: "#047857"
+    }
+  }
+}
+
+# Connection Logic
+User -> SecureTunnel.Traffic: Encrypted Entrance {
+  style: {
+    stroke: "#2563EB"
+    stroke-width: 4
+    animated: true
+  }
+}
+
+SecureTunnel.Traffic -> InternetEnv.CloudflareNode: Encrypted Exit {
+  style: {
+    stroke: "#7C3AED"
+    stroke-width: 4
+    animated: true
+  }
+}
+
+InternetEnv.CloudflareNode -> InternetEnv.WebsiteNode: Proxy Request {
+  style: {
+    stroke: "#059669"
+    stroke-width: 2
+  }
+}
+
+# ISP Pointing to Tunnel
+ISP -> SecureTunnel: Try Detecting {
+  target-arrowhead.shape: cf-one
+  style: {
+    stroke: "#E11D48"
+    stroke-dash: 3
+    stroke-width: 2
+  }
+}

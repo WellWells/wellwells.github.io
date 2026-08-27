@@ -1,0 +1,356 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Installing iPerf3 on Windows and Linux, setting up the server and client, then measuring direct LAN, Tailscale, and multiple parallel client connections, plus how to read the result columns."><title>Installing and Using iPerf3 for Network Speed Testing - WellWells</title><link rel="canonical" href="https://wellstsai.com/en/post/iperf3/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Installing and Using iPerf3 for Network Speed Testing"><meta property='og:description' content="Installing iPerf3 on Windows and Linux, setting up the server and client, then measuring direct LAN, Tailscale, and multiple parallel client connections, plus how to read the result columns."><meta property='og:url' content='https://wellstsai.com/en/post/iperf3/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Tutorial'><meta property='article:tag' content='Software'><meta property='article:tag' content='Tailscale'><meta property='article:tag' content='NAS'><meta property='article:tag' content='Synology'><meta property='article:published_time' content='2024-01-30T16:40:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/iperf3/cover.webp'><meta name="twitter:title" content="Installing and Using iPerf3 for Network Speed Testing"><meta name="twitter:description" content="Installing iPerf3 on Windows and Linux, setting up the server and client, then measuring direct LAN, Tailscale, and multiple parallel client connections, plus how to read the result columns."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/iperf3/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/iperf3/cover_hu_a49e5b5e0b2de377.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/iperf3/cover_hu_4ec8ffa2096060b5.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/iperf3/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/iperf3/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/iperf3/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/iperf3/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"Introduction When purchasing wireless routers and other network communication devices, routers with specifications like AC3000, AX6000, and BE7000 have become the mainstream choice for modern home networks.\nTake a specific brand as an example, their wireless speed characteristics are highlighted as follows:\nWi-Fi 5 (1024 QAM): up to 1733 Mbps. Wi-Fi 6 (2.4 GHz): up to 574 Mbps. Wi-Fi 4: up to 300 Mbps.\nThese transmission speeds indicate the theoretical maximum transmission speed when two …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2024-01-30T16:40:00+08:00","description":"Installing iPerf3 on Windows and Linux, setting up the server and client, then measuring direct LAN, Tailscale, and multiple parallel client connections, plus how to read the result columns.","headline":"Installing and Using iPerf3 for Network Speed Testing","image":"https://wellstsai.com/post/iperf3/cover.webp","keywords":["Tutorial","Software","Tailscale","NAS","Synology"],"mainEntityOfPage":{"@id":"https://wellstsai.com/en/post/iperf3/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/en/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/en/">WellWells</a></h1><h2 class="site-description">Unexpected valuables in the well</h2></div></header><ol class="menu" id="main-menu"><li><a href='/en/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>Home</span></a></li><li><a href='/en/about/'><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href='/en/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>Archive</span></a></li><li><a href='/en/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>Sponsor</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/iperf3/">繁體中文</option><option value="/en/post/iperf3/" selected>English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">Table of Contents</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#installing-iperf3">Installing iPerf3</a><ol><li><a href="#linux">Linux</a></li><li><a href="#windows">Windows</a></li></ol></li><li><a href="#command-overview">Command Overview</a></li><li><a href="#setting-up-an-iperf3-server">Setting up an iPerf3 Server</a></li><li><a href="#direct-connection-via-internal-network">Direct Connection via Internal Network</a></li><li><a href="#internal-network-ip-address-via-tailscale">Internal Network IP address via Tailscale</a></li><li><a href="#multiple-parallel-client-connection">Multiple Parallel Client Connection</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/en/post/iperf3/" style="position:relative;display:block"><img src="/post/iperf3/cover_hu_d8a39e4222e60200.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/iperf3/cover_hu_a49e5b5e0b2de377.webp"><source media="(min-width: 769px)" srcset="/post/iperf3/cover_hu_4ec8ffa2096060b5.webp">
+<img src="/post/iperf3/cover_hu_4ec8ffa2096060b5.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Installing and Using iPerf3 for Network Speed Testing" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/en/post/iperf3/">Installing and Using iPerf3 for Network Speed Testing</a></h2><h3 class="article-subtitle">Installing iPerf3 on Windows and Linux, setting up the server and client, then measuring direct LAN, Tailscale, and multiple parallel client connections, plus how to read the result columns.</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2024-01-30T16:40:00+08:00'>2024/01/30</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">14 Minutes Read</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/post/iperf3/" class="link">繁體中文</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>Table of Contents</span></div></summary><nav class="toc-nav"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#installing-iperf3">Installing iPerf3</a><ol><li><a href="#linux">Linux</a></li><li><a href="#windows">Windows</a></li></ol></li><li><a href="#command-overview">Command Overview</a></li><li><a href="#setting-up-an-iperf3-server">Setting up an iPerf3 Server</a></li><li><a href="#direct-connection-via-internal-network">Direct Connection via Internal Network</a></li><li><a href="#internal-network-ip-address-via-tailscale">Internal Network IP address via Tailscale</a></li><li><a href="#multiple-parallel-client-connection">Multiple Parallel Client Connection</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></details></aside><section class="article-content"><h2 id="introduction">Introduction</h2><p>When purchasing wireless routers and other network communication devices, routers with specifications like AC3000, AX6000, and BE7000 have become the mainstream choice for modern home networks.</p><p>Take a specific brand as an example, their wireless speed characteristics are highlighted as follows:</p><p>Wi-Fi 5 (1024 QAM): up to 1733 Mbps.
+Wi-Fi 6 (2.4 GHz): up to 574 Mbps.
+Wi-Fi 4: up to 300 Mbps.</p><p>These transmission speeds indicate the theoretical maximum transmission speed when two terminal devices (such as mobile phones or computers) are connected to these Wi-Fi hotspots. If both devices support Wi-Fi 5 and 1024 QAM, their maximum transmission speed can reach 1733 Mbps, allowing higher-speed data transmission between two devices within the internal network.</p><p>One important point to note is that transmission speed refers to the theoretical maximum transmission speed the router can provide under optimal conditions. The actual transmission speed is influenced by many factors, such as:</p><ol><li>Distance between devices (weaker signal results in higher error rates).</li><li>Obstacles (such as walls and corners).</li><li>Co-channel interference (Bluetooth products).</li><li>Network congestion (multiple devices uploading or downloading simultaneously).</li><li>Quality of Service (QoS) priority.</li><li>Poor device design (heat, antenna, EMI).</li><li>Cables (network cables).</li><li>Wireless signal band and channel selection.</li><li>Wireless protocols and encryption methods.</li><li>Terminal hardware performance (processor speed and memory size).</li></ol><p>So to know the actual transmission speed between two devices, you can use iPerf3 to measure and evaluate it. The same applies to external network, VPN, or Tailscale speed testing.</p><blockquote><p>If you have, for example, a 300 Mbps/300 Mbps (download/upload) plan, the actual transmission speed still depends on several factors:</p><p>Testing <code>Device A</code> and <code>Device B</code>: Device A connects to a wireless router using a Wi-Fi 6 network card on the 2.4 GHz band (up to 574 Mbps). The wireless router connects to an external telecom device (up to 300 Mbps), then to client B's telecom device (up to 300 Mbps), limiting the speed to a maximum of 300 Mbps. If client B's telecom device is 100 Mbps, the speed will be limited to 100 Mbps.</p><p>Testing <code>Device A</code> and <code>Phone</code>: Device A uses a CAT-5 wired network (up to 100 Mbps) to access the internet, while the phone connects to the router using the 2.4 GHz band (up to 574 Mbps). The maximum speed during the test will be limited by the wired speed to only 100 Mbps. To improve network speed, Device A can use a wireless network card or change the network cable, such as CAT-5e supporting 1 Gbps.</p><p>Network speed is influenced by terminal device hardware parameters, transmission protocols, and the <code>lowest speed</code> in the entire telecommunications link.</p></blockquote><h2 id="installing-iperf3">Installing iPerf3</h2><h3 id="linux">Linux</h3><p>The official version is available for Ubuntu / Debian / Mint / Fedora / FreeBSD, mostly installable through package managers. For ARM architecture, you can download the ARM version of iPerf3 directly from <a class="link" href="https://github.com/userdocs/iperf3-static" target="_blank" rel="noopener">GitHub</a> or <a class="link" href="https://github.com/esnet/iperf" target="_blank" rel="noopener">compile the source code yourself</a>.</p><p>The following explains the installation for Ubuntu 20.04:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Update package list</span>
+</span></span><span class="line"><span class="cl">sudo apt update
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Install iperf3</span>
+</span></span><span class="line"><span class="cl">sudo apt install -y iperf3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Display iperf3 version</span>
+</span></span><span class="line"><span class="cl">iperf3 --version
+</span></span></code></pre></td></tr></table></div></div><p>To remove iperf3, use the following command:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt remove iperf3
+</span></span></code></pre></td></tr></table></div></div><p>After installation, check the output version, which should be iperf 3.9 (cJSON 1.7.13)</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@server:~$ iperf3 --version
+</span></span><span class="line"><span class="cl">iperf 3.9 <span class="o">(</span>cJSON 1.7.13<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Linux server 5.15.0-91-generic <span class="c1">#101-Ubuntu SMP Tue Nov 14 13:30:08 UTC 2023 x86_64</span>
+</span></span><span class="line"><span class="cl">Optional features available: CPU affinity setting, IPv6 flow label, SCTP, TCP congestion algorithm setting, sendfile / zerocopy, socket pacing, authentication
+</span></span></code></pre></td></tr></table></div></div><h3 id="windows">Windows</h3><p>iPerf3 is maintained by the Energy Sciences Network (ESnet) and provides a compiled version for Linux. The current Windows version is compiled and maintained by community developers, who have ported iPerf3 via Cygwin to the Windows platform, maintaining feature parity with the Linux version.</p><p>To use iPerf3 on Windows, download it from the recommended sites: <a class="link" href="https://files.budman.pw/" target="_blank" rel="noopener">BudMan</a> or <a class="link" href="https://github.com/ar51an/iperf3-win-builds/releases" target="_blank" rel="noopener">ar51an</a>.</p><p>Find the latest dated zip package, such as iperf-3.17.1-win64.zip, download and extract it to use.</p><h2 id="command-overview">Command Overview</h2><p>Common commands are as follows. For more advanced usage, refer to the help section.</p><div class="table-wrapper"><table><thead><tr><th>Command</th><th>Syntax</th></tr></thead><tbody><tr><td>Start a server</td><td><code>iperf3 -s</code></td></tr><tr><td>Start a server on a specific port</td><td><code>iperf3 -s -p 5205</code></td></tr><tr><td>Client upload (to Server)</td><td><code>iperf3 -c IP_ADDRESS/HOST</code></td></tr><tr><td>Client download (from Server)</td><td><code>iperf3 -c IP_ADDRESS/HOST -R</code></td></tr><tr><td>Client download with 4 parallel streams</td><td><code>iperf3 -c IP_ADDRESS/HOST -P 4</code></td></tr><tr><td>Use IPv6 protocol version</td><td><code>iperf3 -c IP_ADDRESS/HOST -6</code></td></tr><tr><td>UDP test</td><td><code>iperf3 -c IP_ADDRESS/HOST -u</code></td></tr></tbody></table></div><h2 id="setting-up-an-iperf3-server">Setting up an iPerf3 Server</h2><p>Test the network speed between two devices, where nodeA acts as the server, and nodeB simulates upload or download behavior.</p><ol><li><p>Open the iperf3 directory.</p><p><img alt="Open iperf3 directory" class="gallery-image" data-flex-basis="483px" data-flex-grow="201" decoding="async" fetchpriority="high" height="453" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/iperf3/1_win_iperf_location.webp" srcset="/post/iperf3/1_win_iperf_location_hu_57c13f591d702c4a.webp 800w, /post/iperf3/1_win_iperf_location.webp 913w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="913"></p></li><li><p>Type <code>cmd</code> in the path bar.</p><p><img alt="Type cmd in path bar" class="gallery-image" data-flex-basis="483px" data-flex-grow="201" decoding="async" height="453" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/iperf3/2_type_cmd.webp" srcset="/post/iperf3/2_type_cmd_hu_edb11944692a3347.webp 800w, /post/iperf3/2_type_cmd.webp 913w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="913"></p></li><li><p>Confirm that the command prompt opens in the iperf3 directory.</p><p><img alt="Command prompt" class="gallery-image" data-flex-basis="533px" data-flex-grow="222" decoding="async" height="407" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/iperf3/3_shows_the_cmd.webp" srcset="/post/iperf3/3_shows_the_cmd_hu_94a9b69c9d27eb8.webp 800w, /post/iperf3/3_shows_the_cmd.webp 904w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="904"></p></li><li><p>Enter <code>iperf3 -s</code> to start the iperf3 server, which will open port 5201 and wait for client connections.</p><p><img alt="Run iperf3 server" class="gallery-image" data-flex-basis="533px" data-flex-grow="222" decoding="async" height="407" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/iperf3/4_run_iperf_server.webp" srcset="/post/iperf3/4_run_iperf_server_hu_12cbfd204540f73f.webp 800w, /post/iperf3/4_run_iperf_server.webp 904w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="904"></p></li></ol><p>To specify a different port, use <code>iperf3 -s -p 5205</code>. Clients will need to connect using the corresponding port number.</p><h2 id="direct-connection-via-internal-network">Direct Connection via Internal Network</h2><p>Hardware setup: Two computers connected via wired network, passing through several routers. NodeA acts as the server (192.168.1.30).</p><p>After nodeA sets up the server, enter <code>iperf3 -c IP_ADDRESS/HOST</code> on nodeB to test the upload speed from nodeB to nodeA.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@nodeB:~$ iperf3 -c 192.168.1.30
+</span></span><span class="line"><span class="cl">Connecting to host 192.168.1.30, port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span> <span class="nb">local</span> 192.168.1.20 port <span class="m">55482</span> connected to 192.168.1.30 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth       Retr  Cwnd
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-1.00   sec  85.3 MBytes   <span class="m">715</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   1.00-2.00   sec  78.0 MBytes   <span class="m">655</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   2.00-3.00   sec  86.2 MBytes   <span class="m">723</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   3.00-4.00   sec  88.5 MBytes   <span class="m">742</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   4.00-5.00   sec  86.4 MBytes   <span class="m">725</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   5.00-6.00   sec  90.7 MBytes   <span class="m">761</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   6.00-7.00   sec  85.6 MBytes   <span class="m">718</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   7.00-8.00   sec  85.3 MBytes   <span class="m">715</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   8.00-9.00   sec  78.7 MBytes   <span class="m">660</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   9.00-10.00  sec  82.3 MBytes   <span class="m">691</span> Mbits/sec    <span class="m">0</span>    <span class="m">219</span> KBytes
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth       Retr
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">847</span> MBytes   <span class="m">711</span> Mbits/sec    <span class="m">0</span>             sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">846</span> MBytes   <span class="m">710</span> Mbits/sec                  receiver
+</span></span></code></pre></td></tr></table></div></div><p>The meanings of the table parameters are as follows, with an emphasis on the Bandwidth parameter:</p><ul><li><strong>ID</strong>: The connection number, used to tell multiple test streams apart.</li><li><strong>Interval</strong>: The time segment measured, shown per second or per fixed interval.</li><li><strong>Transfer</strong>: The amount of data transferred during this interval.</li><li><strong>Bandwidth</strong>: The average transfer rate during this interval.</li><li><strong>Retr</strong>: How many times data had to be resent after being lost or corrupted. The fewer retransmissions, the better the network quality.</li><li><strong>Cwnd</strong>: Congestion window size, the maximum amount of data the sender can push out before waiting for an acknowledgment.</li></ul><p>From the table, it can be seen that the average speed at which nodeB transfers data to nodeA is 711 Mbps.</p><p>To test the download speed of nodeB, i.e., the transmission direction from nodeA to nodeB, use <code>iperf3 -c IP_ADDRESS/HOST -R</code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@nodeB:~$ iperf3 -c 192.168.1.30 -R
+</span></span><span class="line"><span class="cl">Connecting to host 192.168.1.30, port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl">Reverse mode, remote host 192.168.1.30 is sending
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span> <span class="nb">local</span> 192.168.1.20 port <span class="m">42550</span> connected to 192.168.1.30 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-1.00   sec   <span class="m">111</span> MBytes   <span class="m">930</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   1.00-2.00   sec   <span class="m">106</span> MBytes   <span class="m">888</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   2.00-3.00   sec  94.4 MBytes   <span class="m">791</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   3.00-4.00   sec   <span class="m">108</span> MBytes   <span class="m">911</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   4.00-5.00   sec  91.8 MBytes   <span class="m">770</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   5.00-6.00   sec   <span class="m">101</span> MBytes   <span class="m">844</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   6.00-7.00   sec   <span class="m">101</span> MBytes   <span class="m">845</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   7.00-8.00   sec   <span class="m">102</span> MBytes   <span class="m">858</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   8.00-9.00   sec  93.2 MBytes   <span class="m">783</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   9.00-10.00  sec   <span class="m">102</span> MBytes   <span class="m">859</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec  <span class="m">1011</span> MBytes   <span class="m">848</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec  <span class="m">1011</span> MBytes   <span class="m">848</span> Mbits/sec                  receiver
+</span></span></code></pre></td></tr></table></div></div><p>The average speed of data transfer from nodeA to nodeB is 848 Mbps.</p><h2 id="internal-network-ip-address-via-tailscale">Internal Network IP address via Tailscale</h2><p>After setting up a network through Tailscale, you can evaluate the transmission speed between two nodes by directly entering the hostname of the other node.</p><p>The following test uses the same computers, but switches to the Tailscale hostname.</p><p>Upload test results:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@nodeB:~$ iperf3 -c nodeA
+</span></span><span class="line"><span class="cl">Connecting to host nodeA, port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span> <span class="nb">local</span> 100.116.123.164 port <span class="m">43086</span> connected to 100.110.114.119 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth       Retr  Cwnd
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-1.00   sec  46.3 MBytes   <span class="m">388</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   1.00-2.00   sec  34.4 MBytes   <span class="m">289</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   2.00-3.00   sec  41.0 MBytes   <span class="m">344</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   3.00-4.00   sec  45.1 MBytes   <span class="m">379</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   4.00-5.00   sec  44.4 MBytes   <span class="m">373</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   5.00-6.00   sec  47.0 MBytes   <span class="m">395</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   6.00-7.00   sec  45.1 MBytes   <span class="m">378</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   7.00-8.00   sec  46.8 MBytes   <span class="m">393</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   8.00-9.00   sec  45.2 MBytes   <span class="m">379</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   9.00-10.00  sec  44.6 MBytes   <span class="m">374</span> Mbits/sec    <span class="m">0</span>    <span class="m">216</span> KBytes
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth       Retr
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">440</span> MBytes   <span class="m">369</span> Mbits/sec    <span class="m">0</span>             sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">439</span> MBytes   <span class="m">369</span> Mbits/sec                  receiver
+</span></span></code></pre></td></tr></table></div></div><p>Download test results:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@nodeB:~$ iperf3 -c nodeA -R
+</span></span><span class="line"><span class="cl">Connecting to host nodeA, port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl">Reverse mode, remote host nodeA is sending
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span> <span class="nb">local</span> 100.116.123.164 port <span class="m">32852</span> connected to 100.110.114.119 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-1.00   sec  95.6 MBytes   <span class="m">802</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   1.00-2.00   sec  86.9 MBytes   <span class="m">729</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   2.00-3.00   sec  90.6 MBytes   <span class="m">760</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   3.00-4.00   sec  72.0 MBytes   <span class="m">604</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   4.00-5.00   sec  81.5 MBytes   <span class="m">684</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   5.00-6.00   sec  73.5 MBytes   <span class="m">616</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   6.00-7.00   sec  78.9 MBytes   <span class="m">662</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   7.00-8.00   sec  87.9 MBytes   <span class="m">738</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   8.00-9.00   sec  90.8 MBytes   <span class="m">761</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   9.00-10.00  sec  70.4 MBytes   <span class="m">590</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">828</span> MBytes   <span class="m">695</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">828</span> MBytes   <span class="m">695</span> Mbits/sec                  receiver
+</span></span></code></pre></td></tr></table></div></div><p>Compared to direct IP address connection, the upload speed via Tailscale is reduced to 52% of the original speed, and the download speed is reduced to 82% of the original speed.</p><h2 id="multiple-parallel-client-connection">Multiple Parallel Client Connection</h2><p>To test the performance of the server, you can use <code>iperf3 -c IP_ADDRESS/HOST -P client_counts</code>.</p><p>For example, to simulate 3 clients downloading simultaneously:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wells@nodeB:~$ iperf3 -c 192.168.1.30 -R -P3
+</span></span><span class="line"><span class="cl">Connecting to host 192.168.1.30, port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl">Reverse mode, remote host 192.168.1.30 is sending
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span> <span class="nb">local</span> 192.168.1.20 port <span class="m">60680</span> connected to 192.168.1.30 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span> <span class="nb">local</span> 192.168.1.20 port <span class="m">60694</span> connected to 192.168.1.30 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span> <span class="nb">local</span> 192.168.1.20 port <span class="m">60704</span> connected to 192.168.1.30 port <span class="m">5201</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-1.00   sec  37.2 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   0.00-1.00   sec  37.2 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   0.00-1.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   0.00-1.00   sec   <span class="m">112</span> MBytes   <span class="m">935</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   1.00-2.00   sec  37.1 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   1.00-2.00   sec  37.1 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   1.00-2.00   sec  37.0 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   1.00-2.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   2.00-3.00   sec  37.2 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   2.00-3.00   sec  37.0 MBytes   <span class="m">310</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   2.00-3.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   2.00-3.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   3.00-4.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   3.00-4.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   3.00-4.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   3.00-4.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   4.00-5.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   4.00-5.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   4.00-5.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   4.00-5.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   5.00-6.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   5.00-6.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   5.00-6.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   5.00-6.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   6.00-7.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   6.00-7.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   6.00-7.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   6.00-7.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   7.00-8.00   sec  37.0 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   7.00-8.00   sec  37.1 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   7.00-8.00   sec  37.1 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   7.00-8.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   8.00-9.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   8.00-9.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   8.00-9.00   sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   8.00-9.00   sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   9.00-10.00  sec  37.2 MBytes   <span class="m">312</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   9.00-10.00  sec  37.1 MBytes   <span class="m">311</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   9.00-10.00  sec  37.0 MBytes   <span class="m">310</span> Mbits/sec
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   9.00-10.00  sec   <span class="m">111</span> MBytes   <span class="m">934</span> Mbits/sec
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl"><span class="o">[</span> ID<span class="o">]</span> Interval           Transfer     Bandwidth
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">372</span> MBytes   <span class="m">312</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  4<span class="o">]</span>   0.00-10.00  sec   <span class="m">372</span> MBytes   <span class="m">312</span> Mbits/sec                  receiver
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   0.00-10.00  sec   <span class="m">372</span> MBytes   <span class="m">312</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  6<span class="o">]</span>   0.00-10.00  sec   <span class="m">372</span> MBytes   <span class="m">312</span> Mbits/sec                  receiver
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   0.00-10.00  sec   <span class="m">371</span> MBytes   <span class="m">311</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>  8<span class="o">]</span>   0.00-10.00  sec   <span class="m">371</span> MBytes   <span class="m">311</span> Mbits/sec                  receiver
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   0.00-10.00  sec  1.09 GBytes   <span class="m">935</span> Mbits/sec                  sender
+</span></span><span class="line"><span class="cl"><span class="o">[</span>SUM<span class="o">]</span>   0.00-10.00  sec  1.09 GBytes   <span class="m">935</span> Mbits/sec                  receiver
+</span></span></code></pre></td></tr></table></div></div><h2 id="conclusion">Conclusion</h2><p>After using iPerf3 for speed testing, if the network speed does not meet your requirements, further troubleshooting may be necessary.</p><p>For home internal networks, factors such as cable quality, device configuration, and protocol support may be the main causes of poor network speed.</p><p>Sometimes, simply restarting the router can normalize the speed. If this frequently happens, it might be time to consider evaluating a new router.</p><p>When encountering slow speeds with Tailscale, you can use the <code>tailscale ping host</code> command to determine whether the device is directly connected or relayed through a DERP server.</p><p>In my experience, Tailscale usually connects directly. Occasionally, though, after connecting to certain Wi-Fi networks, it starts using DERP relays. Even disconnecting from Wi-Fi and returning to the original network doesn't resolve the direct connection issue. In such cases, forcibly restarting the Tailscale service can sometimes fix the problem.</p><h2 id="references">References</h2><ol><li><a class="link" href="https://lindevs.com/install-iperf-on-ubuntu" target="_blank" rel="noopener">Install iPerf 3 on Ubuntu 20.04</a></li><li><a class="link" href="https://docs.oracle.com/cd/E88353_01/html/E37839/iperf3-1.html" target="_blank" rel="noopener">iPerf3 user manual page</a></li><li><a class="link" href="https://en.wikipedia.org/wiki/Iperf" target="_blank" rel="noopener">Iperf - Wikipedia</a></li><li><a class="link" href="https://software.es.net/iperf/faq.html" target="_blank" rel="noopener">iperf3 FAQ—iperf3 documentation</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/en/tags/tutorial/">Tutorial</a>
+<a href="/en/tags/software/">Software</a>
+<a href="/en/tags/tailscale/">Tailscale</a>
+<a href="/en/tags/nas/">NAS</a>
+<a href="/en/tags/synology/">Synology</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>This article is licensed under a <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>Last Updated On 2026/08/15</span></section></footer></article><aside><h2 class="section-title">Related Content</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/en/post/tailscale-synology/"><div class="article-image"><img alt="Featured image of post Install the Latest Version of Tailscale on Synology NAS" height="150" loading="lazy" src="/post/tailscale-synology/cover_hu_a5fffb7a2edbf403.webp" srcset="/post/tailscale-synology/cover_hu_a5fffb7a2edbf403.webp 1x, /post/tailscale-synology/cover_hu_89f6748a86d4c3a2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#44393380 0%,#dfe7daC0 100%)"><h2 class="article-title">Install the Latest Version of Tailscale on Synology NAS</h2></div></a></article><article class="has-image"><a href="/en/post/tailscale/"><div class="article-image"><img alt="Featured image of post Using Tailscale to Easily Create Secure and Private Tunnels" height="150" loading="lazy" src="/post/tailscale/cover_hu_89cc7610fb33014e.webp" srcset="/post/tailscale/cover_hu_89cc7610fb33014e.webp 1x, /post/tailscale/cover_hu_853f11ae42984c46.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebfc780 0%,#27313aC0 100%)"><h2 class="article-title">Using Tailscale to Easily Create Secure and Private Tunnels</h2></div></a></article><article class="has-image"><a href="/en/post/tailscale-acl-grants/"><div class="article-image"><img alt="Featured image of post Tailscale ACL Tutorial: Grants Syntax, Tags, Keyless SSH" height="150" loading="lazy" src="/post/tailscale-acl-grants/cover_hu_1629c685f7f1af37.webp" srcset="/post/tailscale-acl-grants/cover_hu_1629c685f7f1af37.webp 1x, /post/tailscale-acl-grants/cover_hu_fe34e47e5e9fd20e.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d1c5b980 0%,#2b221aC0 100%)"><h2 class="article-title">Tailscale ACL Tutorial: Grants Syntax, Tags, Keyless SSH</h2></div></a></article><article class="has-image"><a href="/en/post/yobi-free-ai-automation/"><div class="article-image"><img alt="Featured image of post Yobi: AI Automation That Drives ChatGPT & Gemini Through Their Web Interfaces to Build Your Own Agent" height="150" loading="lazy" src="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp" srcset="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp 1x, /post/yobi-free-ai-automation/cover_hu_d3c50b8b2713ea5a.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#504a4280 0%,#d6ceb4C0 100%)"><h2 class="article-title">Yobi: AI Automation That Drives ChatGPT & Gemini Through Their Web Interfaces to Build Your Own Agent</h2></div></a></article><article class="has-image"><a href="/en/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","en"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">Copyright &copy;
+2023 -
+2026 WellWells</section><section class="powerby">Theme Stack designed by Jimmy</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.409fe41f76938f50142ab8f2959ffe0c989eda46761970d64bbd31bec3513bee.js" defer></script></body></html>

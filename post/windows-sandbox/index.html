@@ -1,0 +1,339 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Windows 沙箱的啟用與設定：在 BIOS 開虛擬化、用 .wsb 設定檔映射資料夾，再讓開機腳本自動裝好 7-Zip 與 VS Code 並建立桌面捷徑。"><title>Windows 沙箱設定教學：一步步建立安全隔離環境 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/windows-sandbox/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Windows 沙箱設定教學：一步步建立安全隔離環境"><meta property='og:description' content="Windows 沙箱的啟用與設定：在 BIOS 開虛擬化、用 .wsb 設定檔映射資料夾，再讓開機腳本自動裝好 7-Zip 與 VS Code 並建立桌面捷徑。"><meta property='og:url' content='https://wellstsai.com/post/windows-sandbox/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='教學'><meta property='article:tag' content='系統'><meta property='article:tag' content='安全'><meta property='article:tag' content='虛擬化'><meta property='article:tag' content='開發工具'><meta property='article:tag' content='Windows'><meta property='article:tag' content='自動化'><meta property='article:published_time' content='2025-01-14T11:48:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/windows-sandbox/cover.webp'><meta name="twitter:title" content="Windows 沙箱設定教學：一步步建立安全隔離環境"><meta name="twitter:description" content="Windows 沙箱的啟用與設定：在 BIOS 開虛擬化、用 .wsb 設定檔映射資料夾，再讓開機腳本自動裝好 7-Zip 與 VS Code 並建立桌面捷徑。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/windows-sandbox/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/windows-sandbox/cover_hu_4f60674e18c9d69f.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/windows-sandbox/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/windows-sandbox/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/windows-sandbox/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/windows-sandbox/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"前言 在 Windows 中，內建的沙箱功能使用虛擬化技術隔離潛在威脅，讓應用程式在受限的環境中執行而不影響主系統。要測試來路不明的應用程式，或是做實驗性的開發，這是很合適的選擇。\nWindows 沙箱的主要優勢：\n輕量化隔離環境：一個安全隔離的輕量桌面環境，應用程式在裡面執行不會影響主機系統。 每次重開都是全新環境：每次啟動 Sandbox 都會得到一個全新、與主機系統完全隔離的 Windows。 無需額外下載：不需下載額外的軟體、ISO 檔案，或重新安裝 Windows 系統。 基於硬體的安全性：用硬體虛擬化做核心隔離，安全性較高。 最佳化效能：智慧資源分配，操作起來順暢。 不過沙箱預設只有基本功能，新版 Windows 11 裡甚至可能連記事本這種基本應用程式都沒有。這篇會說明怎麼配置沙箱，讓它支援必要的工具（例如 VS Code 或免安裝應用程式），成為功能完整的測試環境。\n開啟 BIOS 中的虛擬化功能 若要使用 Windows 沙箱功能，需先確認 BIOS 或 UEFI 設定中已啟用虛擬化功能。\n確認主機板型號 先確認主機板型號，打開 命令提示字元，並輸入以下指令，取得主機 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2025-01-14T11:48:00+08:00","description":"Windows 沙箱的啟用與設定：在 BIOS 開虛擬化、用 .wsb 設定檔映射資料夾，再讓開機腳本自動裝好 7-Zip 與 VS Code 並建立桌面捷徑。","headline":"Windows 沙箱設定教學：一步步建立安全隔離環境","image":"https://wellstsai.com/post/windows-sandbox/cover.webp","keywords":["教學","系統","安全","虛擬化","開發工具","Windows","自動化"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/windows-sandbox/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/windows-sandbox/" selected>繁體中文</option><option value="/en/post/windows-sandbox/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#前言">前言</a></li><li><a href="#開啟-bios-中的虛擬化功能">開啟 BIOS 中的虛擬化功能</a><ol><li><a href="#確認主機板型號">確認主機板型號</a></li><li><a href="#如何啟用虛擬化功能">如何啟用虛擬化功能</a></li><li><a href="#驗證虛擬化功能是否啟用">驗證虛擬化功能是否啟用</a></li></ol></li><li><a href="#安裝-windows-沙箱">安裝 Windows 沙箱</a></li><li><a href="#設定-windows-沙箱設定wsb">設定 Windows 沙箱設定（.wsb）</a><ol><li><a href="#建立沙箱工作目錄">建立沙箱工作目錄</a></li><li><a href="#建立-wsb">建立 WSB</a></li><li><a href="#建立開機執行腳本">建立開機執行腳本</a></li><li><a href="#自動新增捷徑至桌面">自動新增捷徑至桌面</a></li></ol></li><li><a href="#使用-wsb-啟動沙箱">使用 WSB 啟動沙箱</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/windows-sandbox/" style="position:relative;display:block"><img src="/post/windows-sandbox/cover_hu_2a9848b210696561.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/windows-sandbox/cover_hu_4f60674e18c9d69f.webp"><source media="(min-width: 769px)" srcset="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp">
+<img src="/post/windows-sandbox/cover_hu_10a0518eddd7f813.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Windows 沙箱設定教學：一步步建立安全隔離環境" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/windows-sandbox/">Windows 沙箱設定教學：一步步建立安全隔離環境</a></h2><h3 class="article-subtitle">Windows 沙箱的啟用與設定：在 BIOS 開虛擬化、用 .wsb 設定檔映射資料夾，再讓開機腳本自動裝好 7-Zip 與 VS Code 並建立桌面捷徑。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2025-01-14T11:48:00+08:00'>2025/01/14</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：7 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/windows-sandbox/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#前言">前言</a></li><li><a href="#開啟-bios-中的虛擬化功能">開啟 BIOS 中的虛擬化功能</a><ol><li><a href="#確認主機板型號">確認主機板型號</a></li><li><a href="#如何啟用虛擬化功能">如何啟用虛擬化功能</a></li><li><a href="#驗證虛擬化功能是否啟用">驗證虛擬化功能是否啟用</a></li></ol></li><li><a href="#安裝-windows-沙箱">安裝 Windows 沙箱</a></li><li><a href="#設定-windows-沙箱設定wsb">設定 Windows 沙箱設定（.wsb）</a><ol><li><a href="#建立沙箱工作目錄">建立沙箱工作目錄</a></li><li><a href="#建立-wsb">建立 WSB</a></li><li><a href="#建立開機執行腳本">建立開機執行腳本</a></li><li><a href="#自動新增捷徑至桌面">自動新增捷徑至桌面</a></li></ol></li><li><a href="#使用-wsb-啟動沙箱">使用 WSB 啟動沙箱</a></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="前言">前言</h2><p>在 Windows 中，內建的沙箱功能使用虛擬化技術隔離潛在威脅，讓應用程式在受限的環境中執行而不影響主系統。要測試來路不明的應用程式，或是做實驗性的開發，這是很合適的選擇。</p><p><strong>Windows 沙箱的主要優勢：</strong></p><ul><li><strong>輕量化隔離環境</strong>：一個安全隔離的輕量桌面環境，應用程式在裡面執行不會影響主機系統。</li><li><strong>每次重開都是全新環境</strong>：每次啟動 Sandbox 都會得到一個全新、與主機系統完全隔離的 Windows。</li><li><strong>無需額外下載</strong>：不需下載額外的軟體、ISO 檔案，或重新安裝 Windows 系統。</li><li><strong>基於硬體的安全性</strong>：用硬體虛擬化做核心隔離，安全性較高。</li><li><strong>最佳化效能</strong>：智慧資源分配，操作起來順暢。</li></ul><p>不過沙箱預設只有基本功能，新版 Windows 11 裡甚至可能連記事本這種基本應用程式都沒有。這篇會說明怎麼配置沙箱，讓它支援必要的工具（例如 VS Code 或免安裝應用程式），成為功能完整的測試環境。</p><h2 id="開啟-bios-中的虛擬化功能">開啟 BIOS 中的虛擬化功能</h2><p>若要使用 Windows 沙箱功能，需先確認 BIOS 或 UEFI 設定中已啟用虛擬化功能。</p><h3 id="確認主機板型號">確認主機板型號</h3><ol><li>先確認主機板型號，打開 <code>命令提示字元</code>，並輸入以下指令，取得主機板名稱：</li></ol><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">powershell <span class="s2">&#34;Get-CimInstance -ClassName Win32_BaseBoard | Select-Object Manufacturer, Product, Version, SerialNumber&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start="2"><li>執行後會顯示主機板的詳細資料，例如：</li></ol><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Manufacturer          Product                      Version  SerialNumber
+</span></span><span class="line"><span class="cl">------------          -------                      -------  ------------
+</span></span><span class="line"><span class="cl">ASUSTeK COMPUTER INC. TUF GAMING B760-PLUS WIFI D4 Rev 1.xx 230418721200683
+</span></span></code></pre></td></tr></table></div></div><h3 id="如何啟用虛擬化功能">如何啟用虛擬化功能</h3><p>根據取得的主機板型號，可以用以下方式找相關的教學資源：</p><ol><li>搜尋型號關鍵字，例如：TUF GAMING B760-PLUS WIFI D4 virtualization。</li><li>參考 YouTube 教學影片或查閱主機板官方網站上的技術說明。</li><li>若已知主機板廠牌，也可直接搜尋關鍵字，例如：<code>華碩 虛擬化</code> 或 <code>Lenovo virtualization</code>，以找到相關操作說明。</li></ol><p>以下是常見主機板廠商開啟虛擬化的教學：</p><ul><li><a class="link" href="https://www.asus.com/tw/support/faq/1043786/" target="_blank" rel="noopener">ASUS - Intel 主機板如何透過 BIOS 開啟虛擬化功能</a></li><li><a class="link" href="https://www.asus.com/tw/support/faq/1043992/" target="_blank" rel="noopener">ASUS - AMD 主機板如何透過 BIOS 開啟虛擬化功能</a></li><li><a class="link" href="https://support.lenovo.com/tw/zh/solutions/ht500006-how-to-enable-virtualization-technology-on-lenovo-computers" target="_blank" rel="noopener">Lenovo - 如何在 Lenovo PC 電腦上啟用虛擬化技術</a></li><li><a class="link" href="https://www.dell.com/support/kbdoc/zh-tw/000195978/%E5%A6%82%E4%BD%95-%E5%9C%A8-dell-%E7%B3%BB%E7%B5%B1%E4%B8%8A-%E5%95%9F%E7%94%A8-%E6%88%96-%E5%81%9C%E7%94%A8-%E7%A1%AC%E9%AB%94-%E8%99%9B%E6%93%AC%E5%8C%96" target="_blank" rel="noopener">Dell - 如何在 Dell 系統上啟用或停用硬體虛擬化</a></li><li><a class="link" href="https://support.hp.com/tw-zh/document/ish_5637182-5698339-16" target="_blank" rel="noopener">HP 電腦 - 在 BIOS 中啟用虛擬化技術</a></li><li><a class="link" href="https://tw.msi.com/faq/faq-5390" target="_blank" rel="noopener">MSI - Intel 虛擬化技術支援</a></li><li><a class="link" href="https://tw.msi.com/faq/nb-1627" target="_blank" rel="noopener">MSI - AMD 虛擬化技術支援</a></li><li><a class="link" href="https://youtu.be/46DfLwX5AFQ?si=XV39KURhF78UFg4s&amp;t=36" target="_blank" rel="noopener">Gigabyte - Hardware Virtualization in AMD Machine with Gigabyte Mother Board</a></li></ul><h3 id="驗證虛擬化功能是否啟用">驗證虛擬化功能是否啟用</h3><p>完成設定後，重新進入 Windows，開啟 工作管理員（快速鍵：<code>Ctrl + Shift + Esc</code>），點選 <code>效能</code> 分頁，檢查 <code>虛擬化（模擬）</code> 是否顯示為「已啟用」。</p><p><img alt="於工作管理員中檢查是否以開啟虛擬化" class="gallery-image" data-flex-basis="375px" data-flex-grow="156" decoding="async" fetchpriority="high" height="1331" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/check_virtualization_in_taskmgr.webp" srcset="/post/windows-sandbox/check_virtualization_in_taskmgr_hu_41a1e8149e9124e8.webp 800w, /post/windows-sandbox/check_virtualization_in_taskmgr_hu_52e71ff901f7ae8a.webp 1600w, /post/windows-sandbox/check_virtualization_in_taskmgr.webp 2084w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2084"></p><h2 id="安裝-windows-沙箱">安裝 Windows 沙箱</h2><p>預設情況下，只有專業版、企業版或教育版才支援 Windows 沙箱。如果 Windows 是家用版，可以參考<a class="link" href="https://www.tenforums.com/tutorials/131437-enable-windows-sandbox-feature-windows-10-home-edition.html" target="_blank" rel="noopener">這篇教學來安裝</a>。</p><p>使用系統管理員身分執行 <code>命令提示字元</code> 或 <code>PowerShell</code>，並輸入以下指令以啟用 Windows 沙箱功能：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">powershell -Command <span class="s2">&#34;Enable-WindowsOptionalFeature -FeatureName &#39;Containers-DisposableClientVM&#39; -All -Online&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>安裝完後，可以再開始找到 Windows 沙箱：</p><p><img alt="在開始功能表找到 Windows 沙箱" class="gallery-image" data-flex-basis="303px" data-flex-grow="126" decoding="async" height="2106" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/check_sandbox_installation.webp" srcset="/post/windows-sandbox/check_sandbox_installation_hu_2fba4587f5eb93d9.webp 800w, /post/windows-sandbox/check_sandbox_installation_hu_39a437fe795d8eab.webp 1600w, /post/windows-sandbox/check_sandbox_installation_hu_94c3e4fd395e0a6d.webp 2400w, /post/windows-sandbox/check_sandbox_installation.webp 2666w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2666"></p><p>直接啟動 Windows 沙箱後，會看到一個乾淨的虛擬環境：</p><p><img alt="直接執行 Windows 沙箱" class="gallery-image" data-flex-basis="467px" data-flex-grow="194" decoding="async" height="1026" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/direct_run_sandbox.webp" srcset="/post/windows-sandbox/direct_run_sandbox_hu_64ae29bceb91559e.webp 800w, /post/windows-sandbox/direct_run_sandbox_hu_c328c5669c426118.webp 1600w, /post/windows-sandbox/direct_run_sandbox.webp 2000w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2000"></p><h2 id="設定-windows-沙箱設定wsb">設定 Windows 沙箱設定（.wsb）</h2><h3 id="建立沙箱工作目錄">建立沙箱工作目錄</h3><p>為了保持使用環境的一致性，建議先建立沙箱的工作目錄。資料夾名稱與預設路徑可根據需求自行調整，但相關腳本裡的路徑要記得跟著改：</p><ol><li><strong><code>C:\Sandbox</code></strong>：映射到沙箱的主目錄，可讀可寫。</li><li><strong><code>C:\Sandbox\Apps</code></strong>：用於存放安裝或免安裝的應用程式，類似於 <code>C:\Program Files</code> 的用途。</li><li><strong><code>C:\Sandbox\Install</code></strong>：存放原始安裝檔案，需要時可以手動安裝。</li><li><strong><code>C:\Sandbox\boot.bat</code></strong>：每次啟動沙箱時自動執行的腳本，用於執行基礎設定。</li><li><strong><code>C:\Sandbox\create_paths.ps1</code></strong>：用於建立桌面捷徑的 PowerShell 腳本，會從 Apps 目錄中的程式建立對應捷徑。</li></ol><h3 id="建立-wsb">建立 WSB</h3><p>Windows 沙箱可以用一份 XML 設定檔做基本初始化。在桌面上用 VS Code 或其他編輯器建立一個名為 boot.wsb 的設定檔即可，以下是一個範例設定：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;Configuration&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;MappedFolders&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;HostFolder&gt;</span>C:\Sandbox<span class="nt">&lt;/HostFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;SandboxFolder&gt;</span>C:\Sandbox<span class="nt">&lt;/SandboxFolder&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;/MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;HostFolder&gt;</span>C:\Users\wells\Downloads<span class="nt">&lt;/HostFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;SandboxFolder&gt;</span>C:\Users\WDAGUtilityAccount\Downloads<span class="nt">&lt;/SandboxFolder&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&lt;ReadOnly&gt;</span>true<span class="nt">&lt;/ReadOnly&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;/MappedFolder&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/MappedFolders&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;LogonCommand&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&lt;Command&gt;</span>cmd /c &#34;C:\Sandbox\boot.bat&#34;<span class="nt">&lt;/Command&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;/LogonCommand&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/Configuration&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>上面的設定內容，主要是：</p><ol><li>主目錄映射：將主機端的 <code>C:\Sandbox</code> 映射到沙箱內的路徑 <code>C:\Sandbox</code>，並設為可讀可寫。</li><li>下載資料夾映射：將主機端的 <code>C:\Users\wells\Downloads</code> 映射到沙箱內的路徑 <code>C:\Users\WDAGUtilityAccount\Downloads</code>，設為唯讀。</li><li>自動執行腳本：沙箱登入後會自動執行 <code>C:\Sandbox\boot.bat</code>，以完成必要的初始化設定。</li></ol><h3 id="建立開機執行腳本">建立開機執行腳本</h3><p>在主機的 <strong><code>C:\Sandbox</code></strong> 目錄下建立 <code>boot.bat</code>，用於沙箱啟動時自動初始化。此腳本的主要功能包括：</p><ul><li>建立桌面捷徑（第 4 行）</li><li>安裝 7-zip （第 7 行）</li><li>設定 Windows 基礎選項（第 9 行 ~ 第 58 行）</li><li>設定檔案關聯（第 60 行 ~ 第 78 行）</li></ul><p>此腳本可以自行調整，例如，若需要安裝 <strong><code>Notepad++</code></strong>，可將安裝檔放置於 <strong><code>C:\Sandbox\Install</code></strong>，並在腳本中加入以下指令：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl"><span class="s2">&#34;C:\Sandbox\Install\npp.8.4.6.Installer.x64.exe&#34;</span> /S
+</span></span></code></pre></td></tr></table></div></div><p>若使用免安裝版本，可將其解壓縮至指定路徑（C:\Sandbox\Apps），並在後續自動建立捷徑到桌面。</p><p>C:\Sandbox\boot.bat:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl"><span class="p">@</span><span class="k">echo</span> off
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 執行 PowerShell 腳本以建立路徑</span>
+</span></span><span class="line"><span class="cl">powershell -NoProfile -ExecutionPolicy Bypass -Command <span class="s2">&#34;&amp; &#39;C:\Sandbox\create_paths.ps1&#39;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 安靜地安裝 7-zip</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;C:\Sandbox\Install\7z1900.exe&#34;</span> /S
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 啟用 Sudo 模擬功能</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKLM\Software\Microsoft\Windows\CurrentVersion\Sudo&#34;</span> /v <span class="s2">&#34;Enabled&#34;</span> /t REG_DWORD /d 3 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 在應用程式右鍵選單中顯示「以其他使用者執行」選項</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer&#34;</span> /v <span class="s2">&#34;ShowRunAsDifferentUserInStart&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定控制台預設委派為 Windows Console</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Console\</span><span class="se">%%</span><span class="s2">Startup&#34;</span> /v <span class="s2">&#34;DelegationConsole&#34;</span> /t REG_SZ /d <span class="s2">&#34;{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定終端機預設委派為 Windows Terminal</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Console\</span><span class="se">%%</span><span class="s2">Startup&#34;</span> /v <span class="s2">&#34;DelegationTerminal&#34;</span> /t REG_SZ /d <span class="s2">&#34;{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 在工作列選單中啟用「結束任務」功能</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings&#34;</span> /v <span class="s2">&#34;TaskbarEndTask&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定 Alt+Tab 多工切換顯示所有視窗</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MultiTaskingAltTabFilter&#34;</span> /t REG_DWORD /d 3 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 在系統時鐘中顯示秒數</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;ShowSecondsInSystemClock&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 將工作列圖示排列設定為靠左</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;TaskbarAl&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定工作列不合併相同應用程式視窗</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;TaskbarGlomLevel&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定多螢幕情境下不合併工作列項目</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MMTaskbarGlomLevel&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定多螢幕情境下將應用程式固定在目前螢幕工作列</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;MMTaskbarMode&#34;</span> /t REG_DWORD /d 2 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 啟用開始選單中的自訂版面配置</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Start_Layout&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 關閉開始選單中的建議項目顯示</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Start_IrisRecommendations&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 顯示檔案的副檔名</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;HideFileExt&#34;</span> /t REG_DWORD /d 0 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 顯示隱藏的檔案和資料夾</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;Hidden&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 還原舊版 Windows 傳統右鍵選單</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32&#34;</span> /f /ve
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 將檔案總管 Win+E 預設開啟路徑設為「本機」</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced&#34;</span> /v <span class="s2">&#34;LaunchTo&#34;</span> /t REG_DWORD /d 1 /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定 .txt 檔案的類型關聯為 txt_auto_file</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.txt&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.js&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\.inf&#34;</span> /ve /d <span class="s2">&#34;vscode_file&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 配置 txt_auto_file 類型的開啟命令，指定 VSCode 為預設編輯器</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\vscode_file\shell\open\command&#34;</span> /ve /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34; \&#34;</span><span class="nv">%1</span>\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 配置 VSCode (Code.exe) 的開啟命令</span>
+</span></span><span class="line"><span class="cl"><span class="c1">REM 建立 Code.exe 應用程式登錄項</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定 DefaultIcon 為 VSCode 的圖示</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\DefaultIcon&#34;</span> /ve /d <span class="s2">&#34;C:\\Sandbox\\Apps\\VSCode\\resources\\app\\resources\\win32\\default.ico&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM 建立 shell 登錄項</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定 open 的圖示</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell\open&#34;</span> /v <span class="s2">&#34;Icon&#34;</span> /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl"><span class="c1">REM 設定 open\command 為 VSCode 開啟命令</span>
+</span></span><span class="line"><span class="cl">reg add <span class="s2">&#34;HKEY_CURRENT_USER\Software\Classes\Applications\Code.exe\shell\open\command&#34;</span> /ve /d <span class="s2">&#34;\&#34;</span>C:\\Sandbox\\Apps\\VSCode\\Code.exe\<span class="s2">&#34; \&#34;</span><span class="nv">%1</span>\<span class="s2">&#34;&#34;</span> /f
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">REM 重新啟動檔案總管以應用更改</span>
+</span></span><span class="line"><span class="cl">taskkill /f /im explorer.exe
+</span></span><span class="line"><span class="cl"><span class="k">start</span> explorer.exe
+</span></span></code></pre></td></tr></table></div></div><h3 id="自動新增捷徑至桌面">自動新增捷徑至桌面</h3><p>在主機的 <strong><code>C:\Sandbox</code></strong> 目錄下建立 <code>create_paths.ps1</code>，用於沙箱啟動時建立桌面捷徑。</p><p>只需在 <code>$Apps</code> 陣列中新增欲建立捷徑的應用程式路徑與名稱。我目前在 <strong><code>C:\Sandbox\Apps</code></strong> 放置了 <strong>VS Code</strong>、<strong>WeChat</strong> 與 <strong>BaiduNetdisk</strong>。</p><p>以下是完整的 Powershell 腳本：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 將進度條設定為安靜模式</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$ProgressPreference</span><span class="p">=</span><span class="s1">&#39;Silent&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 設定桌面路徑</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$DesktopPath</span> <span class="p">=</span> <span class="p">[</span><span class="no">Environment</span><span class="p">]::</span><span class="n">GetFolderPath</span><span class="p">(</span><span class="s2">&#34;Desktop&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 定義函式：建立捷徑</span>
+</span></span><span class="line"><span class="cl"><span class="kd">function</span><span class="w"> </span><span class="nb">Create-Shortcut</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">param</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$ShortcutPath</span><span class="p">,</span>     <span class="c"># 捷徑存放位置</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$TargetPath</span><span class="p">,</span>       <span class="c"># 捷徑指向的目標路徑</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$Description</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span><span class="p">,</span> <span class="c"># 捷徑描述 (選填)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="no">string</span><span class="p">]</span><span class="nv">$IconLocation</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span> <span class="c"># 捷徑圖示路徑 (選填)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$WScriptShell</span> <span class="p">=</span> <span class="nb">New-Object</span> <span class="n">-ComObject</span> <span class="n">WScript</span><span class="p">.</span><span class="py">Shell</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span> <span class="p">=</span> <span class="nv">$WScriptShell</span><span class="p">.</span><span class="py">CreateShortcut</span><span class="p">(</span><span class="nv">$ShortcutPath</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">TargetPath</span> <span class="p">=</span> <span class="nv">$TargetPath</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">Description</span> <span class="p">=</span> <span class="nv">$Description</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nv">$IconLocation</span> <span class="o">-ne</span> <span class="s2">&#34;&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">IconLocation</span> <span class="p">=</span> <span class="nv">$IconLocation</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$Shortcut</span><span class="p">.</span><span class="py">Save</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 定義應用程式的路徑與捷徑名稱</span>
+</span></span><span class="line"><span class="cl"><span class="nv">$Apps</span> <span class="p">=</span> <span class="vm">@</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\BaiduNetdisk\BaiduNetdisk.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;BaiduNetdisk&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\WeChat\WeChat.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;WeChat&#34;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="vm">@</span><span class="p">{</span> <span class="n">Path</span> <span class="p">=</span> <span class="s2">&#34;C:\Sandbox\Apps\VSCode\Code.exe&#34;</span><span class="p">;</span> <span class="n">Name</span> <span class="p">=</span> <span class="s2">&#34;VSCode&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 為每個應用程式建立桌面捷徑</span>
+</span></span><span class="line"><span class="cl"><span class="k">foreach</span> <span class="p">(</span><span class="nv">$App</span> <span class="k">in</span> <span class="nv">$Apps</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$ShortcutPath</span> <span class="p">=</span> <span class="nb">Join-Path</span> <span class="n">-Path</span> <span class="nv">$DesktopPath</span> <span class="n">-ChildPath</span> <span class="p">(</span><span class="s2">&#34;</span><span class="p">$(</span><span class="nv">$App</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span><span class="s2">.lnk&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">Create-Shortcut</span> <span class="n">-ShortcutPath</span> <span class="nv">$ShortcutPath</span> <span class="n">-TargetPath</span> <span class="nv">$App</span><span class="p">.</span><span class="py">Path</span> <span class="n">-Description</span> <span class="s2">&#34;Launch </span><span class="p">$(</span><span class="nv">$App</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="使用-wsb-啟動沙箱">使用 WSB 啟動沙箱</h2><p>點選桌面上的 <code>boot.wsb</code> 檔案，即可快速啟動沙箱環境。有了預先寫好的設定檔，每次啟動沙箱都會自動載入這些設定（如下圖），不必再重複下載或安裝那些軟體。</p><p><img alt="撰寫好 WSB 後，直接執行" class="gallery-image" data-flex-basis="207px" data-flex-grow="86" decoding="async" height="112" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/wsb_icon.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="97">
+<img alt="以 WSB 執行沙箱" class="gallery-image" data-flex-basis="467px" data-flex-grow="194" decoding="async" height="1026" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/windows-sandbox/init_sandbox_preconfig.webp" srcset="/post/windows-sandbox/init_sandbox_preconfig_hu_f09b6f6e88053c8e.webp 800w, /post/windows-sandbox/init_sandbox_preconfig_hu_892300db2f3831b7.webp 1600w, /post/windows-sandbox/init_sandbox_preconfig.webp 2000w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2000"></p><h2 id="結論">結論</h2><p>把沙箱環境跟預設軟體都準備好之後，測試應用程式會快很多，而且跟本機系統完全隔離。沙箱不只適合測試不明來源的程式，拿來做開發也很合適，是一個安全又獨立的操作空間。</p><p>以我個人的使用情境為例，沙箱主要用來跑微信、百度雲這類中國軟體。這些應用可能對系統做一些不透明的修改，沙箱可以很快還原到初始狀態，不用擔心它們在系統裡留下什麼。</p><p>沙箱也很適合測試編譯後的軟體，特別是要模擬一台全新的 Windows 時，可以檢查程式需要的執行環境是不是齊全，避免把檔案交給別人之後，因為對方環境缺東西而出錯。</p><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-overview" target="_blank" rel="noopener">Windows Sandbox</a></li><li><a class="link" href="https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file" target="_blank" rel="noopener">Windows Sandbox configuration</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/%E7%B3%BB%E7%B5%B1/">系統</a>
+<a href="/tags/%E5%AE%89%E5%85%A8/">安全</a>
+<a href="/tags/%E8%99%9B%E6%93%AC%E5%8C%96/">虛擬化</a>
+<a href="/tags/%E9%96%8B%E7%99%BC%E5%B7%A5%E5%85%B7/">開發工具</a>
+<a href="/tags/windows/">Windows</a>
+<a href="/tags/%E8%87%AA%E5%8B%95%E5%8C%96/">自動化</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/using-google-antigravity/"><div class="article-image"><img alt="Featured image of post Antigravity vs. GitHub Copilot：功能比較、效能與成本分析" height="150" loading="lazy" src="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp" srcset="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp 1x, /post/using-google-antigravity/anti_meow_hu_7230a257bcb439c2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebac080 0%,#162232C0 100%)"><h2 class="article-title">Antigravity vs. GitHub Copilot：功能比較、效能與成本分析</h2></div></a></article><article class="has-image"><a href="/post/using-github-copilot-vscode/"><div class="article-image"><img alt="Featured image of post 使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗" height="150" loading="lazy" src="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp" srcset="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp 1x, /post/using-github-copilot-vscode/cover_hu_b27652e6f2f39b8c.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a0561980 0%,#34341dC0 100%)"><h2 class="article-title">使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗</h2></div></a></article><article class="has-image"><a href="/post/awesome-windows/"><div class="article-image"><img alt="Featured image of post 2026 Windows 必備軟體推薦：打造極致效率的 Awesome Windows 生產力與開發工具總覽" height="150" loading="lazy" src="/post/awesome-windows/cover_hu_b9bd220d37bdb26a.webp" srcset="/post/awesome-windows/cover_hu_b9bd220d37bdb26a.webp 1x, /post/awesome-windows/cover_hu_1ca23e927bb9c5ba.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c2bd80 0%,#433737C0 100%)"><h2 class="article-title">2026 Windows 必備軟體推薦：打造極致效率的 Awesome Windows 生產力與開發工具總覽</h2></div></a></article><article class="has-image"><a href="/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V 安裝 Home Assistant 步驟詳解：完美橋接 HomeKit 非認證裝置</h2></div></a></article><article class="has-image"><a href="/post/remap-copilot-key-to-ctrl/"><div class="article-image"><img alt="Featured image of post 用 PowerToys 將 Copilot 鍵改回 Ctrl 的完整教學" height="150" loading="lazy" src="/post/remap-copilot-key-to-ctrl/images/cover_hu_f40e681f3c1dc996.webp" srcset="/post/remap-copilot-key-to-ctrl/images/cover_hu_f40e681f3c1dc996.webp 1x, /post/remap-copilot-key-to-ctrl/images/cover_hu_d22452a60a1c1454.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#cec7b780 0%,#342a21C0 100%)"><h2 class="article-title">用 PowerToys 將 Copilot 鍵改回 Ctrl 的完整教學</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

@@ -1,0 +1,386 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="SSH 金鑰讓遠端登入不用打密碼。從產生公私鑰、把公鑰填進 authorized_keys、寫 config，一路到關閉密碼認證、用 ssh-agent 快取 passphrase 與 agent 轉發。"><title>使用 SSH 金鑰進行無密碼遠端連線 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/ssh-connection/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="使用 SSH 金鑰進行無密碼遠端連線"><meta property='og:description' content="SSH 金鑰讓遠端登入不用打密碼。從產生公私鑰、把公鑰填進 authorized_keys、寫 config，一路到關閉密碼認證、用 ssh-agent 快取 passphrase 與 agent 轉發。"><meta property='og:url' content='https://wellstsai.com/post/ssh-connection/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='教學'><meta property='article:tag' content='遠端'><meta property='article:tag' content='Linux'><meta property='article:tag' content='Ubuntu'><meta property='article:tag' content='Synology'><meta property='article:tag' content='Git'><meta property='article:tag' content='SSH'><meta property='article:published_time' content='2023-12-15T18:50:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/ssh-connection/cover.webp'><meta name="twitter:title" content="使用 SSH 金鑰進行無密碼遠端連線"><meta name="twitter:description" content="SSH 金鑰讓遠端登入不用打密碼。從產生公私鑰、把公鑰填進 authorized_keys、寫 config，一路到關閉密碼認證、用 ssh-agent 快取 passphrase 與 agent 轉發。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/ssh-connection/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/ssh-connection/cover_hu_e67dacd6cfa9922f.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/ssh-connection/cover_hu_d99aba63d8821370.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/ssh-connection/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/ssh-connection/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/ssh-connection/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/ssh-connection/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"引言 Secure Shell（SSH）是一個安全協定，允許兩台電腦在加密的連線上交換資料（執行命令、傳檔案），保證資料的安全與完整性。\nSSH 通常用於兩台電腦的遠端登入。它取代了舊的遠端存取協定，像是 Telnet 是以明文沒有加密的方式傳輸密碼和內容。而 PTT 也在 2020 年關閉不安全的 Telnet 協定，改用 SSH 或是 WebSocket 協定，讓通訊過程都有加密，防止竊聽與竄改。\nSSH 除了裝置遠端連線，還可以：\n建立 SSH 隧道（Tunneling）做連接埠轉發，安全地存取網路資源。 SFTP、SCP 可以安全地上傳或下載檔案。 rsync 用於檔案同步，減少傳輸用量。 其他應用... Linux、macOS 或是 Windows 預設都整合了 OpenSSH 套件。OpenSSH 是一套開源的 SSH 實作，裡面包含了：\n遠端操作工具\nssh，用於遠端登入到其他主機並執行命令。 scp，本地與遠端的檔案傳輸。 sftp，類似 FTP 的使用方式，但傳輸都有加密。 金鑰管理工具\nssh-add，將私鑰加入 SSH 代理程式，之後不必再輸入密碼就能用私鑰驗證身 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2023-12-15T18:50:00+08:00","description":"SSH 金鑰讓遠端登入不用打密碼。從產生公私鑰、把公鑰填進 authorized_keys、寫 config，一路到關閉密碼認證、用 ssh-agent 快取 passphrase 與 agent 轉發。","headline":"使用 SSH 金鑰進行無密碼遠端連線","image":"https://wellstsai.com/post/ssh-connection/cover.webp","keywords":["教學","遠端","Linux","Ubuntu","Synology","Git","SSH"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/ssh-connection/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/ssh-connection/" selected>繁體中文</option><option value="/en/post/ssh-connection/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#引言">引言</a></li><li><a href="#ssh-重點摘要">SSH 重點摘要</a></li><li><a href="#ssh-金鑰建立與連線流程">SSH 金鑰建立與連線流程</a></li><li><a href="#確認-ssh-環境">確認 SSH 環境</a><ol><li><a href="#linux">Linux</a></li><li><a href="#windows">Windows</a></li><li><a href="#連線除錯方式">連線除錯方式</a></li></ol></li><li><a href="#建立金鑰">建立金鑰</a></li><li><a href="#使用-ssh-金鑰建立兩台電腦連線">使用 SSH 金鑰建立兩台電腦連線</a></li><li><a href="#使用-ssh-金鑰存取位於-synology-上的-git-伺服器">使用 SSH 金鑰存取位於 Synology 上的 Git 伺服器</a></li><li><a href="#使用-ssh-金鑰存取-github">使用 SSH 金鑰存取 GitHub</a></li><li><a href="#進階安全設定">進階安全設定</a><ol><li><a href="#關閉密碼認證">關閉密碼認證</a></li><li><a href="#金鑰密碼搭配-ssh-agent">金鑰密碼搭配 ssh-agent</a></li><li><a href="#使用-ssh-agent-轉發">使用 SSH agent 轉發</a></li></ol></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/ssh-connection/" style="position:relative;display:block"><img src="/post/ssh-connection/cover_hu_f8209402b48d7331.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/ssh-connection/cover_hu_e67dacd6cfa9922f.webp"><source media="(min-width: 769px)" srcset="/post/ssh-connection/cover_hu_d99aba63d8821370.webp">
+<img src="/post/ssh-connection/cover_hu_d99aba63d8821370.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="使用 SSH 金鑰進行無密碼遠端連線" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/ssh-connection/">使用 SSH 金鑰進行無密碼遠端連線</a></h2><h3 class="article-subtitle">SSH 金鑰讓遠端登入不用打密碼。從產生公私鑰、把公鑰填進 authorized_keys、寫 config，一路到關閉密碼認證、用 ssh-agent 快取 passphrase 與 agent 轉發。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2023-12-15T18:50:00+08:00'>2023/12/15</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：12 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/ssh-connection/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#引言">引言</a></li><li><a href="#ssh-重點摘要">SSH 重點摘要</a></li><li><a href="#ssh-金鑰建立與連線流程">SSH 金鑰建立與連線流程</a></li><li><a href="#確認-ssh-環境">確認 SSH 環境</a><ol><li><a href="#linux">Linux</a></li><li><a href="#windows">Windows</a></li><li><a href="#連線除錯方式">連線除錯方式</a></li></ol></li><li><a href="#建立金鑰">建立金鑰</a></li><li><a href="#使用-ssh-金鑰建立兩台電腦連線">使用 SSH 金鑰建立兩台電腦連線</a></li><li><a href="#使用-ssh-金鑰存取位於-synology-上的-git-伺服器">使用 SSH 金鑰存取位於 Synology 上的 Git 伺服器</a></li><li><a href="#使用-ssh-金鑰存取-github">使用 SSH 金鑰存取 GitHub</a></li><li><a href="#進階安全設定">進階安全設定</a><ol><li><a href="#關閉密碼認證">關閉密碼認證</a></li><li><a href="#金鑰密碼搭配-ssh-agent">金鑰密碼搭配 ssh-agent</a></li><li><a href="#使用-ssh-agent-轉發">使用 SSH agent 轉發</a></li></ol></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="引言">引言</h2><p>Secure Shell（SSH）是一個安全協定，允許兩台電腦在加密的連線上交換資料（執行命令、傳檔案），保證資料的安全與完整性。</p><p>SSH 通常用於兩台電腦的遠端登入。它取代了舊的遠端存取協定，像是 Telnet 是以明文沒有加密的方式傳輸密碼和內容。而 PTT 也在 2020 年關閉不安全的 Telnet 協定，改用 SSH 或是 WebSocket 協定，讓通訊過程都有加密，防止竊聽與竄改。</p><p>SSH 除了裝置遠端連線，還可以：</p><ul><li>建立 SSH 隧道（Tunneling）做連接埠轉發，安全地存取網路資源。</li><li>SFTP、SCP 可以安全地上傳或下載檔案。</li><li>rsync 用於檔案同步，減少傳輸用量。</li><li>其他應用...</li></ul><p>Linux、macOS 或是 Windows 預設都整合了 OpenSSH 套件。OpenSSH 是一套開源的 SSH 實作，裡面包含了：</p><ul><li><p>遠端操作工具</p><ul><li><strong>ssh</strong>，用於遠端登入到其他主機並執行命令。</li><li>scp，本地與遠端的檔案傳輸。</li><li>sftp，類似 FTP 的使用方式，但傳輸都有加密。</li></ul></li><li><p>金鑰管理工具</p><ul><li><strong>ssh-add</strong>，將私鑰加入 SSH 代理程式，之後不必再輸入密碼就能用私鑰驗證身分。</li><li>ssh-keysign，用於簽署 SSH 憑證，供身分驗證使用。</li><li>ssh-keyscan，用於掃描遠端主機以搜尋其 SSH 公鑰。</li><li><strong>ssh-keygen</strong>，用於產生 SSH 金鑰對（公鑰和私鑰）。</li></ul></li><li><p>伺服器端</p><ul><li><strong>sshd</strong> (SSH Daemon)，在伺服器上執行的常駐程式，負責接受來自用戶端的 SSH 連線請求。</li><li>sftp-server，處理 sftp 用戶端的請求與檔案傳輸。</li><li><strong>ssh-agent</strong>，管理使用者的 SSH 金鑰，並在需要時拿這些金鑰驗證身分。</li></ul></li></ul><p>本文章重點會著重在如何建立公鑰與私鑰，並用這兩把鑰匙做到免密碼認證。另外也會提及伺服器端如何執行 SSH 服務，並讓使用者端用 SSH 連上來。</p><p>傳統的密碼登入方式，是輸入正確的使用者密碼來驗證身分。若伺服器暴露在公共網路上，可能會面臨暴力攻擊的風險，導致伺服器資料外洩。</p><p>為了提升安全性(與懶得輸入密碼?)，可以改用公私鑰驗證。如此一來不需要輸入密碼就可以連線，且駭客在沒有私鑰的情況下也無法登入。</p><blockquote><p>💡 本文章有使用 Tailscale 建立內網，讓本地端與伺服器端的電腦可以用 hostname 或是 IP 位址連線。</p><p>兩台電腦要連線需要有 IP 位址，如果是公網 IP 位址則需要在路由器設定連接埠轉發到內網，但相對暴露 SSH 連接埠危險的。
+不想暴露連接埠、沒有公網 IP 位址或是無法修改路由器設定等，可閱讀《<a class="link" href="/post/tailscale/">使用 Tailscale 輕鬆建立安全且私密的隧道</a>》，讓兩台電腦連上線。</p></blockquote><h2 id="ssh-重點摘要">SSH 重點摘要</h2><ol><li><p>SSH 主要兩種驗證方式為：</p><ul><li>密碼身分認證（Password-based authentication）</li><li>公鑰認證（Public-key authentication）</li></ul></li><li><p>設定好 SSH 金鑰後，登入方式可使用金鑰登入，不需要輸入密碼。</p></li><li><p><strong>公開金鑰</strong> 內容會填寫在 <strong>遠端伺服器</strong> 上的 authorized_keys。</p></li><li><p><strong>私密金鑰</strong> 會保留在你的<strong>本機系統</strong>上，保護此私密金鑰，不要共用它。</p></li><li><p>公開金鑰可以與任何人共用，<strong>私密金鑰只有自己有存取權限</strong>。</p></li><li><p>SSH 可以選擇不同加密演算法。RSA 為預設，也是目前廣泛且相容性最好的加密方法；Ed25519 效能比 RSA 好但相容性較差，目前絕大多數伺服器都逐漸支援，是我個人產金鑰的首選。挑哪一種，只要本地端與伺服器可以正常通訊即可。</p></li><li><p>絕大多數存取 GIT 的傳輸協定是 SSH。意味著在遠端操作像是 clone, push, pull 都會要求認證。</p></li></ol><blockquote><p>SSH 加密方式，雖然 RSA 比 Ed25519 相容性好，但實際在使用上建議以產生 Ed25519 為優先以確保安全性與速度。</p></blockquote><h2 id="ssh-金鑰建立與連線流程">SSH 金鑰建立與連線流程</h2><p>假設 nodeA 為本地端（使用者），nodeB 為伺服器端。</p><p>nodeA 為工作的電腦，像是要 git clone，或是 SSH 連線到別的電腦上。</p><p>nodeB 為被連線的電腦，像是 git 伺服器，網頁伺服器、代理伺服器、虛擬專用伺服器等...</p><ol><li>在 nodeA 或 nodeB 產生金鑰（公鑰與私鑰）。</li><li>把私鑰放在 nodeA，公鑰放在 nodeB。</li><li>nodeB 建立 ~/.ssh/authorized_keys，並填入公鑰。</li><li>nodeA 建立 ~/.ssh/config，填入連線資訊，連線資訊包含伺服器 IP 位址與私鑰路徑。</li><li>nodeA 之後 SSH 連線時，預設就會使用金鑰。</li></ol><blockquote><p>💡要特別注意的是：</p><ol><li>確定私鑰只有自己有存取權限，且 nodeB 沒有私鑰。</li><li>nodeB 如果是 Windows 且為系統管理員。路徑需改為：
+<code>C:\ProgramData\ssh\administrators_authorized_keys</code></li><li>如果連線失敗或設定金鑰後卻仍要求輸入密碼，可以在 SSH 連線時加上 <code>-vvvv</code> 除錯。</li></ol></blockquote><h2 id="確認-ssh-環境">確認 SSH 環境</h2><p>Linux 與 Windows 預設已經安裝好用戶端，輸入 <code>ssh USER@IP_ADDRESS</code> 便可以連線到其他伺服器。</p><p>若想要建立 SSH 伺服器，則需要另外安裝，並執行 SSH 服務。</p><h3 id="linux">Linux</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 預設已安裝好 openssh-client，可以直接先檢查版本</span>
+</span></span><span class="line"><span class="cl">ssh -V
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果找不到指令表示尚未安裝，可透過以下指令安裝 openssh-client</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># sudo apt install openssh-client</span>
+</span></span></code></pre></td></tr></table></div></div><p>可以看到 Linux 目前裝的版本為 OpenSSL 3.0.2。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wells@server:~$ ssh -V
+</span></span><span class="line"><span class="cl">OpenSSH_8.9p1 Ubuntu-3ubuntu0.4, OpenSSL 3.0.2 15 Mar 2022
+</span></span></code></pre></td></tr></table></div></div><p>若要讓其他電腦能透過 SSH 連到這台 Linux，則需要安裝 openssh-server</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install openssh-server
+</span></span></code></pre></td></tr></table></div></div><p>安裝後，用 systemctl 指令啟動、檢查服務。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo systemctl <span class="nb">enable</span> ssh <span class="c1"># 開機自動執行 sshd</span>
+</span></span><span class="line"><span class="cl">sudo service ssh start    <span class="c1"># 執行 sshd 服務</span>
+</span></span><span class="line"><span class="cl">sudo systemctl status ssh <span class="c1"># 檢查 sshd 服務狀態</span>
+</span></span></code></pre></td></tr></table></div></div><p>若成功執行，會看到綠色 active</p><p><img alt="檢查 sshd 服務" class="gallery-image" data-flex-basis="575px" data-flex-grow="239" decoding="async" fetchpriority="high" height="465" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/ssh_status.webp" srcset="/post/ssh-connection/ssh_status_hu_d1044f30db310159.webp 800w, /post/ssh-connection/ssh_status.webp 1115w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1115"></p><h3 id="windows">Windows</h3><p>Windows 底下除了用 <code>ssh -V</code> 檢查用戶端是否安裝。</p><p>也可以用 PowerShell 檢查並安裝：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 檢查 OpenSSH 安裝狀態</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Get-WindowsCapability</span> <span class="n">-Online</span> <span class="p">|</span> <span class="nb">Where-Object</span> <span class="n">Name</span> <span class="o">-like</span> <span class="s1">&#39;OpenSSH*&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Installed 表示已安裝，NotPresent 表示尚未安裝</p><p>目前此 Windows 可以看到 Client 已安裝，表示可以透過 SSH 連線到其他伺服器。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PS C:\Users\wells&gt; Get-WindowsCapability -Online | Where-Object Name -like &#39;OpenSSH*&#39;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Name  : OpenSSH.Client~~~~0.0.1.0
+</span></span><span class="line"><span class="cl">State : Installed
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Name  : OpenSSH.Server~~~~0.0.1.0
+</span></span><span class="line"><span class="cl">State : NotPresent
+</span></span></code></pre></td></tr></table></div></div><p>sshd 目前沒有安裝。若要讓其他電腦可以透過 SSH 連線到此電腦，則用 PowerShell 安裝。</p><p>以下為 OpenSSH.Client 與 OpenSSH.Server 的安裝指令：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 安裝 OpenSSH.Client</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Add-WindowsCapability</span> <span class="n">-Online</span> <span class="n">-Name</span> <span class="n">OpenSSH</span><span class="p">.</span><span class="n">Client</span><span class="p">~~~~</span><span class="mf">0.0</span><span class="p">.</span><span class="py">1</span><span class="p">.</span><span class="py">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 安裝 OpenSSH.Server</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Add-WindowsCapability</span> <span class="n">-Online</span> <span class="n">-Name</span> <span class="n">OpenSSH</span><span class="p">.</span><span class="n">Server</span><span class="p">~~~~</span><span class="mf">0.0</span><span class="p">.</span><span class="py">1</span><span class="p">.</span><span class="py">0</span>
+</span></span></code></pre></td></tr></table></div></div><p>安裝 OpenSSH.Server 需要一段時間，安裝好後會出現 <code>RestartNeeded: True</code>，請先重開機。</p><p><img alt="Windows 安裝 SSH server" class="gallery-image" data-flex-basis="1595px" data-flex-grow="664" decoding="async" height="111" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/install_ssh_server.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="738"></p><p>使用 Microsoft Defender 防火牆，對私人網路打開 <code>22 連接埠號</code>。</p><p>如果防火牆是由防毒軟體管理，此行不需要。但需要檢查防毒軟體的防火牆是否開啟 22 連接埠號。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">netsh</span> <span class="n">advfirewall</span> <span class="n">firewall</span> <span class="n">add</span> <span class="n">rule</span> <span class="n">name</span><span class="p">=</span><span class="s2">&#34;Allow SSH from private network&#34;</span> <span class="n">dir</span><span class="p">=</span><span class="k">in</span> <span class="n">action</span><span class="p">=</span><span class="n">allow</span> <span class="n">protocol</span><span class="p">=</span><span class="n">TCP</span> <span class="n">localport</span><span class="p">=</span><span class="mf">22</span> <span class="n">profile</span><span class="p">=</span><span class="n">private</span>
+</span></span></code></pre></td></tr></table></div></div><p>接著，啟用 SSH 服務與開機自動啟用：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 設定每次電腦開機，自動啟動 sshd 服務</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Set-Service</span> <span class="n">-Name</span> <span class="n">sshd</span> <span class="n">-StartupType</span> <span class="s1">&#39;Automatic&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 檢查 SSH 服務</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Start-Service</span> <span class="n">sshd</span>
+</span></span></code></pre></td></tr></table></div></div><p>可以看到 sshd 的狀態，應該為 Running 狀態</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PS C:\Users\wells&gt; Get-Service sshd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Status   Name               DisplayName
+</span></span><span class="line"><span class="cl">------   ----               -----------
+</span></span><span class="line"><span class="cl">Running  sshd               OpenSSH SSH Server
+</span></span></code></pre></td></tr></table></div></div><p>至此，從另一台電腦嘗試連線，便可以成功連線上伺服器終端</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Users\wells_nodeA&gt;ssh wells@nodeB
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ECDSA key fingerprint is SHA256:eaAI46GIucGkcFEeSAwO2GWsTOgr1919FyDoXsJKYG1.
+</span></span><span class="line"><span class="cl">Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+</span></span><span class="line"><span class="cl">wells@nodeB&#39;s password: xxxxxx
+</span></span><span class="line"><span class="cl">Warning: Permanently added &#39;nodeB,100.100.120.16&#39; (ECDSA) to the list of known hosts.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@nodeB C:\Users\wells_nodeB&gt;
+</span></span></code></pre></td></tr></table></div></div><h3 id="連線除錯方式">連線除錯方式</h3><p>如果遠端連線失敗，可在連線時加入 <code>-vvvv</code> 排錯，例如：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Users\wells_nodeA&gt;ssh -vvvv wells@nodeB
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">OpenSSH_for_Windows_8.6p1, LibreSSL 3.4.3
+</span></span><span class="line"><span class="cl">debug1: Reading configuration data C:\\Users\\wells_nodeA/.ssh/config
+</span></span><span class="line"><span class="cl">debug3: Failed to open file:C:/ProgramData/ssh/ssh_config error:2
+</span></span><span class="line"><span class="cl">debug3: expanded UserKnownHostsFile &#39;~/.ssh/known_hosts&#39; -&gt; &#39;C:\\Users\\wells_nodeA/.ssh/known_hosts&#39;
+</span></span><span class="line"><span class="cl">debug1: Authenticator provider $SSH_SK_PROVIDER did not resolve; disabling
+</span></span><span class="line"><span class="cl">debug2: resolving &#34;server&#34; port 22
+</span></span><span class="line"><span class="cl">debug3: ssh_connect_direct: entering
+</span></span><span class="line"><span class="cl">debug1: Connecting to server [100.100.120.16] port 22.
+</span></span><span class="line"><span class="cl">debug3: finish_connect - ERROR: async io completed with error: 10060, io:00000299F796C380
+</span></span><span class="line"><span class="cl">debug1: connect to address 100.100.120.16 port 22: Connection timed out
+</span></span><span class="line"><span class="cl">ssh: connect to host server port 22: Connection timed out
+</span></span></code></pre></td></tr></table></div></div><p>可以看到 <code>Connection timed out</code>，表示可能的原因有：</p><ul><li>伺服器端的防火牆阻擋連線（電腦、防毒軟體、路由器）。</li><li>sshd 沒打開。</li><li>用戶端的 port 22 被阻擋。</li><li>DNS 解析錯誤。</li></ul><p>這些問題需要一步一步 debug，更進一步的操作可以參照 Google 大神尋求協助。</p><h2 id="建立金鑰">建立金鑰</h2><p>由上述的 SSH 連線行為，可以發現目前尚未設定金鑰，所以預設還是用密碼登入。</p><p>建立金鑰很簡單，在用戶端或伺服器端執行都可以。</p><p>Windows 與 Linux 產生金鑰的指令都是 ssh-keygen。</p><p>其中參數的部分：</p><ul><li><code>-t ed25519</code> 為產生一對 ed25519 金鑰。或將其改為<code>-t rsa -b 4096</code>，表示使用 RSA，長度為 4096 位元。</li><li><code>-C "xxx"</code> 裡面的參數為任意值，主要是加入備註，幫助辨識金鑰是由誰建立的。</li></ul><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ssh-keygen -t ed25519 -C <span class="s2">&#34;your_email@example.com&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>產金鑰的過程，會看到 <code>Enter file in which to save the key</code> 的路徑，預設是在個人目錄底下的 .ssh 資料夾底下。</p><p>決定好路徑後，會再詢問 passphrase（金鑰密碼）。若為空值，未來使用金鑰驗證時不需要密碼；若設了 passphrase，駭客就算取得私鑰，還有第二道牆需要突破。</p><p>金鑰是儲存在個人電腦、個人帳戶，一般來說外洩的機會有難度。若害怕金鑰外洩的，可以輸入非空的數值。如此未來使用金鑰驗證時，還會額外要求輸入密碼。但相對又麻煩了...</p><blockquote><p>passphrase 可以用 ssh-agent 快取，在快取時間內不用重打 passphrase。</p><p>此部分建議設定金鑰密碼以提高安全性，並搭配 <a class="link" href="#%e9%87%91%e9%91%b0%e5%af%86%e7%a2%bc%e6%90%ad%e9%85%8d-ssh-agent">金鑰密碼搭配 ssh-agent</a> 做快取。</p></blockquote><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Users\wells_nodeA&gt;ssh-keygen -t ed25519 -C &#34;admin@wellstsai.com&#34;
+</span></span><span class="line"><span class="cl">Generating public/private ed25519 key pair.
+</span></span><span class="line"><span class="cl">Enter file in which to save the key (C:\Users\wells_nodeA/.ssh/id_ed25519): C:\Users\wells_nodeA/.ssh/nodeA_ed25519
+</span></span><span class="line"><span class="cl">Enter passphrase (empty for no passphrase):
+</span></span><span class="line"><span class="cl">Enter same passphrase again:
+</span></span><span class="line"><span class="cl">Your identification has been saved in nodeA_ed25519
+</span></span><span class="line"><span class="cl">Your public key has been saved in nodeA_ed25519.pub
+</span></span><span class="line"><span class="cl">The key fingerprint is:
+</span></span><span class="line"><span class="cl">SHA256:hCRwfElJDbYaaG1JgyDTs4Mqn4tQpIiPhmTwMWIMRO0 admin@wellstsai.com
+</span></span><span class="line"><span class="cl">The key&#39;s randomart image is:
+</span></span><span class="line"><span class="cl">+--[ED25519 256]--+
+</span></span><span class="line"><span class="cl">|E=oo.o.+B=.      |
+</span></span><span class="line"><span class="cl">|o=+.+ +o*o+.     |
+</span></span><span class="line"><span class="cl">|=o+.  o ooo      |
+</span></span><span class="line"><span class="cl">|.+..     .       |
+</span></span><span class="line"><span class="cl">|*    S           |
+</span></span><span class="line"><span class="cl">|*oo..            |
+</span></span><span class="line"><span class="cl">|=Xo+             |
+</span></span><span class="line"><span class="cl">|*oo              |
+</span></span><span class="line"><span class="cl">|o.               |
+</span></span><span class="line"><span class="cl">+----[SHA256]-----+
+</span></span></code></pre></td></tr></table></div></div><p>於 nodeA 產出公私鑰後，可以到個人 .ssh 目錄下檢查：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">##### Windows #####
+</span></span><span class="line"><span class="cl">C:\Users&gt;ls C:\Users\wells_nodeA\.ssh\
+</span></span><span class="line"><span class="cl">authorized_keys    config    nodeA_ed25519    nodeA_ed25519.pub
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">##### Linux #####
+</span></span><span class="line"><span class="cl">wells@nodeA:~$ ls ~/.ssh/
+</span></span><span class="line"><span class="cl">authorized_keys  config  nodeA_ed25519  nodeA_ed25519.pub
+</span></span></code></pre></td></tr></table></div></div><p>其中，私鑰沒有副檔名（nodeA_ed25519），公鑰（nodeA_ed25519.pub）附檔名為 <code>.pub</code>。</p><p>產完金鑰對後，便可以開始部署金鑰。</p><blockquote><p>⚠️ 注意：</p><ol><li><p>私鑰在本機（Local），公鑰在伺服器（Server）上。若在 node B 產出公私鑰，私鑰複製到 nodeA 後記得在 nodeB 上刪除私鑰。</p></li><li><p>私鑰確定只有自己能夠存取，在 Linux 上，若權限為 777，請用 chmod 改為 400。</p></li></ol><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod <span class="m">400</span> ~/.ssh/nodeA_ed25519
+</span></span></code></pre></td></tr></table></div></div></blockquote><h2 id="使用-ssh-金鑰建立兩台電腦連線">使用 SSH 金鑰建立兩台電腦連線</h2><p>接著把公鑰（nodeA_ed25519.pub）複製到伺服器上，可以用 scp 這個程式。</p><p>用法為：<code>scp 本地檔案路徑 使用者名稱@伺服器:伺服器路徑</code></p><p>Windows 複製公鑰到 Windows</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:C:\Users\wells_nodeB\.ssh\nodeA_ed25519.pub
+</span></span></code></pre></td></tr></table></div></div><p>Windows 複製到 Linux</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:~/.ssh/nodeA_ed25519.pub
+</span></span></code></pre></td></tr></table></div></div><p>輸入完密碼後，scp 就會把公鑰複製到伺服器上。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Users&gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:C:\Users\wells_nodeB\.ssh\nodeA_ed25519.pub
+</span></span><span class="line"><span class="cl">wells@nodeB&#39;s password:
+</span></span><span class="line"><span class="cl">nodeA_ed25519.pub                                                                                  100%  102     1.1KB/s   00:00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:\Users&gt;scp C:\Users\wells_nodeA\.ssh\nodeA_ed25519.pub wells@nodeB:~/.ssh/nodeA_ed25519.pub
+</span></span><span class="line"><span class="cl">wells@nodeB&#39;s password:
+</span></span><span class="line"><span class="cl">nodeA_ed25519.pub                                                                                  100%  102     1.2KB/s   00:00
+</span></span></code></pre></td></tr></table></div></div><p>複製後，在 nodeB 上（伺服器端），新增檔案並填入公鑰內容。</p><blockquote><p>使用者為根據 nodeB 的使用者</p><ul><li>Windows 一般使用者：<code>C:\Users\wells_nodeA\.ssh\authorized_keys</code></li><li>⚠️ Windows 系統使用者：<code>C:\ProgramData\ssh\administrators_authorized_keys</code></li><li>Linux 一般使用者/root：<code>~/.ssh/authorized_keys</code></li></ul></blockquote><ol><li>記事本開啟公鑰 (nodeA_ed25519.pub)</li><li>全選複製內容</li><li>新增上述檔案</li><li>在上述檔案內，貼上公鑰內容後存檔</li></ol><p><img alt="在 authorized_keys 填入公鑰" class="gallery-image" data-flex-basis="328px" data-flex-grow="136" decoding="async" height="475" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/add_authorized_keys.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="650"></p><p>最後，本地端 nodeA 新增 config 設定檔後儲存：</p><ul><li>Windows：<code>C:\Users\wells_nodeA\.ssh\config</code></li><li>Linux：<code>~/.ssh/config</code></li></ul><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">Host nodeB_wells
+</span></span><span class="line"><span class="cl">    User wells
+</span></span><span class="line"><span class="cl">    HostName nodeB
+</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/nodeA_ed25519
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>設定檔內容說明</p><ul><li>Host 為個人可辨識的名稱</li><li>User 是伺服器上的使用者名稱</li><li>HostName 為伺服器的 IP 位址或 host 名稱</li><li>IdentityFile 為私鑰路徑，Windows 與 Linux 上都可以使用 <code>~/</code> 表示個人目錄</li></ul></blockquote><p>儲存後，就可以用金鑰登入，若登入失敗要求輸入密碼，可以檢查</p><ul><li>金鑰是否正確</li><li>authorized_keys 路徑是否正確</li></ul><p>再 SSH 連線一次，此時不會要求輸入密碼</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">C:\Users\wells_nodeA&gt;ssh wells@nodeB
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Microsoft Windows [版本 10.0.22631.2861]
+</span></span><span class="line"><span class="cl">(c) Microsoft Corporation. 著作權所有，並保留一切權利。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">wells@NODEB C:\Users\wells&gt;exit
+</span></span><span class="line"><span class="cl">Connection to nodeB closed.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">C:\Users\wells_nodeA&gt;
+</span></span></code></pre></td></tr></table></div></div><h2 id="使用-ssh-金鑰存取位於-synology-上的-git-伺服器">使用 SSH 金鑰存取位於 Synology 上的 Git 伺服器</h2><p>在本地端 Windows/Linux 上建立好金鑰後，將公鑰放置 Synology 的個人使用者目錄下的 .ssh 資料夾，沒有目錄的話需要自行建立。並新增 authorized_keys 並填入公鑰內容。</p><p><img alt="把公鑰放到個人目錄下的 .ssh 資料夾" class="gallery-image" data-flex-basis="505px" data-flex-grow="210" decoding="async" height="640" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/add_pubkey_synology.webp" srcset="/post/ssh-connection/add_pubkey_synology_hu_ce09074e42ee5ac5.webp 800w, /post/ssh-connection/add_pubkey_synology.webp 1348w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1348"></p><p><img alt="在 .ssh 目錄新增 authorized_keys 並填入公鑰內容" class="gallery-image" data-flex-basis="505px" data-flex-grow="210" decoding="async" height="640" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/add_authorized_keys_synology.webp" srcset="/post/ssh-connection/add_authorized_keys_synology_hu_d970ccfa782dc239.webp 800w, /post/ssh-connection/add_authorized_keys_synology.webp 1348w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1348"></p><p>在本地端上的 config 設定檔，填入主機資訊：</p><ul><li>Windows：<code>C:\Users\wells\.ssh\config</code></li><li>Linux：<code>~\.ssh\config</code></li></ul><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">Host NAS
+</span></span><span class="line"><span class="cl">    User wells
+</span></span><span class="line"><span class="cl">    HostName 192.168.50.12
+</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/nodeA_ed25519
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>設定檔內容說明</p><ul><li>Host 為辨識名稱</li><li>User 為 NAS 登入帳號</li><li>HostName 為 NAS IP 位址</li><li>IdentityFile 為私鑰路徑</li></ul></blockquote><p>執行 git remote 相關指令時，會優先使用金鑰認證，不用輸入密碼。</p><h2 id="使用-ssh-金鑰存取-github">使用 SSH 金鑰存取 GitHub</h2><p>首先在 GitHub 建立新的 repo，若已經有 repo 的可略過此步驟。</p><p><img alt="建立新的 repo" class="gallery-image" data-flex-basis="250px" data-flex-grow="104" decoding="async" height="1154" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/create_new_repo.webp" srcset="/post/ssh-connection/create_new_repo_hu_90904392ed6f0fbf.webp 800w, /post/ssh-connection/create_new_repo.webp 1204w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1204"></p><p>建立後，GitHub 會給一組 SSH 連結</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git@github.com:WellWells/TEST_REPO.git
+</span></span></code></pre></td></tr></table></div></div><p><img alt="空的 repo 頁面" class="gallery-image" data-flex-basis="475px" data-flex-grow="198" decoding="async" height="1047" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/repo_init_page.webp" srcset="/post/ssh-connection/repo_init_page_hu_70885d9ca2800185.webp 800w, /post/ssh-connection/repo_init_page_hu_65a7556a9008504f.webp 1600w, /post/ssh-connection/repo_init_page.webp 2076w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2076"></p><p>如果在本地端直接 clone，會跳出沒有權限：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">wells@server:~$ git clone git@github.com:WellWells/TEST_REPO.git
+</span></span><span class="line"><span class="cl">Cloning into &#39;TEST_REPO&#39;...
+</span></span><span class="line"><span class="cl">git@github.com: Permission denied (publickey).
+</span></span><span class="line"><span class="cl">fatal: Could not read from remote repository.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Please make sure you have the correct access rights
+</span></span><span class="line"><span class="cl">and the repository exists.
+</span></span></code></pre></td></tr></table></div></div><p>點選右上方的個人圖示叫出選單，點選 Setting 進入設定頁面</p><p><img alt="點選右上方的個人圖示，叫出選單" class="gallery-image" data-flex-basis="99px" data-flex-grow="41" decoding="async" height="1217" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/github_profile_click_menu.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="505"></p><p>左邊選擇 SSH and GPG keys，進入 SSH Key 頁面後，點選 New SSH key 新增公鑰。</p><p><img alt="新增 SSH Key" class="gallery-image" data-flex-basis="549px" data-flex-grow="228" decoding="async" height="640" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/github_setting_SSH.webp" srcset="/post/ssh-connection/github_setting_SSH_hu_7f6d7c2920495440.webp 800w, /post/ssh-connection/github_setting_SSH.webp 1465w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1465"></p><p><img alt="貼上公鑰內容" class="gallery-image" data-flex-basis="558px" data-flex-grow="232" decoding="async" height="640" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ssh-connection/add_new_ssh_key.webp" srcset="/post/ssh-connection/add_new_ssh_key_hu_27034840e979c372.webp 800w, /post/ssh-connection/add_new_ssh_key.webp 1489w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1489"></p><p>在本地端上的 config 設定檔，填入主機資訊：</p><ul><li>Windows：<code>C:\Users\wells\.ssh\config</code></li><li>Linux：<code>~\.ssh\config</code></li></ul><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">Host github_wells
+</span></span><span class="line"><span class="cl">    HostName github.com
+</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/nodeA_ed25519
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>設定檔內容說明</p><ul><li><code>Host</code> 為辨識名稱</li><li><code>HostName</code> 固定為 <code>github.com</code></li><li><code>IdentityFile</code> 為私鑰路徑</li></ul></blockquote><p>在 clone 一次就可以正常使用金鑰存取 GitHub repo。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">wells@server:~$ git clone git@github.com:WellWells/TEST_REPO.git
+</span></span><span class="line"><span class="cl">Cloning into &#39;TEST_REPO&#39;...
+</span></span><span class="line"><span class="cl">warning: You appear to have cloned an empty repository.
+</span></span></code></pre></td></tr></table></div></div><h2 id="進階安全設定">進階安全設定</h2><p>此章節適用於對安全性敏感的使用者，也建議設定以下相關 config 以達到更高的安全性。</p><h3 id="關閉密碼認證">關閉密碼認證</h3><p>如果預設遠端伺服器 (nodeB) 走的是密碼認證，確定金鑰可以成功登入後，可以關閉密碼認證提高安全性。</p><p>設定檔路徑：</p><ul><li>Windows：<code>C:\ProgramData\ssh\sshd_config</code></li><li>Linux：<code>/etc/ssh/sshd_config</code></li></ul><p>找到約 50 行附近，並將 PasswordAuthentication 改為 no，記得移除前面的 <code>#</code></p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-diff" data-lang="diff"><span class="line"><span class="cl"><span class="gd">---#PasswordAuthentication yes
+</span></span></span><span class="line"><span class="cl"><span class="gi">+++PasswordAuthentication no
+</span></span></span></code></pre></td></tr></table></div></div><p>修改後，重新啟動 sshd 後，<code>下次登入僅使用金鑰進行，若金鑰遺失則無法登入</code></p><p>用 PowerShell 重新啟動 sshd</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">Restart-Service</span> <span class="n">sshd</span>
+</span></span></code></pre></td></tr></table></div></div><p>Linux 重新啟動 sshd</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo service ssh restart
+</span></span></code></pre></td></tr></table></div></div><h3 id="金鑰密碼搭配-ssh-agent">金鑰密碼搭配 ssh-agent</h3><p>在<a class="link" href="#%e5%bb%ba%e7%ab%8b%e9%87%91%e9%91%b0">建立金鑰</a>章節有說明 passphrase 預設可為空值，SSH 時不需要密碼。但私鑰如果外洩，駭客可以直接拿這把私鑰連線。</p><p>所以建立金鑰時可以加入 passphrase，並用 ssh-agent 把私鑰快取在記憶體中，只要輸入一次密碼，之後都會用這份快取驗證金鑰。</p><p>以下操作使用 Windows 為範例，Linux 的操作基本相同。</p><p>其主要差異在 Windows 底下 SSH 執行檔分為兩包，分別為：</p><ol><li>OpenSSH 底下的 <code>C:\Windows\System32\OpenSSH</code></li><li>Git 目錄底下的 <code>C:\Program Files\Git\usr\bin</code></li></ol><p>故需要將 Git 的 sshCommand 更改為 OpenSSH 的路徑。</p><p>Windows：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 更改 git 的 ssh.exe 為 OpenSSH 底下的路徑，若未更改，則無法使用儲存在 OpenSSH 記憶體的私鑰</span>
+</span></span><span class="line"><span class="cl"><span class="n">git</span> <span class="n">config</span> <span class="p">-</span><span class="n">-global</span> <span class="n">core</span><span class="p">.</span><span class="py">sshCommand</span> <span class="n">C:</span><span class="p">/</span><span class="n">Windows</span><span class="p">/</span><span class="n">System32</span><span class="p">/</span><span class="n">OpenSSH</span><span class="p">/</span><span class="n">ssh</span><span class="p">.</span><span class="py">exe</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 開機自動執行 ssh-agent</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Get-Service</span> <span class="nb">ssh-agent</span> <span class="p">|</span> <span class="nb">Set-Service</span> <span class="n">-StartupType</span> <span class="n">Automatic</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 啟動 ssh-agent</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Start-Service</span> <span class="nb">ssh-agent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 檢查 ssh-agent 的狀態</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Get-Service</span> <span class="nb">ssh-agent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 使用 ssh-add 把私鑰加入 ssh-agent，此時會要求輸入 passphrase</span>
+</span></span><span class="line"><span class="cl"><span class="nb">ssh-add</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">wells</span><span class="p">\.</span><span class="n">ssh</span><span class="p">\</span><span class="n">nodeA_ed25519</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 列出目前 ssh-agent 中已載入的金鑰</span>
+</span></span><span class="line"><span class="cl"><span class="nb">ssh-add</span> <span class="n">-l</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c"># 刪除所有金鑰</span>
+</span></span><span class="line"><span class="cl"><span class="c"># ssh-add -D</span>
+</span></span></code></pre></td></tr></table></div></div><p>Linux：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 若預設為 bash，則在 ~/.bashrc 末端加入以下行</span>
+</span></span><span class="line"><span class="cl"><span class="nb">eval</span> <span class="s2">&#34;</span><span class="k">$(</span>ssh-agent -s<span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 新增私鑰到 ssh-agent，並輸入 passphrase</span>
+</span></span><span class="line"><span class="cl">ssh-add ~/.ssh/nodeA_ed25519
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>macOS 指令可能有些不同，請參閱<a class="link" href="https://apple.stackexchange.com/questions/48502/how-can-i-permanently-add-my-ssh-private-key-to-keychain-so-it-is-automatically" target="_blank" rel="noopener">解法</a></p></blockquote><p>確定 ssh-agent 已載入私鑰，私鑰可以備份至安全的地方，並在此電腦上移除。</p><p>只要 ssh-agent 有成功啟動，預設都會由 agent 做金鑰認證。</p><p>最終，本地端 nodeA 的 .ssh 資料夾，應該只有 known_hosts 與 config。</p><p>config 裡面的 IdentityFile 路徑也可以移除。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Host nodeB_wells
+</span></span><span class="line"><span class="cl">    User wells
+</span></span><span class="line"><span class="cl">    HostName nodeB
+</span></span></code></pre></td></tr></table></div></div><p>ssh-agent 預設時間是永久，若要提高安全性可以設定快取時間。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">ssh-agent</span> <span class="n">-t</span> <span class="n">1h</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="使用-ssh-agent-轉發">使用 SSH agent 轉發</h3><p>GitHub 與 nodeB 上已經填入公鑰，本地端 nodeA 也已經用 ssh-add 把私鑰加進 ssh-agent。</p><p>所以本地端可以 SSH 到 nodeB，或用 git 相關指令把 GitHub 的程式碼 clone 到 nodeA。</p><p>現在，若要在 nodeB 上 git clone 把 GitHub 的程式碼抓下來，私鑰不需要放到 nodeB。</p><p>這時可以用 SSH agent 轉發。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># 加入 -A 可以啟用 SSH 代理轉發。允許在遠端伺服器上使用本地的 SSH 金鑰。</span>
+</span></span><span class="line"><span class="cl"><span class="n">ssh</span> <span class="n">-A</span> <span class="n">wells</span><span class="nv">@nodeB</span>
+</span></span></code></pre></td></tr></table></div></div><p>如果每次 SSH 都要帶參數覺得麻煩，也可以在 config 內新增 ForwardAgent</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-diff" data-lang="diff"><span class="line"><span class="cl">Host nodeB_wells
+</span></span><span class="line"><span class="cl">    User wells
+</span></span><span class="line"><span class="cl">    HostName nodeB
+</span></span><span class="line"><span class="cl">    ForwardAgent yes
+</span></span></code></pre></td></tr></table></div></div><p>連線後，遠端伺服器可以使用 <code>ssh-add -l</code> 檢查是否已經載入私鑰。</p><p>若已載入私鑰，就可以直接用該金鑰在 nodeB 上 git clone。</p><blockquote><p>Windows 預設內建版本為 8.6p1，agent 轉發後檢查伺服器上的私鑰是有載入的。</p><p>但 git clone 會出現公鑰認證失敗，此部分為 OpenSSH Bug。</p><p>Windows 使用者可以到微軟 <a class="link" href="https://github.com/PowerShell/Win32-OpenSSH/releases" target="_blank" rel="noopener">OpenSSH Release</a> 手動安裝_8.9p1 後，git 相關操作就正常了。</p><p>另外，如果 NodeB 的信任度不高（例如上面有其他使用者擁有 root 權限），可考慮改用 Proxyjump 當跳板。原理是私鑰只留在 NodeA 上，當要在 NodeB 存取 GitHub 時，把 NodeA 設為跳板。</p><p>好處是不用從 NodeA 把金鑰轉發到 NodeB，而是直接在 NodeA 上做 SSH 操作，再把結果回傳到 NodeB。</p></blockquote><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://support.apple.com/zh-tw/guide/mac-help/mchlp1066/mac" target="_blank" rel="noopener">允許遠端電腦取用你的 Mac</a></li><li><a class="link" href="https://learn.microsoft.com/zh-tw/windows-server/administration/openssh/openssh_install_firstuse" target="_blank" rel="noopener">開始使用 OpenSSH for Windows</a></li><li><a class="link" href="https://ubuntu.com/server/docs/service-openssh" target="_blank" rel="noopener">OpenSSH Server</a></li><li><a class="link" href="https://blog.miniasp.com/post/2021/12/11/How-to-setup-OpenSSH-Server-in-Windows" target="_blank" rel="noopener">如何在 Windows 正確的安裝與設定 OpenSSH Server 服務</a></li><li><a class="link" href="https://learn.microsoft.com/zh-tw/windows/security/operating-system-security/network-security/windows-firewall/configure-with-command-line?tabs=powershell" target="_blank" rel="noopener">使用命令列管理 Windows 防火牆</a></li><li><a class="link" href="https://learn.microsoft.com/zh-tw/azure/devops/repos/git/gcm-ssh-passphrase" target="_blank" rel="noopener">SSH 複雜密碼</a></li><li><a class="link" href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account" target="_blank" rel="noopener">Adding a new SSH key to your GitHub account</a></li><li><a class="link" href="https://superuser.com/questions/1327633/how-to-maintain-ssh-agent-login-session-with-windows-10s-new-openssh-and-powers" target="_blank" rel="noopener">How to maintain ssh-agent login session with Windows 10's new OpenSSH and PowerShell</a></li><li><a class="link" href="https://dmtavt.com/post/2020-08-03-ssh-agent-powershell/" target="_blank" rel="noopener">Automatically starting ssh-agent when powershell or git-bash are started</a></li><li><a class="link" href="https://learn.microsoft.com/zh-tw/windows-server/administration/openssh/openssh_keymanagement" target="_blank" rel="noopener">適用於 Windows 的 OpenSSH 中的金鑰型驗證</a></li><li><a class="link" href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/using-ssh-agent-forwarding" target="_blank" rel="noopener">Using SSH agent forwarding</a></li><li><a class="link" href="https://stackoverflow.com/questions/71399334/ssh-fails-to-use-private-key-from-ssh-agent-communication-with-agent-failed" target="_blank" rel="noopener">Ssh fails to use private key from ssh-agent: communication with agent failed</a></li><li><a class="link" href="https://heipei.github.io/2015/02/26/SSH-Agent-Forwarding-considered-harmful/" target="_blank" rel="noopener">SSH Agent Forwarding considered harmful</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/%E9%81%A0%E7%AB%AF/">遠端</a>
+<a href="/tags/linux/">Linux</a>
+<a href="/tags/ubuntu/">Ubuntu</a>
+<a href="/tags/synology/">Synology</a>
+<a href="/tags/git/">Git</a>
+<a href="/tags/ssh/">SSH</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/ubuntu-no-network-on-boot/"><div class="article-image"><img alt="Featured image of post 解決 Ubuntu 24.04 網路線插入，但網路指示燈不亮且無網路的問題" height="150" loading="lazy" src="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp" srcset="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp 1x, /post/ubuntu-no-network-on-boot/cover_hu_d95a03bc103153c1.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#996b3f80 0%,#1a2a2bC0 100%)"><h2 class="article-title">解決 Ubuntu 24.04 網路線插入，但網路指示燈不亮且無網路的問題</h2></div></a></article><article class="has-image"><a href="/post/tailscale-advanced-guides/"><div class="article-image"><img alt="Featured image of post Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定" height="150" loading="lazy" src="/post/tailscale-advanced-guides/cover_hu_53b6600b46464107.webp" srcset="/post/tailscale-advanced-guides/cover_hu_53b6600b46464107.webp 1x, /post/tailscale-advanced-guides/cover_hu_a83964a66e99b6e0.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#5a4f3880 0%,#d2cab9C0 100%)"><h2 class="article-title">Tailscale 進階應用教學：Taildrop、出口節點與子網路路由設定</h2></div></a></article><article class="has-image"><a href="/post/ubuntu-setup/"><div class="article-image"><img alt="Featured image of post Ubuntu Server 24.04：安裝、磁碟分割與網路設定" height="150" loading="lazy" src="/post/ubuntu-setup/cover_hu_19881943a955bae.webp" srcset="/post/ubuntu-setup/cover_hu_19881943a955bae.webp 1x, /post/ubuntu-setup/cover_hu_708b5ccd0fba8e04.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d3995c80 0%,#443e32C0 100%)"><h2 class="article-title">Ubuntu Server 24.04：安裝、磁碟分割與網路設定</h2></div></a></article><article class="has-image"><a href="/post/tailscale-acl-grants/"><div class="article-image"><img alt="Featured image of post Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入" height="150" loading="lazy" src="/post/tailscale-acl-grants/cover_hu_1629c685f7f1af37.webp" srcset="/post/tailscale-acl-grants/cover_hu_1629c685f7f1af37.webp 1x, /post/tailscale-acl-grants/cover_hu_fe34e47e5e9fd20e.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d1c5b980 0%,#2b221aC0 100%)"><h2 class="article-title">Tailscale ACL 設定教學：grants 語法、標籤權限與 SSH 免金鑰登入</h2></div></a></article><article class="has-image"><a href="/post/mdns-iot-device-discovery/"><div class="article-image"><img alt="Featured image of post mDNS 運作原理與 IoT 裝置發現機制" height="150" loading="lazy" src="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp" srcset="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp 1x, /post/mdns-iot-device-discovery/cover_hu_8f608671f48343b3.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c2c1b280 0%,#524332C0 100%)"><h2 class="article-title">mDNS 運作原理與 IoT 裝置發現機制</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

@@ -1,0 +1,453 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Notes from installing Ubuntu Server 24.04: host and distro choice, disk partitioning, Netplan networking, Tailscale and SSH remote access, plus locale and package setup."><title>Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration - WellWells</title><link rel="canonical" href="https://wellstsai.com/en/post/ubuntu-setup/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration"><meta property='og:description' content="Notes from installing Ubuntu Server 24.04: host and distro choice, disk partitioning, Netplan networking, Tailscale and SSH remote access, plus locale and package setup."><meta property='og:url' content='https://wellstsai.com/en/post/ubuntu-setup/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Linux'><meta property='article:tag' content='Ubuntu'><meta property='article:tag' content='Tutorial'><meta property='article:tag' content='Service'><meta property='article:tag' content='System'><meta property='article:tag' content='Network'><meta property='article:published_time' content='2024-06-18T14:35:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/ubuntu-setup/cover.webp'><meta name="twitter:title" content="Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration"><meta name="twitter:description" content="Notes from installing Ubuntu Server 24.04: host and distro choice, disk partitioning, Netplan networking, Tailscale and SSH remote access, plus locale and package setup."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/ubuntu-setup/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/ubuntu-setup/cover_hu_fa99eabf619d4fbe.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/ubuntu-setup/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/ubuntu-setup/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/ubuntu-setup/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/ubuntu-setup/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"Introduction Due to recent hardware failures, I decided to perform a fresh installation of a Linux-based server, using the opportunity to optimize its configuration.\nYou can do a lot with a Linux server, including:\nDNS server: Used for blocking ads and related applications. Remote development: Allows continuous development on trusted computers. Web server: Set up websites using Nginx or Apache, along with database services. Proxy server: For bypassing restrictions or NAT traversal. Simple file …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2024-06-18T14:35:00+08:00","description":"Notes from installing Ubuntu Server 24.04: host and distro choice, disk partitioning, Netplan networking, Tailscale and SSH remote access, plus locale and package setup.","headline":"Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration","image":"https://wellstsai.com/post/ubuntu-setup/cover.webp","keywords":["Linux","Ubuntu","Tutorial","Service","System","Network"],"mainEntityOfPage":{"@id":"https://wellstsai.com/en/post/ubuntu-setup/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/en/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/en/">WellWells</a></h1><h2 class="site-description">Unexpected valuables in the well</h2></div></header><ol class="menu" id="main-menu"><li><a href='/en/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>Home</span></a></li><li><a href='/en/about/'><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href='/en/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>Archive</span></a></li><li><a href='/en/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>Sponsor</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/ubuntu-setup/">繁體中文</option><option value="/en/post/ubuntu-setup/" selected>English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">Table of Contents</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#host-selection">Host Selection</a><ol><li><a href="#my-hosting-choice">My Hosting Choice</a></li><li><a href="#popular-third-party-vps-providers">Popular Third-Party VPS Providers</a></li></ol></li><li><a href="#choosing-a-linux-distribution">Choosing a Linux Distribution</a></li><li><a href="#disk-partitioning-during-ubuntu-server-2404-installation">Disk Partitioning During Ubuntu Server 24.04 Installation</a></li><li><a href="#network-configuration">Network Configuration</a></li><li><a href="#ensure-that-the-systems-software-and-packages-are-up-to-date">Ensure that the system's software and packages are up to date</a></li><li><a href="#remote-environment-setup">Remote Environment Setup</a><ol><li><a href="#install-tailscale">Install Tailscale</a></li><li><a href="#configure-ssh">Configure SSH</a></li></ol></li><li><a href="#system-basic-configuration-and-installation">System Basic Configuration and Installation</a><ol><li><a href="#system-timezone-and-language-settings">System Timezone and Language Settings</a></li><li><a href="#install-net-tools">Install Net-tools</a></li><li><a href="#install-build-essentials">Install Build Essentials</a></li><li><a href="#install-blesh">Install ble.sh</a></li><li><a href="#install-homebrew">Install Homebrew</a></li><li><a href="#install-fzf">Install fzf</a></li><li><a href="#install-nodejs">Install Node.js</a></li><li><a href="#install-tldr">Install tldr</a></li><li><a href="#update-git-to-the-latest-version">Update Git to the Latest Version</a></li><li><a href="#configure-git-user">Configure Git User</a></li></ol></li><li><a href="#other-advanced-settings">Other Advanced Settings</a><ol><li><a href="#disable-ipv6-connection">Disable IPv6 Connection</a><ol><li><a href="#disable-ipv6-via-sysctl">Disable IPv6 via sysctl</a></li><li><a href="#disable-ipv6-via-netplan">Disable IPv6 via Netplan</a></li></ol></li><li><a href="#set-vs-code-as-the-default-editor-for-ssh-remote-development">Set VS Code as the Default Editor for SSH Remote Development</a></li><li><a href="#configure-ubuntu-pro-security">Configure Ubuntu Pro Security</a></li></ol></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/en/post/ubuntu-setup/" style="position:relative;display:block"><img src="/post/ubuntu-setup/cover_hu_e0f0050fa88656db.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/ubuntu-setup/cover_hu_fa99eabf619d4fbe.webp"><source media="(min-width: 769px)" srcset="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp">
+<img src="/post/ubuntu-setup/cover_hu_782753f524880a1a.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/en/post/ubuntu-setup/">Ubuntu Server 24.04: Installation, Partitioning, and Network Configuration</a></h2><h3 class="article-subtitle">Notes from installing Ubuntu Server 24.04: host and distro choice, disk partitioning, Netplan networking, Tailscale and SSH remote access, plus locale and package setup.</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2024-06-18T14:35:00+08:00'>2024/06/18</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">17 Minutes Read</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/post/ubuntu-setup/" class="link">繁體中文</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>Table of Contents</span></div></summary><nav class="toc-nav"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#host-selection">Host Selection</a><ol><li><a href="#my-hosting-choice">My Hosting Choice</a></li><li><a href="#popular-third-party-vps-providers">Popular Third-Party VPS Providers</a></li></ol></li><li><a href="#choosing-a-linux-distribution">Choosing a Linux Distribution</a></li><li><a href="#disk-partitioning-during-ubuntu-server-2404-installation">Disk Partitioning During Ubuntu Server 24.04 Installation</a></li><li><a href="#network-configuration">Network Configuration</a></li><li><a href="#ensure-that-the-systems-software-and-packages-are-up-to-date">Ensure that the system's software and packages are up to date</a></li><li><a href="#remote-environment-setup">Remote Environment Setup</a><ol><li><a href="#install-tailscale">Install Tailscale</a></li><li><a href="#configure-ssh">Configure SSH</a></li></ol></li><li><a href="#system-basic-configuration-and-installation">System Basic Configuration and Installation</a><ol><li><a href="#system-timezone-and-language-settings">System Timezone and Language Settings</a></li><li><a href="#install-net-tools">Install Net-tools</a></li><li><a href="#install-build-essentials">Install Build Essentials</a></li><li><a href="#install-blesh">Install ble.sh</a></li><li><a href="#install-homebrew">Install Homebrew</a></li><li><a href="#install-fzf">Install fzf</a></li><li><a href="#install-nodejs">Install Node.js</a></li><li><a href="#install-tldr">Install tldr</a></li><li><a href="#update-git-to-the-latest-version">Update Git to the Latest Version</a></li><li><a href="#configure-git-user">Configure Git User</a></li></ol></li><li><a href="#other-advanced-settings">Other Advanced Settings</a><ol><li><a href="#disable-ipv6-connection">Disable IPv6 Connection</a><ol><li><a href="#disable-ipv6-via-sysctl">Disable IPv6 via sysctl</a></li><li><a href="#disable-ipv6-via-netplan">Disable IPv6 via Netplan</a></li></ol></li><li><a href="#set-vs-code-as-the-default-editor-for-ssh-remote-development">Set VS Code as the Default Editor for SSH Remote Development</a></li><li><a href="#configure-ubuntu-pro-security">Configure Ubuntu Pro Security</a></li></ol></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></details></aside><section class="article-content"><h2 id="introduction">Introduction</h2><p>Due to recent hardware failures, I decided to perform a fresh installation of a Linux-based server, using the opportunity to optimize its configuration.</p><p>You can do a lot with a Linux server, including:</p><ul><li>DNS server: Used for blocking ads and related applications.</li><li>Remote development: Allows continuous development on trusted computers.</li><li>Web server: Set up websites using Nginx or Apache, along with database services.</li><li>Proxy server: For bypassing restrictions or NAT traversal.</li><li>Simple file server: Not recommended as a standard NAS, as data maintenance costs are high. It's better to use a ready-made NAS solution.</li><li>Local AI Model Deployment: low-power devices like a Raspberry Pi can handle 1.5B to 3B models for basic text generation and summarization. A 14B model such as DeepSeek R1 14B still needs around 9 to 10 GB even at 4-bit quantization, so it runs properly only on a server with a discrete GPU. Either way, it suits development, testing, and automation applications.</li></ul><p>Performance requirements depend on what the server is for. Setting up a web server means thinking about security measures such as firewalls. Running AI models means checking the external graphics card, RAM, and CPU so it actually runs smoothly.</p><h2 id="host-selection">Host Selection</h2><p>Before installing a Linux server, the first step is to choose the appropriate execution environment. The common options for hosting environments include:</p><ol><li><strong>Physical Host (Local Server)</strong>: Install Linux directly on hardware such as mini PCs, including <code>Intel NUC</code> and <code>Raspberry Pi</code>, among other common options.</li><li><strong>Virtualized Host</strong>: Use technologies like <strong>WSL</strong> and <strong>Docker</strong> to deploy and manage Linux environments within an existing system, enabling lightweight virtualization.</li><li><strong>Cloud Hosting</strong>:<ul><li><strong>Shared Hosting</strong>: Multiple users share server resources, but their environments remain relatively independent. It is commonly used for small websites and blogs. Suitable for beginners as system management is not required.</li><li><strong>Virtual Private Server (VPS)</strong>: A physical server is divided into multiple independent virtual servers, each with its own operating system and administrative privileges. It offers full control, making it suitable for developers who need a customized environment.</li><li><strong>Bare Metal Server</strong>: Provides an entire physical server without a virtualization layer, meaning all hardware resources are fully dedicated to a single tenant. Ideal for high-performance applications and enterprise deployments.</li></ul></li></ol><h3 id="my-hosting-choice">My Hosting Choice</h3><p>I assemble my own hardware, including the <strong>case, motherboard, CPU, RAM, SSD, and power supply</strong>. The primary use cases include:</p><ul><li><strong>Remote access and management</strong></li><li><strong>Web scraping and data processing</strong></li><li><strong>Hosting web servers and deploying applications</strong></li></ul><p>If the goal is to set up an <strong>ad-blocking server</strong> (e.g., <strong>AdGuard Home</strong>) or manage smart home devices with <strong>Home Assistant</strong>, I recommend using a <strong>Raspberry Pi</strong>. Its <strong>ARM architecture</strong> draws less power and costs less.</p><p>If a dedicated <strong>physical server</strong> is not an option, a <strong>VPS</strong> offers a flexible alternative. However, compared to bare-metal deployments, VPS instances often come with hardware resource constraints and potential data security concerns.</p><h3 id="popular-third-party-vps-providers">Popular Third-Party VPS Providers</h3><ul><li><strong>Amazon Web Services (AWS)</strong></li><li><strong>Google Cloud Platform (GCP)</strong></li><li><strong>Microsoft Azure</strong></li><li><strong>DigitalOcean</strong></li><li><strong>Vultr</strong></li><li><strong>Linode</strong></li></ul><p>These services are billed based on usage or via a monthly subscription. For lightweight instances, the estimated cost ranges from approximately USD 0.093 to USD 0.15 per hour, or USD 10 to USD 30 per month.</p><h2 id="choosing-a-linux-distribution">Choosing a Linux Distribution</h2><p>Since my primary use case involves hosting services, web development, and infrastructure setup, I chose to install <strong>Ubuntu Server 24.04</strong>. However, some SDKs require Ubuntu 18.04 as the development environment. When selecting a distribution, it's important to base your decision on your specific development needs and environment.</p><p>Here's a comparison of different Linux distributions, their ideal user groups, and key features:</p><div class="table-wrapper"><table><thead><tr><th>Distribution</th><th>Ideal Users</th><th>Key Features</th></tr></thead><tbody><tr><td><strong>Ubuntu</strong></td><td>General users, developers, beginners</td><td>The most popular Linux distribution, widely supported. LTS versions are stable, while short-term releases feature newer updates.</td></tr><tr><td><strong>Linux Mint</strong></td><td>Windows switchers</td><td>User-friendly, stable, ideal for daily use, and offers multiple desktop environments.</td></tr><tr><td><strong>MX Linux</strong></td><td>Lightweight users</td><td>Suitable for older computers, includes built-in system management tools, stable and easy to use.</td></tr><tr><td><strong>Debian</strong></td><td>Servers, developers</td><td>Highly stable with long-term support, but software versions may be outdated.</td></tr><tr><td><strong>Pop!_OS</strong></td><td>Productivity, STEM students</td><td>Offers automatic window tiling, suitable for scientific computing and development, with built-in privacy features.</td></tr><tr><td><strong>Fedora</strong></td><td>Developers who want the latest tech</td><td>Rapid adoption of new technologies, strong official support, great for development but less suited for long-term stability.</td></tr><tr><td><strong>openSUSE</strong></td><td>Enterprise, server users</td><td>Available in stable (Leap) and rolling release (Tumbleweed) versions, suitable for enterprise and professional users.</td></tr><tr><td><strong>EndeavourOS</strong></td><td>Users wanting to learn Arch</td><td>Provides a simplified Arch installation while maintaining a native Arch experience with rolling updates.</td></tr><tr><td><strong>Manjaro</strong></td><td>Arch beginners</td><td>Includes built-in driver management, a more stable Arch-based variant, and is desktop-friendly.</td></tr></tbody></table></div><p>The main reason for using Ubuntu is its friendliness to beginners, avoiding many difficulties encountered by professionals. Most tasks can be developed normally on any distribution, so don't agonize over the choice. Pick the one you like.</p><blockquote><p>As of June 2024, if you want to develop the NVIDIA Optimized Deep Learning Framework, the official support is only for Ubuntu 22.04, so be sure to check if the framework you want to develop supports your expected Linux distribution.</p></blockquote><h2 id="disk-partitioning-during-ubuntu-server-2404-installation">Disk Partitioning During Ubuntu Server 24.04 Installation</h2><p>During the installation of Ubuntu Server 24.04, the interface mainly relies on keyboard interaction, making the operation relatively simple.</p><p>The installation process involves disk partitioning, which can be referenced from <a class="link" href="https://help.ubuntu.com/community/DiskSpace" target="_blank" rel="noopener">Ubuntu Disk Space Recommendations and Strategies</a>.</p><div class="table-wrapper"><table><thead><tr><th>Partition</th><th>Size</th><th>My Partition</th></tr></thead><tbody><tr><td>/</td><td>At least 15 GB</td><td>30 GB (ext4)</td></tr><tr><td>/boot</td><td>250 MB ~ 1 GB</td><td>500 MB (ext4)</td></tr><tr><td>/var</td><td>2 GB</td><td>2 GB (ext4)</td></tr><tr><td>swap</td><td>Size of RAM</td><td>8 GB (ext4)</td></tr><tr><td>/home</td><td>Remaining space</td><td>151.34 GB (ext4)</td></tr></tbody></table></div><ol><li><p>The <code>/</code> partition serves as the root directory of the system, with an official recommendation of at least 15 GB. Over time, log files, temporary caches, and installed packages may accumulate, potentially leading to system performance degradation or operational failures. To prevent such situations, I used twice the size to reduce errors. It is still recommended to regularly clean up the root partition files or adjust the root partition size when space is insufficient.</p></li><li><p>/boot for most UEFI systems is 500 MB ~ 1 GB.</p></li><li><p>For general desktop systems, allocating 1-2 GB for /var is sufficient. For server systems, especially those generating a lot of system logs (such as web servers), it is recommended to allocate 5 GB or more to the /var partition to prevent log files from filling up the root directory. When using Docker, it is recommended to allocate at least 20 to 50 GB of disk space for /var. If the initial space planning is too small, you can modify /etc/docker/daemon.json to change the default path /var/lib/docker/ to another directory or use symbolic links to solve the problem.</p></li><li><p>Swap should be configured to 1.5 ~ 2 times the system RAM, for example, if you have 4 GB of RAM, set SWAP to 6 GB. If you have more than 8 GB of RAM, 1x SWAP is sufficient.</p></li><li><p>Leave the remaining space for /home, or plan other partitions as needed.</p></li></ol><p>After verifying that all partition settings are correct, you can proceed with the official installation of the system. Once the installation is complete and the system is restarted, it will successfully boot into Ubuntu.</p><h2 id="network-configuration">Network Configuration</h2><p>⚠️ Once the system is installed, check the network right away: IP address configuration, DNS server availability, and whether external networks are reachable. If the connection is unstable or drops, package installation, remote management, and system maintenance all suffer.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Display detailed information about network interfaces</span>
+</span></span><span class="line"><span class="cl">ip addr show
+</span></span></code></pre></td></tr></table></div></div><p>You can find the wired network interface name (e.g., enp8s0) in the output as follows:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu <span class="m">65536</span> qdisc noqueue state UNKNOWN group default qlen <span class="m">1000</span>
+</span></span><span class="line"><span class="cl">    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span class="line"><span class="cl">    inet 127.0.0.1/8 scope host lo
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span><span class="line"><span class="cl">    inet6 ::1/128 scope host noprefixroute
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span><span class="line"><span class="cl">2: enp8s0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu <span class="m">1500</span> qdisc pfifo_fast state UP group default qlen <span class="m">1000</span>
+</span></span><span class="line"><span class="cl">    link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff
+</span></span><span class="line"><span class="cl">    inet 192.168.1.107/24 metric <span class="m">100</span> brd 192.168.0.255 scope global dynamic enp8s0
+</span></span><span class="line"><span class="cl">       valid_lft 123456sec preferred_lft 123456sec
+</span></span><span class="line"><span class="cl">    inet6 fd3f:1234:5678:9abc:0011:22ff:fe33:4455/64 scope global dynamic mngtmpaddr noprefixroute
+</span></span><span class="line"><span class="cl">       valid_lft 1688sec preferred_lft 1688sec
+</span></span><span class="line"><span class="cl">    inet6 fe80::0011:22ff:fe33:4455/64 scope link
+</span></span><span class="line"><span class="cl">       valid_lft forever preferred_lft forever
+</span></span></code></pre></td></tr></table></div></div><p>Since <strong>Ubuntu 17.10</strong>, network management has been unified under <strong>Netplan</strong>. You can check the configuration files located in <code>/etc/netplan</code> using the following command. Common filenames include <code>01-netcfg.yaml</code> or <code>50-cloud-init.yaml</code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ls /etc/netplan
+</span></span></code></pre></td></tr></table></div></div><p>In Netplan configurations, <code>01-netcfg.yaml</code> has a higher priority. If this file exists, the system will apply its settings first. Currently, my server only contains the <code>50-cloud-init.yaml</code> configuration file, which can be edited using the following command:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/netplan/50-cloud-init.yaml
+</span></span></code></pre></td></tr></table></div></div><p>In the file, you can apply the following configuration. This example sets enp8s0 to obtain an IP address automatically via DHCP and uses 1.1.1.1 and 8.8.8.8 as DNS servers. Adjust the settings according to your network environment:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp8s0</span><span class="p">:</span><span class="w">  </span><span class="c"># Ensure this matches your actual network interface name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>If you need to set a <strong>static IP address</strong>, you can use the following example and adjust the configuration according to your actual network segment:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp0s31f6</span><span class="p">:</span><span class="w">  </span><span class="c"># Ensure this matches your actual network interface name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">no</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="m">192.168.88.123</span><span class="l">/24    </span><span class="w"> </span><span class="c"># Desired static IP address</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">gateway4</span><span class="p">:</span><span class="w"> </span><span class="m">192.168.88.254</span><span class="w">  </span><span class="c"># Gateway</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">addresses</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="m">1.1.1.1</span><span class="p">,</span><span class="w"> </span><span class="m">8.8.8.8</span><span class="p">]</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>After editing the configuration, apply the changes to the system using the following command:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo netplan apply
+</span></span></code></pre></td></tr></table></div></div><p>Once the configuration is successfully applied, use the <code>ping</code> command to test external network connectivity. For example:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ping google.com
+</span></span></code></pre></td></tr></table></div></div><p>The output will resemble the following message, indicating that the network is ready:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">PING google.com <span class="o">(</span>173.194.174.101<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from td-in-f101.1e100.net <span class="o">(</span>173.194.174.101<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">1</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">103</span> <span class="nv">time</span><span class="o">=</span>17.7 ms
+</span></span><span class="line"><span class="cl"><span class="m">64</span> bytes from td-in-f101.1e100.net <span class="o">(</span>173.194.174.101<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">2</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">103</span> <span class="nv">time</span><span class="o">=</span>21.9 ms
+</span></span></code></pre></td></tr></table></div></div><p>By following the above steps, you can confirm whether the network connection is functioning properly.</p><h2 id="ensure-that-the-systems-software-and-packages-are-up-to-date">Ensure that the system's software and packages are up to date</h2><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Update the package list and then upgrade the installed packages.</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt upgrade
+</span></span></code></pre></td></tr></table></div></div><h2 id="remote-environment-setup">Remote Environment Setup</h2><p>Once the server is online, the next step is to set up <strong>Tailscale</strong> and <strong>SSH</strong> so you can develop on it remotely.</p><h3 id="install-tailscale">Install Tailscale</h3><p>For secure remote access to this machine, it is highly recommended to use <strong>Tailscale</strong> instead of exposing the server directly to the public internet.</p><p>For a detailed installation guide, refer to: <strong><a class="link" href="/en/post/tailscale/">Using Tailscale to Easily Create Secure and Private Tunnels</a></strong>.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Install</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://tailscale.com/install.sh <span class="p">|</span> sh
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Start Tailscale</span>
+</span></span><span class="line"><span class="cl">sudo tailscale up
+</span></span></code></pre></td></tr></table></div></div><p>After executing <code>sudo tailscale up</code>. The terminal will display a URL. Open this URL using a web browser or a third-party device to log in to your Tailscale account. Once authentication is complete, the system will automatically add this device to your tailnet private network.</p><blockquote><p>⚠️ Potential Issues After Installing Tailscale</p><p>After installing Tailscale, I encountered issues where the network interface name changed or DNS settings were overridden by Tailscale, preventing successful ping commands.</p><p>It is recommended to restart the system after installation and verify that the network connection is functioning properly. If necessary, update the network configuration accordingly.</p></blockquote><h3 id="configure-ssh">Configure SSH</h3><p>Refer to the following guide for more details: <strong><a class="link" href="/en/post/ssh-connection/">Using SSH Keys for Password-Free Remote Connections</a></strong>.</p><p>After completing the above configurations, you should be able to access and operate the system remotely using <strong>Tailscale + SSH</strong> from a third-party device.</p><h2 id="system-basic-configuration-and-installation">System Basic Configuration and Installation</h2><h3 id="system-timezone-and-language-settings">System Timezone and Language Settings</h3><p>Use the following command to set the system timezone to <strong>Asia/Taipei</strong>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo timedatectl set-timezone Asia/Taipei <span class="o">&amp;&amp;</span> sudo systemctl restart systemd-timesyncd
+</span></span></code></pre></td></tr></table></div></div><p>For other regions, you can query all available timezones using <code>timedatectl list-timezones</code> and filter the relevant timezone names using <code>grep</code>, for example:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">timedatectl list-timezones <span class="p">|</span> grep Asia
+</span></span></code></pre></td></tr></table></div></div><p>Execute the following command to generate the <code>zh_TW.UTF-8</code> locale:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install language-pack-zh-hant
+</span></span><span class="line"><span class="cl">sudo locale-gen
+</span></span></code></pre></td></tr></table></div></div><p>You can check the available locales on the system using <code>locale -a</code>, which will output something like the following:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">C
+</span></span><span class="line"><span class="cl">C.utf8
+</span></span><span class="line"><span class="cl">en_US.utf8
+</span></span><span class="line"><span class="cl">POSIX
+</span></span><span class="line"><span class="cl">zh_HK.utf8
+</span></span><span class="line"><span class="cl">zh_TW.utf8
+</span></span></code></pre></td></tr></table></div></div><p>Use the <code>update-locale</code> command to update the <code>/etc/default/locale</code> file and set <code>LANG</code> to <code>zh_TW.UTF-8</code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo update-locale <span class="nv">LANG</span><span class="o">=</span>zh_TW.UTF-8
+</span></span></code></pre></td></tr></table></div></div><p>Finally, check using the <code>locale</code> command, and the output will be as follows:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">LANG</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LANGUAGE</span><span class="o">=</span>
+</span></span><span class="line"><span class="cl"><span class="nv">LC_CTYPE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_NUMERIC</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_TIME</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_COLLATE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MONETARY</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MESSAGES</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_PAPER</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_NAME</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_ADDRESS</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_TELEPHONE</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_MEASUREMENT</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_IDENTIFICATION</span><span class="o">=</span>zh_TW.UTF-8
+</span></span><span class="line"><span class="cl"><span class="nv">LC_ALL</span><span class="o">=</span>
+</span></span></code></pre></td></tr></table></div></div><p>The system's default language and locale settings cover character encoding, time formats, number formats, currency formats, etc. Setting it to <code>zh_TW.UTF-8</code> means the system will use Traditional Chinese (Taiwan) and UTF-8 encoding for character processing. The <code>LANGUAGE</code> variable is used to specify the language priority, controlling the selection of the translation language. If this variable is empty, the system will rely solely on <code>LANG</code> to set the language environment.</p><h3 id="install-net-tools">Install Net-tools</h3><p><code>Net-tools</code> provides a set of useful network management and troubleshooting tools. However, since <strong>Ubuntu 18.10</strong>, this package is <strong>no longer installed by default</strong>, and some commands (such as <code>ifconfig</code> and <code>netstat</code>) have gradually been replaced by more modern tools like <code>ip</code> and <code>ss</code>.</p><p>If you still need to use <code>Net-tools</code>, you can install it manually:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install net-tools
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-build-essentials">Install Build Essentials</h3><p>Some development tools rely on compilers such as GCC, G++, and Make. Install the <code>build-essential</code> package to cover the basic development and build environment.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt install build-essential
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-blesh">Install ble.sh</h3><p><a class="link" href="https://github.com/akinomyoga/ble.sh" target="_blank" rel="noopener">ble.sh</a> is a script that provides real-time syntax highlighting and powerful features (such as auto-completion) for Bash.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Clone and Compile ble.sh</span>
+</span></span><span class="line"><span class="cl">git clone --recursive --depth <span class="m">1</span> --shallow-submodules https://github.com/akinomyoga/ble.sh.git
+</span></span><span class="line"><span class="cl">make -C ble.sh install <span class="nv">PREFIX</span><span class="o">=</span>~/.local
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s1">&#39;source ~/.local/share/blesh/ble.sh&#39;</span> &gt;&gt; ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-homebrew">Install Homebrew</h3><p>Homebrew provides a faster way to install software packages on macOS, allowing convenient installation, updates, and management of packages. It also supports other Linux systems like Ubuntu.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Install Homebrew</span>
+</span></span><span class="line"><span class="cl">/bin/bash -c <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==&gt; Next steps:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># - Run these two commands in your terminal to add Homebrew to your PATH:</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     (echo; echo &#39;eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;&#39;) &gt;&gt; /home/user/.bashrc</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>After installation, you will need to execute an additional two commands to automatically load Homebrew's installation directory into Bash.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Configure Bash to Load Homebrew Installation Path on Startup</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>echo<span class="p">;</span> <span class="nb">echo</span> <span class="s1">&#39;eval &#34;$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)&#34;&#39;</span><span class="o">)</span> &gt;&gt; /home/user/.bashrc
+</span></span><span class="line"><span class="cl"><span class="nb">eval</span> <span class="s2">&#34;</span><span class="k">$(</span>/home/linuxbrew/.linuxbrew/bin/brew shellenv<span class="k">)</span><span class="s2">&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-fzf">Install fzf</h3><p><a class="link" href="https://github.com/junegunn/fzf" target="_blank" rel="noopener">fzf</a> is a command-line fuzzy finder that searches files, command history, Git commits, and more. It makes finding things on the command line much faster.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Install using Homebrew</span>
+</span></span><span class="line"><span class="cl">brew install fzf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># For future updates, use</span>
+</span></span><span class="line"><span class="cl">brew update<span class="p">;</span> brew upgrade fzf
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-nodejs">Install Node.js</h3><p>Node.js is a JavaScript runtime environment used for both front-end and back-end development.</p><p>The <a class="link" href="https://nodejs.org/en/download/package-manager" target="_blank" rel="noopener">official installation guide</a> provides clear instructions. It is recommended to use nvm for installation.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Install nvm (Node Version Manager)</span>
+</span></span><span class="line"><span class="cl">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh <span class="p">|</span> bash
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Download and install Node.js (may require restarting your terminal)</span>
+</span></span><span class="line"><span class="cl">nvm install <span class="m">20</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Verify the correct Node.js version is installed</span>
+</span></span><span class="line"><span class="cl">node -v <span class="c1"># Should display `v20.14.0`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Verify the correct npm version is installed</span>
+</span></span><span class="line"><span class="cl">npm -v <span class="c1"># Should display `10.7.0`</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-tldr">Install tldr</h3><p><a class="link" href="https://github.com/tldr-pages/tldr" target="_blank" rel="noopener">tldr</a> provides concise and practical command-line tool explanations and examples, offering a more intuitive alternative to the <code>man</code> command on Linux.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install tlrc
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Alternatively, if Node.js is installed, you can install it via npm.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># npm install -g tldr</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># tldr --update</span>
+</span></span></code></pre></td></tr></table></div></div><p>To use tldr, simply type <code>tldr &lt;command></code>.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tldr zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  Package and compress <span class="o">(</span>archive<span class="o">)</span> files into a Zip archive.
+</span></span><span class="line"><span class="cl">  See also: unzip.
+</span></span><span class="line"><span class="cl">  More information: https://manned.org/zip.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Add files/directories to a specific archive:
+</span></span><span class="line"><span class="cl">    zip -r path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Remove files/directories from a specific archive:
+</span></span><span class="line"><span class="cl">    zip --delete path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories e<span class="o">[</span>x<span class="o">]</span>cluding specified ones:
+</span></span><span class="line"><span class="cl">    zip path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ... --exclude path/to/excluded_files_or_directories
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories with a specific compression level <span class="o">(</span><span class="m">0</span> - the lowest, <span class="m">9</span> - the highest<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">    zip -r -0..9 path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Create an encrypted archive with a specific password:
+</span></span><span class="line"><span class="cl">    zip -r --encrypt path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Archive files/directories to a multi-part <span class="o">[</span>s<span class="o">]</span>plit Zip archive <span class="o">(</span>e.g. <span class="m">3</span> GB parts<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">    zip -r -s 3g path/to/compressed.zip path/to/file_or_directory1 path/to/file_or_directory2 ...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  - Print a specific archive contents:
+</span></span><span class="line"><span class="cl">    zip -sf path/to/compressed.zip
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">See also: unzip
+</span></span></code></pre></td></tr></table></div></div><h3 id="update-git-to-the-latest-version">Update Git to the Latest Version</h3><p>Updating Git to the latest version is not always necessary. Some tools may require older versions of Git, and installing the latest version could lead to compatibility issues.</p><p>The <code>git-core/ppa</code> is a Personal Package Archive (PPA) maintained by the Git community, providing the latest versions of Git software.</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Add the PPA</span>
+</span></span><span class="line"><span class="cl">sudo add-apt-repository ppa:git-core/ppa
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Update Git to the latest version</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt upgrade
+</span></span></code></pre></td></tr></table></div></div><h3 id="configure-git-user">Configure Git User</h3><p>To set up your Git user information, use the following commands:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git config --global user.name <span class="s2">&#34;USER&#34;</span>
+</span></span><span class="line"><span class="cl">git config --global user.email <span class="s2">&#34;USER_MAIL&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id="other-advanced-settings">Other Advanced Settings</h2><h3 id="disable-ipv6-connection">Disable IPv6 Connection</h3><p>If the ISP provides both IPv4 and IPv6 addresses, it is recommended to use only IPv4 for security or specific operational requirements. In that case you can disable IPv6 so all network traffic goes over IPv4 only, which shrinks the attack surface.</p><h4 id="disable-ipv6-via-sysctl">Disable IPv6 via sysctl</h4><p>Before Ubuntu 17.10, network configuration was managed using traditional tools like <code>ifupdown</code> and <code>sysctl</code>, rather than Netplan. You can disable IPv6 using sysctl:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/sysctl.conf
+</span></span></code></pre></td></tr></table></div></div><p>Add the following configurations at the end of the file and save the changes:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">net.ipv6.conf.all.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">net.ipv6.conf.default.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">net.ipv6.conf.lo.disable_ipv6 <span class="o">=</span> <span class="m">1</span>
+</span></span></code></pre></td></tr></table></div></div><p>Apply the changes immediately by running:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sysctl -p
+</span></span></code></pre></td></tr></table></div></div><h4 id="disable-ipv6-via-netplan">Disable IPv6 via Netplan</h4><p>Since Ubuntu 17.10, network management has been unified under Netplan. You can disable IPv6 for a specific network interface using Netplan:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo nano /etc/netplan/50-cloud-init.yaml
+</span></span></code></pre></td></tr></table></div></div><p>Add <code>link-local: [ ipv4 ]</code> to the configuration of the target network interface (e.g., <code>enp8s0</code>). Below is an example configuration. Save the file and exit:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">network</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ethernets</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">enp8s0</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">dhcp4</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">link-local</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="l">ipv4 ] </span><span class="w"> </span><span class="c"># Disable IPv6</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nameservers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">addresses</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">1.1.1.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span>- <span class="m">8.8.8.8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="m">2</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>Verify the configuration and apply the settings:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo netplan apply
+</span></span></code></pre></td></tr></table></div></div><p>Finally, verify that IPv6 has been successfully disabled by checking the network interface status with <code>ip a</code> or <code>ifconfig</code>. If the configuration was applied correctly, the interface should no longer display an <code>inet6</code> address.</p><h3 id="set-vs-code-as-the-default-editor-for-ssh-remote-development">Set VS Code as the Default Editor for SSH Remote Development</h3><p>When connecting to Ubuntu via SSH, you can set VS Code as the default editor, making the editing experience in the terminal more intuitive, and allowing you to open files directly using the <code>code</code> command.</p><p>First, modify the <code>.bashrc</code> file (if using zsh, modify <code>~/.zshrc</code>). Execute the following command to open <code>.bashrc</code> in VS Code:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">code ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><p>Next, add the following content at the bottom of the file so the system uses VS Code as the default editor:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">CODE_PATH</span><span class="o">=</span><span class="k">$(</span><span class="nb">command</span> -v code 2&gt;/dev/null<span class="k">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[[</span> -x <span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2">&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>  <span class="c1"># Ensure that `code` is available and executable</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">VISUAL</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">EDITOR</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">export</span> <span class="nv">SUDO_EDITOR</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$CODE_PATH</span><span class="s2"> --wait&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span></code></pre></td></tr></table></div></div><p>Once completed, save the file (<code>Ctrl + S</code>) and close it.</p><p>Finally, execute the following command to reload the settings, or simply open a new terminal to apply the changes:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">source</span> ~/.bashrc
+</span></span></code></pre></td></tr></table></div></div><p>With this setup, you can edit files that require elevated privileges using <code>sudoedit</code> in the terminal, opening and editing them directly in VS Code. Similarly, running <code>crontab -e</code> to edit cron jobs will automatically open VS Code, which makes remote development a lot easier.</p><h3 id="configure-ubuntu-pro-security">Configure Ubuntu Pro Security</h3><p>Enabling Ubuntu Pro patches system vulnerabilities sooner, which helps both security and stability.</p><p>First, register and obtain a free Ubuntu Pro subscription from the Ubuntu official website. You can register at <a class="link" href="https://ubuntu.com/pro" target="_blank" rel="noopener">Ubuntu Pro</a>.</p><p>After registration, subscribe to Ubuntu Pro using <code>sudo pro attach &lt;YOUR_TOKEN></code>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo pro attach YGBDmwR6Y2S
+</span></span></code></pre></td></tr></table></div></div><p>The output:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Enabling Ubuntu Pro: ESM Apps
+</span></span><span class="line"><span class="cl">Ubuntu Pro: ESM Apps enabled
+</span></span><span class="line"><span class="cl">Enabling Ubuntu Pro: ESM Infra
+</span></span><span class="line"><span class="cl">Ubuntu Pro: ESM Infra enabled
+</span></span><span class="line"><span class="cl">Enabling Livepatch
+</span></span><span class="line"><span class="cl">Livepatch enabled
+</span></span><span class="line"><span class="cl">This machine is now attached to <span class="s1">&#39;Ubuntu Pro - free personal subscription&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">SERVICE          ENTITLED  STATUS       DESCRIPTION
+</span></span><span class="line"><span class="cl">anbox-cloud      yes       disabled     Scalable Android in the cloud
+</span></span><span class="line"><span class="cl">esm-apps         yes       enabled      Expanded Security Maintenance <span class="k">for</span> Applications
+</span></span><span class="line"><span class="cl">esm-infra        yes       enabled      Expanded Security Maintenance <span class="k">for</span> Infrastructure
+</span></span><span class="line"><span class="cl">landscape        yes       disabled     Management and administration tool <span class="k">for</span> Ubuntu
+</span></span><span class="line"><span class="cl">livepatch        yes       enabled      Canonical Livepatch service
+</span></span><span class="line"><span class="cl">realtime-kernel* yes       disabled     Ubuntu kernel with PREEMPT_RT patches integrated
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> * Service has variants
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">NOTICES
+</span></span><span class="line"><span class="cl">Operation in progress: pro attach
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">For a list of all Ubuntu Pro services and variants, run <span class="s1">&#39;pro status --all&#39;</span>
+</span></span><span class="line"><span class="cl">Enable services with: pro <span class="nb">enable</span> &lt;service&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">     Account: xxxxx@xxx.com
+</span></span><span class="line"><span class="cl">Subscription: Ubuntu Pro - free personal subscription
+</span></span></code></pre></td></tr></table></div></div><h2 id="conclusion">Conclusion</h2><p>Once the above basic environment configurations are set up, you can happily proceed with remote development 🥳.</p><h2 id="references">References</h2><ol><li><a class="link" href="https://aws.amazon.com/what-is/vps/" target="_blank" rel="noopener">What is a VPS (Virtual Private Server)?</a></li><li><a class="link" href="https://ubuntu.com/server/docs" target="_blank" rel="noopener">Ubuntu Server documentation</a></li><li><a class="link" href="https://help.ubuntu.com/community/DiskSpace" target="_blank" rel="noopener">DiskSpace - Community Help Wiki</a></li><li><a class="link" href="https://ubuntu.com/blog/ubuntu-bionic-netplan" target="_blank" rel="noopener">Ubuntu Bionic: Netplan</a></li><li><a class="link" href="https://github.com/akinomyoga/ble.sh" target="_blank" rel="noopener">ble.sh</a></li><li><a class="link" href="https://github.com/junegunn/fzf" target="_blank" rel="noopener">fzf</a></li><li><a class="link" href="https://github.com/tldr-pages/tldr" target="_blank" rel="noopener">tldr-pages/tldr</a></li><li><a class="link" href="https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup" target="_blank" rel="noopener">First-Time Git Setup</a></li><li><a class="link" href="https://tailscale.com/kb/1077/secure-server-ubuntu-18-04?q=ufw+allow#step-1-ssh-into-your-new-ubuntu-server" target="_blank" rel="noopener">Use UFW to lock down an Ubuntu server</a></li><li><a class="link" href="https://superuser.com/questions/1037346/i-have-both-ipv4-and-ipv6-public-addresses-why" target="_blank" rel="noopener">networking - I have both IPv4 and IPv6 public addresses. Why?</a></li><li><a class="link" href="https://discourse.ubuntu.com/t/fine-tuning-the-ubuntu-24-04-kernel-for-low-latency-throughput-and-power-efficiency/44834" target="_blank" rel="noopener">Fine-Tuning the Ubuntu 24.04 Kernel for low latency, throughput, and power efficiency</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/en/tags/linux/">Linux</a>
+<a href="/en/tags/ubuntu/">Ubuntu</a>
+<a href="/en/tags/tutorial/">Tutorial</a>
+<a href="/en/tags/service/">Service</a>
+<a href="/en/tags/system/">System</a>
+<a href="/en/tags/network/">Network</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>This article is licensed under a <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>Last Updated On 2026/08/15</span></section></footer></article><aside><h2 class="section-title">Related Content</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/en/post/ubuntu-no-network-on-boot/"><div class="article-image"><img alt="Featured image of post Fixing Ubuntu 24.04 Boot Hang: System Stalls When Ethernet Port is Off" height="150" loading="lazy" src="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp" srcset="/post/ubuntu-no-network-on-boot/cover_hu_45063635a3650a33.webp 1x, /post/ubuntu-no-network-on-boot/cover_hu_d95a03bc103153c1.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#996b3f80 0%,#1a2a2bC0 100%)"><h2 class="article-title">Fixing Ubuntu 24.04 Boot Hang: System Stalls When Ethernet Port is Off</h2></div></a></article><article class="has-image"><a href="/en/post/home-assistant-homekit-bridge/"><div class="article-image"><img alt="Featured image of post Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit" height="150" loading="lazy" src="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp" srcset="/post/home-assistant-homekit-bridge/cover_hu_37df8e041d9b76ca.webp 1x, /post/home-assistant-homekit-bridge/cover_hu_b7b44962d3268df7.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#bebbb280 0%,#413424C0 100%)"><h2 class="article-title">Hyper-V Home Assistant Setup: Easily Bridge Non-Certified Devices to HomeKit</h2></div></a></article><article class="has-image"><a href="/en/post/mdns-iot-device-discovery/"><div class="article-image"><img alt="Featured image of post How mDNS Works: Device Discovery in IoT" height="150" loading="lazy" src="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp" srcset="/post/mdns-iot-device-discovery/cover_hu_9b0b5f07c13f7c93.webp 1x, /post/mdns-iot-device-discovery/cover_hu_8f608671f48343b3.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c2c1b280 0%,#524332C0 100%)"><h2 class="article-title">How mDNS Works: Device Discovery in IoT</h2></div></a></article><article class="has-image"><a href="/en/post/generate-self-signed-cert/"><div class="article-image"><img alt="Featured image of post Effortless Intranet HTTPS Upgrade: Creating Self-Signed Certificates with OpenSSL" height="150" loading="lazy" src="/post/generate-self-signed-cert/cover_hu_c26d95563300f92.webp" srcset="/post/generate-self-signed-cert/cover_hu_c26d95563300f92.webp 1x, /post/generate-self-signed-cert/cover_hu_97e045c2e227d905.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a45b2180 0%,#47261cC0 100%)"><h2 class="article-title">Effortless Intranet HTTPS Upgrade: Creating Self-Signed Certificates with OpenSSL</h2></div></a></article><article class="has-image"><a href="/en/post/ssh-connection/"><div class="article-image"><img alt="Featured image of post Using SSH Keys for Password-Free Remote Connections" height="150" loading="lazy" src="/post/ssh-connection/cover_hu_383b24a9cea8f2c8.webp" srcset="/post/ssh-connection/cover_hu_383b24a9cea8f2c8.webp 1x, /post/ssh-connection/cover_hu_f74a22af6adde5c9.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#216b9180 0%,#193c4aC0 100%)"><h2 class="article-title">Using SSH Keys for Password-Free Remote Connections</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","en"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">Copyright &copy;
+2023 -
+2026 WellWells</section><section class="powerby">Theme Stack designed by Jimmy</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.409fe41f76938f50142ab8f2959ffe0c989eda46761970d64bbd31bec3513bee.js" defer></script></body></html>

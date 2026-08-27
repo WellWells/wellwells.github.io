@@ -1,0 +1,342 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="Set up Faster Whisper locally, plus a script that takes a YouTube or Bilibili URL, downloads the video, and produces an offline transcript with SRT/TXT subtitles."><title>Get Raw Subtitles for Any Video or Audio with Faster Whisper - WellWells</title><link rel="canonical" href="https://wellstsai.com/en/post/whisper/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="Get Raw Subtitles for Any Video or Audio with Faster Whisper"><meta property='og:description' content="Set up Faster Whisper locally, plus a script that takes a YouTube or Bilibili URL, downloads the video, and produces an offline transcript with SRT/TXT subtitles."><meta property='og:url' content='https://wellstsai.com/en/post/whisper/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='AI'><meta property='article:tag' content='Tutorial'><meta property='article:tag' content='GPT'><meta property='article:tag' content='Productivity'><meta property='article:tag' content='Automation'><meta property='article:tag' content='Script'><meta property='article:tag' content='Software'><meta property='article:published_time' content='2025-07-08T21:30:00+08:00'><meta property='article:modified_time' content='2026-08-15T12:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/whisper/cover.webp'><meta name="twitter:title" content="Get Raw Subtitles for Any Video or Audio with Faster Whisper"><meta name="twitter:description" content="Set up Faster Whisper locally, plus a script that takes a YouTube or Bilibili URL, downloads the video, and produces an offline transcript with SRT/TXT subtitles."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/whisper/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/whisper/cover_hu_ab75c67866670264.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/whisper/cover_hu_9bbf7a5756798424.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/whisper/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/whisper/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/whisper/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/whisper/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"Introduction After recording a video, how can you quickly add subtitles?\nOr, after recording a meeting conversation or interview on an iPhone, how do you convert it into a readable text transcript?\nWhen a video's content is too complex or there's a language barrier, how can you feed it to an AI for a structured summary, complete with causes and effects?\nAll the needs above can be met with OpenAI's open-source Whisper automatic speech recognition model, or its high-efficiency derivative project, …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T12:00:00+08:00","datePublished":"2025-07-08T21:30:00+08:00","description":"Set up Faster Whisper locally, plus a script that takes a YouTube or Bilibili URL, downloads the video, and produces an offline transcript with SRT/TXT subtitles.","headline":"Get Raw Subtitles for Any Video or Audio with Faster Whisper","image":"https://wellstsai.com/post/whisper/cover.webp","keywords":["AI","Tutorial","GPT","Productivity","Automation","Script","Software"],"mainEntityOfPage":{"@id":"https://wellstsai.com/en/post/whisper/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/en/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/en/">WellWells</a></h1><h2 class="site-description">Unexpected valuables in the well</h2></div></header><ol class="menu" id="main-menu"><li><a href='/en/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>Home</span></a></li><li><a href='/en/about/'><svg class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span></a></li><li><a href='/en/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>Archive</span></a></li><li><a href='/en/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>Sponsor</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/whisper/">繁體中文</option><option value="/en/post/whisper/" selected>English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">Table of Contents</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#what-is-whisper">What is Whisper?</a><ol><li><a href="#main-features">Main Features</a></li><li><a href="#technical-features">Technical Features</a></li><li><a href="#use-cases">Use Cases</a></li><li><a href="#other-versions">Other Versions</a></li></ol></li><li><a href="#deploying-faster-whisper-locally">Deploying faster-whisper Locally</a><ol><li><a href="#install-python">Install Python</a></li><li><a href="#install-faster-whisper">Install faster-whisper</a></li><li><a href="#install-cuda-toolkit-12-and-cudnn-optional">Install CUDA Toolkit 12 and cuDNN (Optional)</a></li></ol></li><li><a href="#using-the-script-to-transcribe-videoaudio-to-a-transcript">Using the Script to Transcribe Video/Audio to a Transcript</a><ol><li><a href="#script-download">Script Download</a></li><li><a href="#generate-srtbat">generate-srt.bat</a></li><li><a href="#generate-srtpy">generate-srt.py</a></li><li><a href="#parameterstxt-參數設定txt">parameters.txt (參數設定.txt)</a></li></ol></li><li><a href="#usage-example">Usage Example</a></li><li><a href="#independently-transcribing-local-files">Independently Transcribing Local Files</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/en/post/whisper/" style="position:relative;display:block"><img src="/post/whisper/cover_hu_c9bad6f677b535ff.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/whisper/cover_hu_ab75c67866670264.webp"><source media="(min-width: 769px)" srcset="/post/whisper/cover_hu_9bbf7a5756798424.webp">
+<img src="/post/whisper/cover_hu_9bbf7a5756798424.webp" width="1536" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="Get Raw Subtitles for Any Video or Audio with Faster Whisper" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/en/post/whisper/">Get Raw Subtitles for Any Video or Audio with Faster Whisper</a></h2><h3 class="article-subtitle">Set up Faster Whisper locally, plus a script that takes a YouTube or Bilibili URL, downloads the video, and produces an offline transcript with SRT/TXT subtitles.</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2025-07-08T21:30:00+08:00'>2025/07/08</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">5 Minutes Read</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/post/whisper/" class="link">繁體中文</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>Table of Contents</span></div></summary><nav class="toc-nav"><ol><li><a href="#introduction">Introduction</a></li><li><a href="#what-is-whisper">What is Whisper?</a><ol><li><a href="#main-features">Main Features</a></li><li><a href="#technical-features">Technical Features</a></li><li><a href="#use-cases">Use Cases</a></li><li><a href="#other-versions">Other Versions</a></li></ol></li><li><a href="#deploying-faster-whisper-locally">Deploying faster-whisper Locally</a><ol><li><a href="#install-python">Install Python</a></li><li><a href="#install-faster-whisper">Install faster-whisper</a></li><li><a href="#install-cuda-toolkit-12-and-cudnn-optional">Install CUDA Toolkit 12 and cuDNN (Optional)</a></li></ol></li><li><a href="#using-the-script-to-transcribe-videoaudio-to-a-transcript">Using the Script to Transcribe Video/Audio to a Transcript</a><ol><li><a href="#script-download">Script Download</a></li><li><a href="#generate-srtbat">generate-srt.bat</a></li><li><a href="#generate-srtpy">generate-srt.py</a></li><li><a href="#parameterstxt-參數設定txt">parameters.txt (參數設定.txt)</a></li></ol></li><li><a href="#usage-example">Usage Example</a></li><li><a href="#independently-transcribing-local-files">Independently Transcribing Local Files</a></li><li><a href="#conclusion">Conclusion</a></li><li><a href="#references">References</a></li></ol></nav></details></aside><section class="article-content"><h2 id="introduction">Introduction</h2><p>After recording a video, how can you quickly add subtitles?</p><p>Or, after recording a meeting conversation or interview on an iPhone, how do you convert it into a readable text transcript?</p><p>When a video's content is too complex or there's a language barrier, how can you feed it to an AI for a structured summary, complete with causes and effects?</p><p>All the needs above can be met with OpenAI's open-source Whisper automatic speech recognition model, or its high-efficiency derivative project, Faster-Whisper. Deploy it locally and you get one-click video/audio to text transcription, subtitle generation, and content analysis afterwards.</p><h2 id="what-is-whisper">What is Whisper?</h2><p>Whisper is an automatic speech recognition (ASR) system officially released and open-sourced by OpenAI in September 2022. As of 2025, Whisper has been available for nearly three years.</p><h3 id="main-features">Main Features</h3><ul><li><p><strong>Speech-to-Text</strong>: Automatically recognizes and converts speech content from recordings, videos, etc., into a text transcript.</p></li><li><p><strong>Multi-language Support</strong>: Supports over 57 languages (such as Chinese, English, Japanese, French, etc.) and detects the language automatically. The underlying model is actually trained on data from 98 languages using weak supervision. Official support only covers the 57 languages with a word error rate below 50%.</p></li><li><p><strong>Automatic Language Recognition</strong>: The model can automatically determine the language being spoken without needing it to be specified beforehand.</p></li><li><p><strong>Fault Tolerance</strong>: Maintains high recognition accuracy even with poor audio quality, heavy accents, or background noise.</p></li></ul><h3 id="technical-features">Technical Features</h3><ul><li><p><strong>Deep Learning Model</strong>: Uses a Transformer architecture and is trained with weak supervision on a large-scale, multi-language dataset of speech-to-text pairings.</p></li><li><p><strong>Open-Source and Available</strong>: The source code and model weights are freely available on GitHub, making it convenient for researchers and developers to perform secondary development and customization.</p></li><li><p><strong>Cross-Platform Support</strong>: Can be deployed on various operating systems, including Windows, macOS, and Linux.</p></li><li><p><strong>Multiple Model Sizes</strong>: Offers various model configurations, from <code>tiny</code> to <code>large-v3</code>, <code>turbo</code>, allowing users to choose based on their resource and accuracy requirements.</p></li></ul><h3 id="use-cases">Use Cases</h3><ul><li><p><strong>Automatic Video Subtitle Generation</strong>: Quickly generate video transcripts and subtitle files (SRT/TXT).</p></li><li><p><strong>Automated Meeting Minutes</strong>: Transcribe audio from online/offline meetings, reducing the time spent on manual organization.</p></li><li><p><strong>Voice Search and Voice Control</strong>: Supports use cases like voice queries and command recognition.</p></li><li><p><strong>Podcast and Interview Transcription</strong>: Quickly convert long-form audio content into text transcripts for easier content management and retrieval.</p></li></ul><h3 id="other-versions">Other Versions</h3><p>Besides the original Whisper model, the community has developed several derivative projects to meet different performance and functional needs:</p><ol><li><p><strong>faster-whisper</strong>: Based on the Whisper architecture but rewritten with CTranslate2 as the inference engine. Both execution speed and resource efficiency come out better than the original, which suits applications that need high throughput or real-time transcription.</p></li><li><p><strong>WhisperX</strong>: Builds on faster-whisper by adding advanced features like batch inference, forced alignment, speaker diarization, and voice activity detection (VAD). It is particularly useful for precise transcription and analysis of long audio files or recordings with multiple speakers.</p></li><li><p><strong>Whisper.cpp</strong>: A super-lightweight C/C++ implementation of the Whisper model. It can run locally offline on various edge devices (like laptops, mobile phones, IoT) with a fast startup time, which fits scenarios that need real-time performance and portability.</p></li></ol><p>I used to transcribe subtitles with the official OpenAI Whisper. Later I found that on the same hardware, faster-whisper matches or beats it on recognition accuracy while cutting computation time noticeably. So this tutorial goes with faster-whisper. If higher alignment accuracy or multi-speaker analysis is needed later, WhisperX is the next thing to evaluate.</p><h2 id="deploying-faster-whisper-locally">Deploying faster-whisper Locally</h2><h3 id="install-python">Install Python</h3><p>You need Python 3.9 or a newer version. Here, we'll install it directly using <a class="link" href="/en/post/awesome-windows/#installing-winget">WinGet</a>:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">winget install -e --id Python.Python.3.9
+</span></span></code></pre></td></tr></table></div></div><p>Check the version with <code>python -V</code>. If a version number is returned, the installation was successful:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">wells</span><span class="p">&gt;</span> <span class="n">python</span> <span class="n">-V</span>
+</span></span><span class="line"><span class="cl"><span class="n">Python</span> <span class="mf">3.9</span><span class="p">.</span><span class="py">13</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-faster-whisper">Install faster-whisper</h3><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">pip install faster-whisper
+</span></span></code></pre></td></tr></table></div></div><h3 id="install-cuda-toolkit-12-and-cudnn-optional">Install CUDA Toolkit 12 and cuDNN (Optional)</h3><p>⚠️ This step is only for systems equipped with an NVIDIA graphics card that supports CUDA.</p><p>A CUDA-capable GPU changes the conversion time a lot. There is a measured GPU-versus-CPU comparison at the end of this post. Below is a summary of NVIDIA GPU models that support CUDA:</p><div class="table-wrapper"><table><thead><tr><th style="text-align:left">Category</th><th style="text-align:left">Models</th></tr></thead><tbody><tr><td style="text-align:left"><strong>Data Center & Superchips</strong></td><td style="text-align:left">B200, B100, GH200, H200, H100, L40S, L40, L4, A100, A40, A30, A16, A10, A2, T4, V100</td></tr><tr><td style="text-align:left"><strong>Workstation & Pro Cards</strong></td><td style="text-align:left">RTX PRO 6000, RTX PRO 5000, RTX PRO 4500, RTX PRO 4000, RTX 6000, RTX 5000, RTX 4500, RTX 4000, RTX 2000, RTX A6000, RTX A5500, RTX A5000, RTX A4500, RTX A4000, RTX A2000, Quadro RTX 8000/6000/5000/4000, Quadro GV100, Quadro T-Series</td></tr><tr><td style="text-align:left"><strong>GeForce</strong></td><td style="text-align:left"><strong>RTX 50:</strong> 5090, 5080, 5070 Ti, 5070, 5060 Ti, 5060 &lt;br> <strong>RTX 40:</strong> 4090, 4080, 4070 SUPER/Ti, 4070, 4060 Ti, 4060, 4050 &lt;br> <strong>RTX 30:</strong> 3090 Ti, 3090, 3080 Ti, 3080, 3070 Ti, 3070, 3060 Ti, 3060, 3050 Ti, 3050 &lt;br> <strong>RTX 20:</strong> 2080 Ti/Super, 2080, 2070 Super, 2070, 2060 Super, 2060 &lt;br> <strong>GTX 16:</strong> 1660 Ti/Super, 1660, 1650 Super/Ti, 1650 &lt;br> <strong>TITAN:</strong> Titan RTX, TITAN V</td></tr><tr><td style="text-align:left"><strong>Jetson SoC</strong></td><td style="text-align:left">Jetson AGX Orin, Jetson Orin NX, Jetson Orin Nano</td></tr></tbody></table></div><p>Go to the official <a class="link" href="https://developer.nvidia.com/cuda-12-0-0-download-archive?target_os=Windows&amp;target_arch=x86_64&amp;target_version=11&amp;target_type=exe_local" target="_blank" rel="noopener">CUDA Toolkit 12.0 Downloads link</a> and select the corresponding operating system and version.</p><p>In this case, I am currently downloading <code>cuda_12.9.1_576.57_windows.exe</code>. I will use the default settings throughout the installation process.</p><p>After installation is complete, you can check if CUDA has been installed in the system directory <code>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA</code>.</p><p><img alt="CUDA Toolkit Download Page" class="gallery-image" data-flex-basis="348px" data-flex-grow="145" decoding="async" fetchpriority="high" height="1614" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/download_cuda_toolkit_12.x.webp" srcset="/post/whisper/download_cuda_toolkit_12.x_hu_3e7c5eafd304d170.webp 800w, /post/whisper/download_cuda_toolkit_12.x_hu_b4c2bb20deab2c84.webp 1600w, /post/whisper/download_cuda_toolkit_12.x.webp 2341w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2341">
+<img alt="Verify CUDA Installation in System Path" class="gallery-image" data-flex-basis="983px" data-flex-grow="409" decoding="async" height="323" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/check_cuda_path.webp" srcset="/post/whisper/check_cuda_path_hu_f7109e6501a4a79e.webp 800w, /post/whisper/check_cuda_path.webp 1324w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1324"></p><p>Next, go to the <a class="link" href="https://developer.nvidia.com/cudnn-downloads?target_os=Windows&amp;target_arch=x86_64&amp;target_version=Agnostic&amp;cuda_version=12" target="_blank" rel="noopener">official cuDNN accelerated library download page</a> to download a compatible cuDNN version.</p><p>After downloading, you will get a zip archive named <code>cudnn-windows-x86_64-9.10.2.21_cuda12-archive.zip</code>.</p><p>After unzipping, copy the <code>bin</code>, <code>include</code>, and <code>lib</code> folders into the already installed CUDA directory.</p><p><img alt="cuDNN Download Page" class="gallery-image" data-flex-basis="361px" data-flex-grow="150" decoding="async" height="1533" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/download_cudnn.webp" srcset="/post/whisper/download_cudnn_hu_150a8bfc872254d6.webp 800w, /post/whisper/download_cudnn_hu_378555aebef1d11c.webp 1600w, /post/whisper/download_cudnn.webp 2312w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2312">
+<img alt="Copy bin, include, lib from zip to CUDA directory" class="gallery-image" data-flex-basis="254px" data-flex-grow="105" decoding="async" height="1125" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/install_cudnn.webp" srcset="/post/whisper/install_cudnn_hu_702066760038f715.webp 800w, /post/whisper/install_cudnn.webp 1192w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="1192"></p><p>The installation and configuration of CUDA and cuDNN are now complete.</p><h2 id="using-the-script-to-transcribe-videoaudio-to-a-transcript">Using the Script to Transcribe Video/Audio to a Transcript</h2><h3 id="script-download">Script Download</h3><p>Download the complete package: <a class="link" href="generate-srt.zip">generate-srt.zip</a></p><p>After unzipping, you can place the entire folder in any directory to run it. The folder contains three files:</p><ol><li>generate-srt.bat (Main program)</li><li>generate-srt.py</li><li>parameters.txt (參數設定.txt)</li></ol><p>The batch file needs external tools to download videos. It will require <a class="link" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">yt-dlp</a> to download YouTube videos or <a class="link" href="https://github.com/iawia002/lux" target="_blank" rel="noopener">lux</a> to download Bilibili videos.</p><p>You can use <a class="link" href="/en/post/awesome-windows/#installing-winget">WinGet</a> to install yt-dlp:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">winget install yt-dlp.yt-dlp
+</span></span></code></pre></td></tr></table></div></div><p>If you need to convert Bilibili videos, you will need lux. Please go to its official release page to <a class="link" href="https://github.com/iawia002/lux/releases/download/v0.24.1/lux_0.24.1_Windows_x86_64.zip" target="_blank" rel="noopener">download the lux.exe executable</a>.</p><p>After downloading, unzip <code>lux.exe</code> into the <code>generate-srt</code> folder.</p><p><img alt="generate-srt Directory" class="gallery-image" data-flex-basis="420px" data-flex-grow="175" decoding="async" height="429" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/generate-srt_with_lux.webp" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="751"></p><h3 id="generate-srtbat">generate-srt.bat</h3><p>This batch file is responsible for the entire "Download → Transcribe → File Organization" automation. Key logic includes:</p><ol><li><p>Configuration Section (⚠️ Needs to be adjusted based on your computer on first use)</p><ul><li><code>whisperModel</code>: Specify the Faster-Whisper model size (tiny/base/small/medium/large-v3/turbo)</li><li><code>whisperDevice</code>: Computation device (cpu/cuda)</li><li><code>whisperTask</code>: Task mode (transcribe/translate)</li><li><code>computeType</code>: Precision type (float16/int8_float16/...)</li><li><code>openEditor</code>: The editor to open the subtitle file after transcription (none/notepad/code)</li><li><code>autoLoop</code>: Whether to automatically loop to process multiple videos (true/false)</li></ul></li><li><p>Environment Check</p><ul><li>Checks if the <code>yt-dlp</code> and <code>lux</code> downloaders are installed or exist in the current directory.</li><li>Checks if Python is available and if <code>faster_whisper</code> can be imported.</li><li>Checks if <code>generate-srt.py</code> is in the same directory.</li></ul></li><li><p>Uses <code>yt-dlp</code> or <code>lux</code> to download the video, then passes the video path to <code>generate-srt.py</code> to output a subtitle file.</p></li><li><p>Finally, opens the subtitle file with a text editor.</p></li></ol><h3 id="generate-srtpy">generate-srt.py</h3><p>This Python script uses the Faster-Whisper package to perform speech recognition. Its core parameters can be passed externally. You generally do not need to modify this file.</p><h3 id="parameterstxt-參數設定txt">parameters.txt (參數設定.txt)</h3><p>This file explains all adjustable parameters, provides usage examples, and recommended settings. Here is a sample of its content:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-markdown" data-lang="markdown"><span class="line"><span class="cl"><span class="gh"># Parameter Configuration Guide
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperModel
+</span></span></span><span class="line"><span class="cl">Options: tiny, base, small, medium, large-v3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## openEditor
+</span></span></span><span class="line"><span class="cl">Options: none, notepad, code
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## autoLoop
+</span></span></span><span class="line"><span class="cl">true: Automatically restart after conversion is complete
+</span></span><span class="line"><span class="cl">false: Run only once
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperDevice
+</span></span></span><span class="line"><span class="cl">Options: cpu, cuda
+</span></span><span class="line"><span class="cl"><span class="k">-</span> To use GPU acceleration, you need an NVIDIA graphics card and must install:
+</span></span><span class="line"><span class="cl">  <span class="k">-</span> CUDA 12
+</span></span><span class="line"><span class="cl">  <span class="k">-</span> cuDNN 9 for CUDA 12
+</span></span><span class="line"><span class="cl"><span class="k">-</span> Important: The latest version of faster-whisper relies on ctranslate2, which only supports CUDA 12.
+</span></span><span class="line"><span class="cl"><span class="k">-</span> If you have an AMD GPU or no NVIDIA CUDA, please select cpu.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## whisperTask
+</span></span></span><span class="line"><span class="cl">Options: transcribe, translate
+</span></span><span class="line"><span class="cl"><span class="k">-</span> transcribe: Directly convert speech content into text in the original language (i.e., ASR).
+</span></span><span class="line"><span class="cl"><span class="k">-</span> translate: Translate the speech content into English text (i.e., speech translation).
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="gu">## computeType
+</span></span></span><span class="line"><span class="cl">Options: auto, default, float16, int8_float16, int8, int8_float32, int8_bfloat16, int16, float32, bfloat16
+</span></span><span class="line"><span class="cl"><span class="k">-</span> NVIDIA graphics card (Compute Capability &gt;= 7.0): float16 or int8_float16 (fast and memory-efficient)
+</span></span><span class="line"><span class="cl"><span class="k">-</span> CPU only (Intel/AMD): int8_float32 or int16 (memory-efficient, good speed), or auto
+</span></span><span class="line"><span class="cl"><span class="k">-</span> AMD GPU: Recommend using auto or float32 (AMD support is limited, auto will select the fastest)
+</span></span><span class="line"><span class="cl"><span class="k">-</span> When unsure, set to auto, and the system will automatically choose the best type
+</span></span><span class="line"><span class="cl"><span class="k">-</span> Reference: https://github.com/OpenNMT/CTranslate2/blob/master/docs/quantization.md
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>⚠️ Before you start, you must modify the batch file according to your computer's hardware. Apply the changes to the corresponding variable section in <code>generate-srt.bat</code>.</p><p><code>whisperModel=turbo</code> offers a good balance between results and performance. For less powerful computers, you can change it to <code>base</code> or <code>tiny</code>.</p><p><code>whisperDevice=cpu</code>. If you have already set up CUDA support, you can change this to <code>cuda</code>, which cuts the conversion time a lot.</p><p><code>openEditor=none</code>. If you want the subtitle file to open automatically after conversion, you can set this to <code>notepad</code> or <code>code</code>.</p></blockquote><h2 id="usage-example">Usage Example</h2><ol><li><p>First, modify the global variables in <code>generate-srt.bat</code>. If you have GPU support configured, change it to <code>SET "whisperDevice=cuda"</code> to speed up the conversion.</p></li><li><p>Double-click <code>generate-srt.bat</code>, and the system will automatically check if the execution environment meets the requirements.</p><p><img alt="Run generate-srt.bat" class="gallery-image" data-flex-basis="425px" data-flex-grow="177" decoding="async" height="2159" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/run_generate-srt.webp" srcset="/post/whisper/run_generate-srt_hu_bd6b25b9bb4400ab.webp 800w, /post/whisper/run_generate-srt_hu_d0611d0f22ec40a3.webp 1600w, /post/whisper/run_generate-srt_hu_7cd679f9fbf9c890.webp 2400w, /post/whisper/run_generate-srt.webp 3832w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="3832"></p></li><li><p>Enter a YouTube URL, for example, "<a class="link" href="https://www.youtube.com/watch?v=RnkcNjeA-rU" target="_blank" rel="noopener">Taijiang National Park – Conservation and Habitat of the Black-faced Spoonbill</a>". This video has embedded subtitles and does not provide subtitles in other languages.</p><p><img alt="Downloading and Converting to Subtitles" class="gallery-image" data-flex-basis="425px" data-flex-grow="177" decoding="async" height="2159" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/downloaded_and_converting.webp" srcset="/post/whisper/downloaded_and_converting_hu_53b83cdc3ad31154.webp 800w, /post/whisper/downloaded_and_converting_hu_8989e94913071beb.webp 1600w, /post/whisper/downloaded_and_converting_hu_3be04c238263c1e2.webp 2400w, /post/whisper/downloaded_and_converting.webp 3832w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="3832"></p></li><li><p>After the conversion is complete, you can find the generated <code>.srt</code> subtitle file in the <code>output</code> folder.</p><p><img alt="Conversion Result" class="gallery-image" data-flex-basis="672px" data-flex-grow="280" decoding="async" height="333" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/whisper/image.webp" srcset="/post/whisper/image_hu_b9ad830c31d4254c.webp 800w, /post/whisper/image.webp 933w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="933"></p></li></ol><p>Transcript conversion result:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">1
+</span></span><span class="line"><span class="cl">00:00:00,690 --&gt; 00:00:05,969
+</span></span><span class="line"><span class="cl">台江國家公園是 2009 年的 12 月 28 號成立
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">2
+</span></span><span class="line"><span class="cl">00:00:05,969 --&gt; 00:00:11,269
+</span></span><span class="line"><span class="cl">它是一個以濕地為主的一個國家公園
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">3
+</span></span><span class="line"><span class="cl">00:00:11,269 --&gt; 00:00:13,710
+</span></span><span class="line"><span class="cl">有紀錄的鳥類將近 300 種
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">4
+</span></span><span class="line"><span class="cl">00:00:13,710 --&gt; 00:00:16,710
+</span></span><span class="line"><span class="cl">當然最主要是水鳥
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">5
+</span></span><span class="line"><span class="cl">00:00:16,710 --&gt; 00:00:20,789
+</span></span><span class="line"><span class="cl">當然包括雁鴨類或鷺鷥類
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">6
+</span></span><span class="line"><span class="cl">00:00:20,789 --&gt; 00:00:22,269
+</span></span><span class="line"><span class="cl">當然還有黑面琵鷺
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">7
+</span></span><span class="line"><span class="cl">00:00:22,269 --&gt; 00:00:26,429
+</span></span><span class="line"><span class="cl">我們全世界黑面琵鷺大概有 3000 多隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">8
+</span></span><span class="line"><span class="cl">00:00:26,429 --&gt; 00:00:30,589
+</span></span><span class="line"><span class="cl">可是來臺灣去年已經超過了 2000 隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">9
+</span></span><span class="line"><span class="cl">00:00:30,589 --&gt; 00:00:36,149
+</span></span><span class="line"><span class="cl">當中的 90% 是在我們曾文溪口
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">10
+</span></span><span class="line"><span class="cl">00:00:36,149 --&gt; 00:00:45,530
+</span></span><span class="line"><span class="cl">在我們來的第二年數量大概減少了四五百隻
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">11
+</span></span><span class="line"><span class="cl">00:00:45,530 --&gt; 00:00:52,130
+</span></span><span class="line"><span class="cl">我們推斷的原因可能是它度冬期間的食物來源不足
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">12
+</span></span><span class="line"><span class="cl">00:00:52,130 --&gt; 00:00:56,130
+</span></span><span class="line"><span class="cl">所以我們提倡淺坪式的魚塭
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">13
+</span></span><span class="line"><span class="cl">00:00:56,130 --&gt; 00:00:57,350
+</span></span><span class="line"><span class="cl">為什麼要淺坪呢
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">14
+</span></span><span class="line"><span class="cl">00:00:57,350 --&gt; 00:01:00,990
+</span></span><span class="line"><span class="cl">就是水深大概是一公尺以內
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">15
+</span></span><span class="line"><span class="cl">00:01:00,990 --&gt; 00:01:04,549
+</span></span><span class="line"><span class="cl">陽光照射到魚塭裡面它會自然的
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">16
+</span></span><span class="line"><span class="cl">00:01:04,549 --&gt; 00:01:06,549
+</span></span><span class="line"><span class="cl">產生藻類
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">17
+</span></span><span class="line"><span class="cl">00:01:06,549 --&gt; 00:01:09,549
+</span></span><span class="line"><span class="cl">再適時的加以一些飼料
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">18
+</span></span><span class="line"><span class="cl">00:01:09,549 --&gt; 00:01:11,549
+</span></span><span class="line"><span class="cl">虱目魚就可以長得很好
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">19
+</span></span><span class="line"><span class="cl">00:01:11,549 --&gt; 00:01:16,549
+</span></span><span class="line"><span class="cl">所以虱目魚在一般四月份開始養殖
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">20
+</span></span><span class="line"><span class="cl">00:01:16,549 --&gt; 00:01:18,549
+</span></span><span class="line"><span class="cl">一直到十月份收成
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">21
+</span></span><span class="line"><span class="cl">00:01:18,549 --&gt; 00:01:22,549
+</span></span><span class="line"><span class="cl">以後還有一些小魚小蝦它要洩水
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">22
+</span></span><span class="line"><span class="cl">00:01:22,549 --&gt; 00:01:27,549
+</span></span><span class="line"><span class="cl">這個地方就變成黑面琵鷺最喜歡的這個覓食場所
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">23
+</span></span><span class="line"><span class="cl">00:01:27,549 --&gt; 00:01:30,549
+</span></span><span class="line"><span class="cl">也強調人用半年鳥用半年
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">24
+</span></span><span class="line"><span class="cl">00:01:30,549 --&gt; 00:01:34,430
+</span></span><span class="line"><span class="cl">我們想到這樣子的方式去推動以後
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">25
+</span></span><span class="line"><span class="cl">00:01:34,430 --&gt; 00:01:37,430
+</span></span><span class="line"><span class="cl">那也得到 BirdLife International
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">26
+</span></span><span class="line"><span class="cl">00:01:37,430 --&gt; 00:01:40,430
+</span></span><span class="line"><span class="cl">世界上最大的鳥類保育組織的認同
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">27
+</span></span><span class="line"><span class="cl">00:01:40,430 --&gt; 00:01:44,430
+</span></span><span class="line"><span class="cl">來給我們頒授這個保育的成就獎
+</span></span></code></pre></td></tr></table></div></div><h2 id="independently-transcribing-local-files">Independently Transcribing Local Files</h2><p>If you don't need to download a video via the <code>bat</code> file and already have a local audio file, you can directly execute the following command to transcribe subtitles:</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">python generate-srt.py [input.mp3] --model_size turbo --device cuda --task transcribe --compute_type float16
+</span></span></code></pre></td></tr></table></div></div><h2 id="conclusion">Conclusion</h2><p>After converting audio/video content to text, you can hand the transcript to a large language model (like ChatGPT or Gemini) for summarization, analysis, or key point extraction. That gets you the core of the video quickly, and lets you skip the long or off-topic stretches.</p><p>In my tests, I found that the <code>base</code> model's output contained quite a few inaccuracies and tended to misspell proper nouns, but it was generally fine for analysis and summarization by GPT. As for <code>turbo</code> and <code>large-v3</code>, I personally feel they are quite similar, but <code>turbo</code> has the advantage of much faster conversion. For daily use I stick with <code>turbo</code>.</p><p>Finally, I'm sharing a comparison of the conversion results for an 18-minute video on two different computers—one using an NVIDIA GPU and another with only a CPU—for anyone who might find it useful.</p><div class="table-wrapper"><table><thead><tr><th>Hardware Configuration</th><th>Model Version</th><th>GPU Used</th><th>Processing Time</th></tr></thead><tbody><tr><td>NVIDIA RTX 3060 Ti</td><td><code>base</code></td><td>Yes</td><td><strong>01 min 16 sec</strong></td></tr><tr><td>NVIDIA RTX 3060 Ti</td><td><code>large-v3-turbo</code></td><td>Yes</td><td><strong>01 min 42 sec</strong></td></tr><tr><td>NVIDIA RTX 3060 Ti</td><td><code>large-v3</code></td><td>Yes</td><td><strong>06 min 43 sec</strong></td></tr><tr><td>AMD Ryzen 5 3500X</td><td><code>base</code></td><td>No</td><td><strong>03 min 17 sec</strong></td></tr><tr><td>AMD Ryzen 5 3500X</td><td><code>large-v3-turbo</code></td><td>No</td><td><strong>11 min 29 sec</strong></td></tr></tbody></table></div><h2 id="references">References</h2><ol><li><a class="link" href="https://github.com/openai/whisper" target="_blank" rel="noopener">openai/whisper</a></li><li><a class="link" href="https://platform.openai.com/docs/guides/speech-to-text" target="_blank" rel="noopener">Speech to text - OpenAI API</a></li><li><a class="link" href="https://en.wikipedia.org/wiki/Word_error_rate" target="_blank" rel="noopener">Word error rate</a></li><li><a class="link" href="https://github.com/SYSTRAN/faster-whisper" target="_blank" rel="noopener">SYSTRAN/faster-whisper</a></li><li><a class="link" href="https://github.com/m-bain/whisperX" target="_blank" rel="noopener">m-bain/whisperX: WhisperX</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/en/tags/ai/">AI</a>
+<a href="/en/tags/tutorial/">Tutorial</a>
+<a href="/en/tags/gpt/">GPT</a>
+<a href="/en/tags/productivity/">Productivity</a>
+<a href="/en/tags/automation/">Automation</a>
+<a href="/en/tags/script/">Script</a>
+<a href="/en/tags/software/">Software</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>This article is licensed under a <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>Last Updated On 2026/08/15</span></section></footer></article><aside><h2 class="section-title">Related Content</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/en/post/yobi-free-ai-automation/"><div class="article-image"><img alt="Featured image of post Yobi: AI Automation That Drives ChatGPT & Gemini Through Their Web Interfaces to Build Your Own Agent" height="150" loading="lazy" src="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp" srcset="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp 1x, /post/yobi-free-ai-automation/cover_hu_d3c50b8b2713ea5a.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#504a4280 0%,#d6ceb4C0 100%)"><h2 class="article-title">Yobi: AI Automation That Drives ChatGPT & Gemini Through Their Web Interfaces to Build Your Own Agent</h2></div></a></article><article class="has-image"><a href="/en/post/agentic-workflow-guide/"><div class="article-image"><img alt="Featured image of post Mastering Agentic Workflow: A Practical Guide to AI-Driven Project Development" height="150" loading="lazy" src="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp" srcset="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp 1x, /post/agentic-workflow-guide/img/cover_hu_c1d69f4e3cceb740.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d6ccbd80 0%,#3f332dC0 100%)"><h2 class="article-title">Mastering Agentic Workflow: A Practical Guide to AI-Driven Project Development</h2></div></a></article><article class="has-image"><a href="/en/post/using-google-antigravity/"><div class="article-image"><img alt="Featured image of post Antigravity vs. GitHub Copilot: Feature Comparison, Performance, and Cost Analysis" height="150" loading="lazy" src="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp" srcset="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp 1x, /post/using-google-antigravity/anti_meow_hu_7230a257bcb439c2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebac080 0%,#162232C0 100%)"><h2 class="article-title">Antigravity vs. GitHub Copilot: Feature Comparison, Performance, and Cost Analysis</h2></div></a></article><article class="has-image"><a href="/en/post/ai-summary-deploy/"><div class="article-image"><img alt="Featured image of post AI Website Tutorial: Auto-Deploy Tailwind HTML via GitHub Actions" height="150" loading="lazy" src="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp" srcset="/post/ai-summary-deploy/cover_hu_9f3c9cc0b86a3ad0.webp 1x, /post/ai-summary-deploy/cover_hu_f4a263386c4d8d96.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#c8c8cb80 0%,#3c382eC0 100%)"><h2 class="article-title">AI Website Tutorial: Auto-Deploy Tailwind HTML via GitHub Actions</h2></div></a></article><article class="has-image"><a href="/en/post/using-github-copilot-vscode/"><div class="article-image"><img alt="Featured image of post Boosting Coding Efficiency and Developer Experience with GitHub Copilot Agent Mode" height="150" loading="lazy" src="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp" srcset="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp 1x, /post/using-github-copilot-vscode/cover_hu_b27652e6f2f39b8c.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a0561980 0%,#34341dC0 100%)"><h2 class="article-title">Boosting Coding Efficiency and Developer Experience with GitHub Copilot Agent Mode</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","en"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">Copyright &copy;
+2023 -
+2026 WellWells</section><section class="powerby">Theme Stack designed by Jimmy</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.409fe41f76938f50142ab8f2959ffe0c989eda46761970d64bbd31bec3513bee.js" defer></script></body></html>

@@ -1,0 +1,89 @@
+direction: right
+style.fill: "#fff"
+
+# --- 樣式類別定義 (Classes) ---
+classes: {
+  packet: {
+    style: {
+      stroke-width: 2
+      font-size: 12
+    }
+  }
+}
+
+# --- 節點定義 (Nodes) ---
+
+# 1. Client (使用者 - 舉手圖示)
+client: {
+  icon: https://www.svgrepo.com/show/525580/user-hand-up.svg
+  label: "使用者\nwellstsai.com"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# 2. Network (區域網路)
+network: 區域網路 (LAN)\n(192.168.1.0/24) {
+  shape: cloud
+  style: {
+    fill: "#F5F5F5"
+    stroke: "#9E9E9E"
+    stroke-dash: 3
+  }
+  # 已移除 tooltip，右上角不會再出現提示圖示
+}
+
+# 3. Printer (印表機)
+printer: {
+  icon: https://www.svgrepo.com/show/530658/printer.svg
+  label: "印表機"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# 4. Other (電腦)
+other: {
+  icon: https://www.svgrepo.com/show/530234/laptop.svg
+  label: "電腦"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# --- 流程連線 (Connections) ---
+
+# Step 1: Query
+client -> network: "1. mDNS 查詢\n(誰是 printer.local?)" {
+  class: packet
+  style.stroke: "#1565C0"
+}
+
+# Step 2: Propagation
+network -> other: "2a. [不相符]\n忽略 (丟棄)" {
+  style: {
+    stroke-dash: 3
+    opacity: 0.5
+    stroke: "#D32F2F"
+  }
+}
+
+network -> printer: "2b. [相符]\n處理查詢" {
+  class: packet
+  style.stroke: "#2E7D32"
+}
+
+# Step 3: Response
+printer -> client: "3. mDNS 回應\n(A 紀錄: 192.168.1.50)" {
+  class: packet
+  style: {
+    stroke: "#2E7D32"
+    animated: true
+  }
+}

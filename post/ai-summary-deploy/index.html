@@ -1,0 +1,294 @@
+<!doctype html><html lang="zh-Hant" dir="ltr"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='description' content="用 LLM 把 Perplexity 搜尋結果、YouTube 字幕或 PDF 整理成 TailwindCSS 單頁網頁，再用 GitHub Actions 從私人儲存庫自動部署到 GitHub Pages，附完整的 workflow 腳本。"><title>AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署 - WellWells</title><link rel="canonical" href="https://wellstsai.com/post/ai-summary-deploy/"><link rel="stylesheet" href="/scss/style.min.064492eaeb0d3aae3b83e6b664c6f96d8523db4f1b65b7374861dc29fff6c386.css"><meta property='og:title' content="AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署"><meta property='og:description' content="用 LLM 把 Perplexity 搜尋結果、YouTube 字幕或 PDF 整理成 TailwindCSS 單頁網頁，再用 GitHub Actions 從私人儲存庫自動部署到 GitHub Pages，附完整的 workflow 腳本。"><meta property='og:url' content='https://wellstsai.com/post/ai-summary-deploy/'><meta property='og:site_name' content='WellWells'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='AI'><meta property='article:tag' content='自動化'><meta property='article:tag' content='建站'><meta property='article:tag' content='前端開發'><meta property='article:tag' content='教學'><meta property='article:tag' content='GPT'><meta property='article:tag' content='生產力'><meta property='article:published_time' content='2025-08-31T03:27:00+08:00'><meta property='article:modified_time' content='2026-08-15T18:00:00+08:00'><meta property='og:image' content='https://wellstsai.com/post/ai-summary-deploy/cover.webp'><meta name="twitter:title" content="AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署"><meta name="twitter:description" content="用 LLM 把 Perplexity 搜尋結果、YouTube 字幕或 PDF 整理成 TailwindCSS 單頁網頁，再用 GitHub Actions 從私人儲存庫自動部署到 GitHub Pages，附完整的 workflow 腳本。"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content='https://wellstsai.com/post/ai-summary-deploy/cover.webp'><script data-ga-id="G-JKC4KZLT26">(function(){var e,t,s=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack;if(s=="1"||s=="yes")return;e=document.currentScript.getAttribute("data-ga-id"),t=!1;function n(){if(t)return;t=!0;var n=document.createElement("script");n.async=!0,n.src="https://www.googletagmanager.com/gtag/js?id="+e,document.head.appendChild(n),window.dataLayer=window.dataLayer||[],window.gtag=function(){dataLayer.push(arguments)},gtag("js",new Date),gtag("config",e)}["scroll","keydown","mousemove","touchstart","click"].forEach(function(e){addEventListener(e,n,{once:!0,passive:!0})}),"requestIdleCallback"in window?requestIdleCallback(n,{timeout:3200}):addEventListener("load",function(){setTimeout(n,1500)})})()</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#da532c"><meta name="msapplication-config" content="/browserconfig.xml"><meta name="msapplication-TileColor" content="#da532c"><meta name="theme-color" content="#ffffff"><link rel="preload" as="image" fetchpriority="high" media="(max-width: 768px)" href="/post/ai-summary-deploy/cover_hu_18bb4432af9bbf5a.webp"><link rel="preload" as="image" fetchpriority="high" media="(min-width: 769px)" href="/post/ai-summary-deploy/cover_hu_2e0cb288212d5047.webp"><link rel="alternate" hreflang="zh-TW" href="https://wellstsai.com/post/ai-summary-deploy/"><link rel="alternate" hreflang="zh" href="https://wellstsai.com/post/ai-summary-deploy/"><link rel="alternate" hreflang="en" href="https://wellstsai.com/en/post/ai-summary-deploy/"><link rel="alternate" hreflang="x-default" href="https://wellstsai.com/en/post/ai-summary-deploy/"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","articleBody":"前言 我們每天從網路上擷取、學習各式各樣的內容，看 YouTube 學習相機設定、查除濕機原理、比較舒肥機哪台最好、追蹤 iOS 的新功能，或規劃日本自助行。問題是這些內容多半沒被記錄下來，看過就忘，30 分鐘的影片看完也常常抓不到重點。\nAI 摘要工具、主動筆記法和分段觀看策略都能改善這件事。先前曾分享過的文章 《透過 ChatGPT 進行 YouTube 影片分析與總結》能夠快速取得影片的文字稿、或是《使用 Faster Whisper 取得任何影片或音訊的原始字幕》能夠將純影片的內容轉換為文字稿。\n後續交給大型語言模型（large language model，LLM），如 OpenAI ChatGPT、Google Gemini、Anthropic Claude 等工具做摘要、分類與重組；最後把結果儲存在 Notion 供應個人閱讀或私人分享。\n也可以直接轉成能上線的單頁網站（single-page site）。這篇文章說明一套完整的自動化流程，從用 AI 統整內容、產生網頁原始碼，到用 GitHub Actions 自動部署網站。沒有深厚程式背景的人也能自己建置、發布網頁，把 …","author":{"@type":"Person","name":"Wells","url":"https://wellstsai.com/about/"},"dateModified":"2026-08-15T18:00:00+08:00","datePublished":"2025-08-31T03:27:00+08:00","description":"用 LLM 把 Perplexity 搜尋結果、YouTube 字幕或 PDF 整理成 TailwindCSS 單頁網頁，再用 GitHub Actions 從私人儲存庫自動部署到 GitHub Pages，附完整的 workflow 腳本。","headline":"AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署","image":"https://wellstsai.com/post/ai-summary-deploy/cover.webp","keywords":["AI","自動化","建站","前端開發","教學","GPT","生產力"],"mainEntityOfPage":{"@id":"https://wellstsai.com/post/ai-summary-deploy/","@type":"WebPage"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","height":512,"url":"https://wellstsai.com/android-chrome-512x512.png","width":512},"name":"WellWells"}}</script></head><body class="article-page"><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切換選單">
+<span class="hamburger-box"><span class="hamburger-inner"></span></span></button><header><figure class="site-avatar"><a href="/"><img src="/img/mimi.png" width="300" height="300" class="site-logo" alt="Avatar">
+</a><span class="emoji">✨</span></figure><div class="site-meta"><h1 class="site-name"><a href="/">WellWells</a></h1><h2 class="site-description">井裡總有一些意想不到的好東西</h2></div></header><ol class="menu" id="main-menu"><li><a href='/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 00-1-1h-4a1 1 0 00-1 1v8"/><path d="M3 10a2 2 0 01.709-1.528l7-6a2 2 0 012.582.0l7 6A2 2 0 0121 10v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+<span>首頁</span></a></li><li><a href='/about/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contact-icon lucide-contact"><path d="M16 2v2"/><path d="M7 22v-2a2 2 0 012-2h6a2 2 0 012 2v2"/><path d="M8 2v2"/><circle cx="12" cy="11" r="3"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>
+<span>關於 Wells</span></a></li><li><a href='/archives/'><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive-icon lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 002 2h12a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+<span>歷史文章</span></a></li><li><a href='https://wellstsai.com/single-page-conclusion/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 01-1-1V4a1 1 0 011-1h5a4 4 0 014 4 4 4 0 014-4h5a1 1 0 011 1v13a1 1 0 01-1 1h-6a3 3 0 00-3 3 3 3 0 00-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>
+<span>深度議題解析</span></a></li><li><a href='https://wellstsai.com/infinite-taiwan/' target="_blank"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gamepad2-icon lucide-gamepad-2"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68A4 4 0 002.702 8.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/></svg>
+<span>無限臺灣</span></a></li><li><a href='/sponsored/'><svg width="24" height="24" viewBox="0 0 24 24"><title>Coffee SVG Icon</title><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v2m4-2v2m2 4a1 1 0 011 1v8a4 4 0 01-4 4H7a4 4 0 01-4-4V9a1 1 0 011-1h14a4 4 0 110 8h-1M6 2v2"/></svg>
+<span>贊助 Wells</span></a></li><li class="menu-bottom-section"><ol class="menu"><li id="i18n-switch"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<select name="language" title="language" onchange="window.location.href=this.selectedOptions[0].value"><option value="/post/ai-summary-deploy/" selected>繁體中文</option><option value="/en/post/ai-summary-deploy/">English</option></select></li><li id="dark-mode-toggle"><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>深色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class="widget-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hash-icon lucide-hash"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg></div><h2 class="widget-title section-title">目錄</h2><div class="widget--toc"><nav class="toc-nav" id="TableOfContents"><ol><li><a href="#前言">前言</a></li><li><a href="#運用-llm-進行內容統整或產生可靠性的內容">運用 LLM 進行內容統整或產生可靠性的內容</a></li><li><a href="#使用-llm-產生符合設計規範的網頁">使用 LLM 產生符合設計規範的網頁</a></li><li><a href="#使用-github-pages-部署靜態-html-網站">使用 GitHub Pages 部署靜態 HTML 網站</a><ol><li><a href="#前置準備">前置準備</a></li><li><a href="#上傳網頁">上傳網頁</a></li></ol></li><li><a href="#使用-github-actions-實現自動化部署">使用 GitHub Actions 實現自動化部署</a><ol><li><a href="#建立與使用個人存取權杖">建立與使用個人存取權杖</a></li><li><a href="#撰寫-workflow-部署腳本">撰寫 Workflow 部署腳本</a></li></ol></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class="article-header"><div class="article-image"><a href="/post/ai-summary-deploy/" style="position:relative;display:block"><img src="/post/ai-summary-deploy/cover_hu_b83a27f9768a3468.webp" alt class="lqip" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px);transform:scale(1.1);z-index:1" loading="eager"><picture style="position:relative;z-index:2;display:block"><source media="(max-width: 768px)" srcset="/post/ai-summary-deploy/cover_hu_18bb4432af9bbf5a.webp"><source media="(min-width: 769px)" srcset="/post/ai-summary-deploy/cover_hu_2e0cb288212d5047.webp">
+<img src="/post/ai-summary-deploy/cover_hu_2e0cb288212d5047.webp" width="1024" height="1024" fetchpriority="high" loading="eager" decoding="async" alt="AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署" style="width:100%;height:auto"></picture></a></div><div class="article-details"><div class="article-title-wrapper"><h2 class="article-title"><a href="/post/ai-summary-deploy/">AI 建站教學：用 LLM 生成 Tailwind 網頁與 GitHub Actions 自動部署</a></h2><h3 class="article-subtitle">用 LLM 把 Perplexity 搜尋結果、YouTube 字幕或 PDF 整理成 TailwindCSS 單頁網頁，再用 GitHub Actions 從私人儲存庫自動部署到 GitHub Pages，附完整的 workflow 腳本。</h3></div><footer class="article-meta"><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+<time class="article-time--published" datetime='2025-08-31T03:27:00+08:00'>2025/08/31</time>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<time class="article-time--reading">閱讀時間：8 分鐘</time></div><div class="inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<a href="/en/post/ai-summary-deploy/" class="link">English</a></div></footer></div></header><aside class="article-toc"><details><summary><div class="article-toc-title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6-6 6"/></svg>
+<span>目錄</span></div></summary><nav class="toc-nav"><ol><li><a href="#前言">前言</a></li><li><a href="#運用-llm-進行內容統整或產生可靠性的內容">運用 LLM 進行內容統整或產生可靠性的內容</a></li><li><a href="#使用-llm-產生符合設計規範的網頁">使用 LLM 產生符合設計規範的網頁</a></li><li><a href="#使用-github-pages-部署靜態-html-網站">使用 GitHub Pages 部署靜態 HTML 網站</a><ol><li><a href="#前置準備">前置準備</a></li><li><a href="#上傳網頁">上傳網頁</a></li></ol></li><li><a href="#使用-github-actions-實現自動化部署">使用 GitHub Actions 實現自動化部署</a><ol><li><a href="#建立與使用個人存取權杖">建立與使用個人存取權杖</a></li><li><a href="#撰寫-workflow-部署腳本">撰寫 Workflow 部署腳本</a></li></ol></li><li><a href="#結論">結論</a></li><li><a href="#參考文獻">參考文獻</a></li></ol></nav></details></aside><section class="article-content"><h2 id="前言">前言</h2><p>我們每天從網路上擷取、學習各式各樣的內容，看 YouTube 學習相機設定、查除濕機原理、比較舒肥機哪台最好、追蹤 iOS 的新功能，或規劃日本自助行。問題是這些內容多半沒被記錄下來，看過就忘，30 分鐘的影片看完也常常抓不到重點。</p><p>AI 摘要工具、主動筆記法和分段觀看策略都能改善這件事。先前曾分享過的文章 《<a class="link" href="/post/youtube-analysis-in-chatgpt/">透過 ChatGPT 進行 YouTube 影片分析與總結</a>》能夠快速取得影片的文字稿、或是《<a class="link" href="/post/whisper/">使用 Faster Whisper 取得任何影片或音訊的原始字幕</a>》能夠將純影片的內容轉換為文字稿。</p><p>後續交給大型語言模型（large language model，LLM），如 OpenAI ChatGPT、Google Gemini、Anthropic Claude 等工具做摘要、分類與重組；最後把結果儲存在 Notion 供應個人閱讀或私人分享。</p><p>也可以直接轉成能上線的單頁網站（single-page site）。這篇文章說明一套完整的自動化流程，從用 AI 統整內容、產生網頁原始碼，到用 GitHub Actions 自動部署網站。沒有深厚程式背景的人也能自己建置、發布網頁，把看到的文章快速分享出去。</p><h2 id="運用-llm-進行內容統整或產生可靠性的內容">運用 LLM 進行內容統整或產生可靠性的內容</h2><p>目前市場上有許多 AI 工具可以協助內容統整與產生，如 ChatGPT、Gemini 等。這些工具支援多元化的輸入來源，包括：</p><ul><li>完整文章內容</li><li>YouTube 影片字幕</li><li>PDF 檔案</li><li>網路搜尋統整結果</li></ul><p>以我常用的搜尋統整結果為例子：</p><p><strong>1. <a class="link" href="https://wellstsai.com/post/why-use-perplexity/" target="_blank" rel="noopener">Perplexity</a></strong></p><ul><li>整合多個網頁來源做綜合分析。</li><li>適合需要多角度資訊統整的研究需求。</li><li>附上來源引用與連結，便於回溯與驗證。</li></ul><p><strong>2. <a class="link" href="https://gemini.google/overview/deep-research/" target="_blank" rel="noopener">Gemini Deep Research</a></strong></p><ul><li>自動化網路資訊瀏覽與分析。</li><li>快速產出綜合性研究報告（數分鐘內完成）。</li><li>專門處理複雜的研究任務。</li></ul><h2 id="使用-llm-產生符合設計規範的網頁">使用 LLM 產生符合設計規範的網頁</h2><p>內容到手之後，下一步是把它變成網頁。一樣是給 LLM 具體的設計與技術指令，讓它產生 HTML 程式碼。</p><p>以下是目前我常用的提示詞（Prompt）：</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-md" data-lang="md"><span class="line"><span class="cl">請以資深前端 UI/UX 設計師之專業角度，對以下採用 TailwindCSS 框架的 HTML 程式碼進行全面性美化。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">🎨 視覺設計最佳化
+</span></span><span class="line"><span class="cl">色彩搭配：採用藍色系為主色調，並融合紫色與青色的漸層效果。
+</span></span><span class="line"><span class="cl">卡片設計：為各章節設計具備玻璃擬態效果與柔和陰影的卡片樣式。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">✨ 互動體驗提升
+</span></span><span class="line"><span class="cl">關鍵字互動：為關鍵字添加 hover 效果、背景色變化及細微動畫。
+</span></span><span class="line"><span class="cl">進場動畫：設定各章節依序淡入，以增強視覺層次感。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">📱 響應式設計最佳化
+</span></span><span class="line"><span class="cl">行動裝置體驗：針對行動裝置的瀏覽體驗進行最佳化，確保在小螢幕上的可讀性與操作便利性。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">🔧 技術層面改進
+</span></span><span class="line"><span class="cl">TailwindCSS 實踐：最大化利用原生類別，以減少自訂 CSS 的需求。
+</span></span><span class="line"><span class="cl">效能最佳化：採用 <span class="sb">`transform`</span> 與 <span class="sb">`opacity`</span> 屬性執行動畫，以提升渲染效能。
+</span></span></code></pre></td></tr></table></div></div><p>想再做任何調整，就拿這段提示詞繼續跟 LLM 來回微調，最後可以產出兼具美觀、效能與互動性的 <code>index.html</code> 檔案。</p><h2 id="使用-github-pages-部署靜態-html-網站">使用 GitHub Pages 部署靜態 HTML 網站</h2><p>GitHub Pages 很方便，可以直接從 GitHub 儲存庫（Repository）託管靜態網站。這份教學會帶你把一個簡單的 HTML 檔案部署上線。</p><h3 id="前置準備">前置準備</h3><p>在開始之前，請先確認你已經：</p><ol><li>擁有一個 GitHub 帳號。</li><li>在自己的電腦上安裝了 Git。</li><li>對 Git 的基本操作有初步了解，例如 <code>clone</code>, <code>add</code>, <code>commit</code>, <code>push</code>。</li></ol><p>若對 Git 不熟悉，可以參考以下文章：</p><ul><li>《<a class="link" href="https://wellstsai.com/post/git-tutorial-introduction/" target="_blank" rel="noopener">Git 基礎教學：什麼是版本控制？核心概念與遠端儲存庫介紹</a>》</li><li>《<a class="link" href="https://wellstsai.com/post/git-tutorial-remote/" target="_blank" rel="noopener">Git 基礎教學：使用 VS Code 推送程式碼至遠端儲存庫</a>》</li></ul><h3 id="上傳網頁">上傳網頁</h3><p>首先，在 GitHub 上建立一個新的<code>公開儲存庫</code>，例如 <code>single-page-conclusion</code>。</p><p>假設有一個名為 <code>Git 常見指令統整.html</code> 的檔案。使用 Git 指令將本地的專案提交至專門的分支 <code>gh-pages</code>，並將該分支推送上去。</p><p>接著就可以在 <code>https://&lt;你的使用者名稱>.github.io/&lt;你的儲存庫名稱>/Git 常見指令統整.html</code> 這個網址看到網頁內容。</p><h2 id="使用-github-actions-實現自動化部署">使用 GitHub Actions 實現自動化部署</h2><p>有些腳本或設定不希望公開，所以原始碼放在私人儲存庫，只把最終產出的網頁檔案部署到公開儲存庫。這一段交給 GitHub Actions，程式碼推上私有儲存庫後，它會自動跑預設好的指令，把網頁檔案發布到公開儲存庫。</p><p>為了清楚說明，以下假設有兩個 GitHub 儲存庫：</p><ul><li><strong>私人儲存庫 (Private Repository):</strong> <code>single-page-conclusion-deploy</code><ul><li>存放所有原始碼、腳本 (<code>.sh</code>) 與提示詞 (<code>.txt</code>)，這是主要的工作區。</li></ul></li><li><strong>公開儲存庫 (Public Repository):</strong> <code>single-page-conclusion</code><ul><li>僅用於存放最終產生的靜態 HTML 檔案，並啟用 GitHub Pages 功能來發布網站。</li></ul></li></ul><h3 id="建立與使用個人存取權杖">建立與使用個人存取權杖</h3><p>要讓私有儲存庫的 Actions 有權限自動推送到公開儲存庫，必須建立一把金鑰來做認證。最常見的做法是使用個人存取權杖（personal access token，PAT）。</p><ol><li><p><strong>產生 PAT</strong></p><p>到 GitHub 的 <strong><a class="link" href="https://github.com/settings/tokens" target="_blank" rel="noopener">Personal Access Tokens 頁面</a></strong>，點選 <code>Generate new token</code>，並選擇 <code>Generate new token (classic)</code> 來產生新的金鑰。</p><p><img alt="產生存取 Token" class="gallery-image" data-flex-basis="654px" data-flex-grow="272" decoding="async" fetchpriority="high" height="1046" loading="eager" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ai-summary-deploy/github-generate-access-tokens.webp" srcset="/post/ai-summary-deploy/github-generate-access-tokens_hu_fad53efdb849b2b2.webp 800w, /post/ai-summary-deploy/github-generate-access-tokens_hu_378e79c3f00dbe89.webp 1600w, /post/ai-summary-deploy/github-generate-access-tokens_hu_4dcbb1bec666363e.webp 2400w, /post/ai-summary-deploy/github-generate-access-tokens.webp 2854w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2854"></p></li><li><p><strong>設定 Token Scope</strong></p><p>在 <code>Select scopes</code> 中，務必勾選 <code>repo</code>、<code>workflow</code> 的所有權限。這把金鑰才有辦法對你的儲存庫做讀取、寫入等操作。</p><p><img alt="設定權限，workflow 必須勾選" class="gallery-image" data-flex-basis="433px" data-flex-grow="180" decoding="async" height="1236" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ai-summary-deploy/github-new-personal-access-token-scopes.webp" srcset="/post/ai-summary-deploy/github-new-personal-access-token-scopes_hu_71819833b7b62c98.webp 800w, /post/ai-summary-deploy/github-new-personal-access-token-scopes_hu_173e77bc944e1a5.webp 1600w, /post/ai-summary-deploy/github-new-personal-access-token-scopes.webp 2233w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2233"></p></li><li><p><strong>儲存金鑰為 Secret</strong></p><p>產生金鑰後，請立即複製它。它會是一長串以 <code>ghp_</code> 開頭的字元，<strong>例如</strong>：</p><p><code>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</code></p></li><li><p><strong>新增 Secret 至私人儲存庫</strong></p><p>前往<strong>私人儲存庫</strong> (<code>single-page-conclusion-deploy</code>)，進入 <code>Settings</code> > <code>Secrets and variables</code> > <code>Actions</code>，點選 <code>New repository secret</code>。將金鑰命名為 <code>GH_TOKEN</code> 並貼上內容。</p><p><img alt="新增金鑰至私人儲存庫中" class="gallery-image" data-flex-basis="476px" data-flex-grow="198" decoding="async" height="1415" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/post/ai-summary-deploy/add-new-access-token-for-private-repo.webp" srcset="/post/ai-summary-deploy/add-new-access-token-for-private-repo_hu_ca65abe9e2101cd8.webp 800w, /post/ai-summary-deploy/add-new-access-token-for-private-repo_hu_12f3428d1b72e2a5.webp 1600w, /post/ai-summary-deploy/add-new-access-token-for-private-repo_hu_6069a4c04d71619c.webp 2400w, /post/ai-summary-deploy/add-new-access-token-for-private-repo.webp 2808w" style="max-width:80%;max-height:50vh;width:auto;border-radius:5px" width="2808"></p><p>完成設定後，Workflow 就能用 <code>${{ secrets.GH_TOKEN }}</code> 安全地讀取這個金鑰，取得推送到公開儲存庫的權限。</p></li></ol><h3 id="撰寫-workflow-部署腳本">撰寫 Workflow 部署腳本</h3><p>以我個人的目錄架構為例，以下檔案皆在我的私人儲存庫中管理：</p><ol><li><code>./提示詞.txt</code></li><li><code>./update_rss.sh</code></li><li><code>./update.sh</code></li><li><code>./gh-pages/*.html</code></li></ol><p>其中，前三項是我個人使用的腳本與資料，而真正需要部署上線的，只有 <code>./gh-pages/</code> 目錄下的靜態網頁檔案。</p><p>要做自動化部署，只需在專案根目錄下建立 <code>./.github/workflows/deploy.yml</code> 檔案，貼上以下內容。腳本中的 <code>&lt;USER>/&lt;PUBLIC_REPO_NAME></code> 記得換成你自己的 GitHub 使用者名稱與公開儲存庫名稱。</p><div class="highlight"><div class="chroma"><table class="lntable"><tr><td class="lntd"><pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span></code></pre></td><td class="lntd"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="c"># .github/workflows/deploy.yml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># name: 為此工作流程設定一個在 GitHub Actions 介面上顯示的名稱。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Deploy HTML to single-page-conclusion</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># on: 定義觸發此工作流程的事件。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">on</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># push: 當有 Git push 事件發生時觸發。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">push</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># branches: 指定只有推送到特定分支時才會觸發。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 當私有儲存庫的 &#39;main&#39; 分支有任何更新推送時，此工作流程就會啟動。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c"># jobs: 工作流程由一或多個「工作（Job）」組成，它們可以依序執行。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">deploy</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># 指定此工作在最新的 Ubuntu 系統上執行</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># steps: 「工作」是由一系列依序執行的「步驟（Step）」所組成。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟一：簽出（Checkout）私有儲存庫的程式碼</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Checkout private repo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># uses: 使用 GitHub Marketplace 中預先寫好的 Action。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># actions/checkout@v3: 這是官方提供的 Action，功能是將觸發此流程的儲存庫程式碼下載到 Runner 中。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># with: 為使用的 Action 傳入特定參數。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># fetch-depth: 0: 拉取完整的 Git 歷史紀錄。這在需要基於 Git 歷史進行操作時很有用。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟二：設定 Git 提交者資訊</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Setup Git</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># run: 直接在 Runner 的 shell 環境中執行指令。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git config --global user.name &#34;github-actions[bot]&#34;
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git config --global user.email &#34;41898282+github-actions[bot]@users.noreply.github.com&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟三：執行腳本以產生 README.md</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Generate README.md</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          chmod +x update.sh
+</span></span></span><span class="line"><span class="cl"><span class="sd">          ./update.sh</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟四：複製（Clone）公開的目標儲存庫</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Clone public repo (single-page-conclusion)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 透過金鑰，把公開儲存庫複製到本機中的 public-repo 目錄。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 這個金鑰需要預先在私有儲存庫的 Settings &gt; Secrets 中設定。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git clone --depth 1 https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/&lt;USER&gt;/&lt;PUBLIC_REPO_NAME&gt;.git public-repo
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 進入剛剛 clone 下來的 &#39;public-repo&#39; 資料夾。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cd public-repo
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 以下指令確保不論遠端分支是否存在，都能順利切換，避免因分支不存在而導致 workflow 失敗。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # || true: 如果前面的指令失敗（例如遠端沒有 main 分支），則回傳成功狀態，讓 workflow 繼續執行。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git fetch origin main || true
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git fetch origin gh-pages || true
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 嘗試切換到 main 分支，如果不存在，就建立一個新的 main 分支。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git checkout main || git checkout -b main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟五：同步檔案至公開儲存庫的 main 分支（主要更新 README）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Sync files to public repo main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cd public-repo
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 將上一步驟在私有儲存庫根目錄產生的 README.md 複製到公開儲存庫的資料夾中。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cp ../README.md .
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 將 README.md 加入 Git 的暫存區。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git add README.md
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 提交變更。如果沒有任何變更（檔案內容和上次一樣），commit 會失敗。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git commit -m &#34;Update README.md&#34; || echo &#34;No changes&#34;
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 將 commit 推送到公開儲存庫的 main 分支。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git push origin main</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># 步驟六：同步網站內容至公開儲存庫的 gh-pages 分支（部署網站）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Sync files to public repo gh-pages</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cd public-repo
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 切換到 gh-pages 分支，這是 GitHub Pages 用來發布網站的預設分支。如果不存在則建立。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git checkout gh-pages || git checkout -b gh-pages
+</span></span></span><span class="line"><span class="cl"><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # --- 清理舊檔案 ---
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 為了確保部署的內容是最新的，先刪除上次部署的檔案。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 這可以避免舊的、已在來源中刪除的檔案殘留在遠端上。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          find . -maxdepth 1 -name &#39;*.html&#39; -delete
+</span></span></span><span class="line"><span class="cl"><span class="sd">          rm -f README.md
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # --- 複製新檔案 ---
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 將私有儲存庫中 &#39;gh-pages&#39; 資料夾內的所有新檔案複製過來。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 這些是網站的實際內容。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cp ../gh-pages/*.html .
+</span></span></span><span class="line"><span class="cl"><span class="sd">          cp ../README.md .
+</span></span></span><span class="line"><span class="cl"><span class="sd">          
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # --- 提交與推送 ---
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 將所有新增、修改、刪除的檔案加入 Git 暫存區。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git add .
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 提交所有變更。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git commit -m &#34;Update content, RSS feed and posts data&#34; || echo &#34;No changes&#34;
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 強制推送（force push）到 gh-pages 分支。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # --force: 使用強制推送確保遠端分支的內容與此次部署完全一致，覆蓋掉舊的歷史紀錄。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          # 這在自動化部署 gh-pages 這類分支時是常見且安全的做法。
+</span></span></span><span class="line"><span class="cl"><span class="sd">          git push origin gh-pages --force</span><span class="w">
+</span></span></span></code></pre></td></tr></table></div></div><p>儲存後提交、推送到伺服器上後，每當更新推送到私有儲存庫的 <code>main</code> 分支，GitHub Actions 就會自動執行上述步驟（更新 <code>README.md</code> 並部署最新的靜態網頁）。基於同樣的邏輯，也可以輕易擴充此流程，例如加入自動產生 <code>rss.xml</code> 的步驟。</p><p>這個方法既能保有原始碼與腳本的隱私，公開儲存庫裡也只會留下乾淨、可以直接發布的內容。</p><h2 id="結論">結論</h2><p>這篇走完了一套從內容統整到網站自動發布的流程。把 LLM 的內容處理能力接上 GitHub Actions 的自動化部署，繁瑣的發布動作最後就簡化成一次 <code>git push</code>。</p><p>相較於把筆記留在私人空間，整理成獨立網頁之後，自己的理解會紮實一點，別人也找得到。</p><p>目前也將我看到的文章，統整後輸出於《<a class="link" href="https://wellstsai.com/single-page-conclusion/" target="_blank" rel="noopener">深度議題解析｜拆解科技、產品與商業核心</a>》，有興趣的可以自由閱讀。</p><p>我覺得做得不錯的有以下幾篇可以參考，用互動的方式看，比較快抓到背後的重點：</p><ol><li><a class="link" href="https://wellstsai.com/single-page-conclusion/%E6%A9%9F%E7%8E%87%E6%82%96%E8%AB%96%E4%BA%92%E5%8B%95%E5%AF%A6%E9%A9%97%E5%AE%A4.html" target="_blank" rel="noopener">機率悖論的共同核心</a></li><li><a class="link" href="https://wellstsai.com/single-page-conclusion/AI%20%E6%BA%9D%E9%80%9A%E8%A1%93%EF%BC%9A%E5%BE%9E%E6%8F%90%E7%A4%BA%E8%A9%9E%E5%88%B0%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B.html" target="_blank" rel="noopener">AI 溝通術：從提示詞到上下文工程</a></li><li><a class="link" href="https://wellstsai.com/single-page-conclusion/%E9%81%8E%E6%93%AC%E5%90%88-%E6%AD%A3%E8%A6%8F%E5%8C%96-%E5%A5%A7%E5%8D%A1%E5%A7%86%E5%89%83%E5%88%80.html" target="_blank" rel="noopener">過擬合：為什麼完美的解釋反而毫無用處？</a></li><li><a class="link" href="https://wellstsai.com/single-page-conclusion/Netflix%E8%87%AA%E7%94%B1%E8%88%87%E8%B2%AC%E4%BB%BB%E6%96%87%E5%8C%96%E6%8C%87%E5%8D%97.html" target="_blank" rel="noopener">Netflix 自由與責任文化指南</a></li><li><a class="link" href="https://wellstsai.com/single-page-conclusion/DJI%20Osmo%20360%20vs%20Insta360%20X5.html" target="_blank" rel="noopener">DJI Osmo 360 vs Insta360 X5</a></li></ol><h2 id="參考文獻">參考文獻</h2><ol><li><a class="link" href="https://www.perplexity.ai/hub/blog/introducing-perplexity-deep-research" target="_blank" rel="noopener">Introducing Perplexity Deep Research</a></li><li><a class="link" href="https://gemini.google/overview/deep-research/" target="_blank" rel="noopener">Gemini Deep Research</a></li><li><a class="link" href="https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site" target="_blank" rel="noopener">Creating a GitHub Pages site</a></li><li><a class="link" href="https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits" target="_blank" rel="noopener">GitHub Pages limits</a></li><li><a class="link" href="https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages" target="_blank" rel="noopener">Using custom workflows with GitHub Pages</a></li></ol></section><footer class="article-meta article-footer"><section class="article-tags"><a href="/tags/ai/">AI</a>
+<a href="/tags/%E8%87%AA%E5%8B%95%E5%8C%96/">自動化</a>
+<a href="/tags/%E5%BB%BA%E7%AB%99/">建站</a>
+<a href="/tags/%E5%89%8D%E7%AB%AF%E9%96%8B%E7%99%BC/">前端開發</a>
+<a href="/tags/%E6%95%99%E5%AD%B8/">教學</a>
+<a href="/tags/gpt/">GPT</a>
+<a href="/tags/%E7%94%9F%E7%94%A2%E5%8A%9B/">生產力</a></section><section class="article-copyright inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copyright-icon lucide-copyright"><circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 110-5.66"/></svg>
+<span>本文章使用 <a class="link" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a> 進行許可。</span></section><section class="article-lastmod inline-meta"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock8-icon lucide-clock-8"><path d="M12 6v6l-4 2"/><circle cx="12" cy="12" r="10"/></svg>
+<span>最後更新 2026/08/15</span></section></footer></article><aside><h2 class="section-title">相關文章</h2><div class="subsection-list"><div class="article-list--tile"><article class="has-image"><a href="/post/agentic-workflow-guide/"><div class="article-image"><img alt="Featured image of post 實戰 Agentic Workflow：從規劃到實作的專案開發全攻略" height="150" loading="lazy" src="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp" srcset="/post/agentic-workflow-guide/img/cover_hu_b39ec60efba22101.webp 1x, /post/agentic-workflow-guide/img/cover_hu_c1d69f4e3cceb740.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#d6ccbd80 0%,#3f332dC0 100%)"><h2 class="article-title">實戰 Agentic Workflow：從規劃到實作的專案開發全攻略</h2></div></a></article><article class="has-image"><a href="/post/using-google-antigravity/"><div class="article-image"><img alt="Featured image of post Antigravity vs. GitHub Copilot：功能比較、效能與成本分析" height="150" loading="lazy" src="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp" srcset="/post/using-google-antigravity/anti_meow_hu_d31a4874b555c168.webp 1x, /post/using-google-antigravity/anti_meow_hu_7230a257bcb439c2.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#aebac080 0%,#162232C0 100%)"><h2 class="article-title">Antigravity vs. GitHub Copilot：功能比較、效能與成本分析</h2></div></a></article><article class="has-image"><a href="/post/whisper/"><div class="article-image"><img alt="Featured image of post 使用 Faster Whisper 取得任何影片或音訊的原始字幕" height="150" loading="lazy" src="/post/whisper/cover_hu_ff46335c54609190.webp" srcset="/post/whisper/cover_hu_ff46335c54609190.webp 1x, /post/whisper/cover_hu_a3adff1ae6b54d0.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#2f2e3080 0%,#cfc1aeC0 100%)"><h2 class="article-title">使用 Faster Whisper 取得任何影片或音訊的原始字幕</h2></div></a></article><article class="has-image"><a href="/post/using-github-copilot-vscode/"><div class="article-image"><img alt="Featured image of post 使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗" height="150" loading="lazy" src="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp" srcset="/post/using-github-copilot-vscode/cover_hu_8bb0a00070c7f102.webp 1x, /post/using-github-copilot-vscode/cover_hu_b27652e6f2f39b8c.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#a0561980 0%,#34341dC0 100%)"><h2 class="article-title">使用 GitHub Copilot 的代理模式以提升撰寫程式的效率與開發體驗</h2></div></a></article><article class="has-image"><a href="/post/yobi-free-ai-automation/"><div class="article-image"><img alt="Featured image of post Yobi：用內建瀏覽器操作網頁版 AI 的自動化工具，打造專屬 Agent" height="150" loading="lazy" src="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp" srcset="/post/yobi-free-ai-automation/cover_hu_98be3c07af3f5be6.webp 1x, /post/yobi-free-ai-automation/cover_hu_d3c50b8b2713ea5a.webp 2x" width="250"></div><div class="article-details" style="background:linear-gradient(0deg,#504a4280 0%,#d6ceb4C0 100%)"><h2 class="article-title">Yobi：用內建瀏覽器操作網頁版 AI 的自動化工具，打造專屬 Agent</h2></div></a></article></div></div></aside><div id="giscus-container"></div><script>(function(){var e,t,n=!1;function s(){if(n)return;n=!0;var t,e=document.createElement("script");e.src="https://giscus.app/client.js",e.setAttribute("data-repo","wellwells/wellwells.giscus"),e.setAttribute("data-repo-id","R_kgDOMUYr2w"),e.setAttribute("data-category","Announcements"),e.setAttribute("data-category-id","DIC_kwDOMUYr284CgsJr"),e.setAttribute("data-mapping","pathname"),e.setAttribute("data-strict","0"),e.setAttribute("data-reactions-enabled","1"),e.setAttribute("data-emit-metadata","0"),e.setAttribute("data-input-position","top"),e.setAttribute("data-theme",document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed"),e.setAttribute("data-lang","zh-TW"),e.setAttribute("data-loading","lazy"),e.crossOrigin="anonymous",e.async=!0,t=document.getElementById("giscus-container"),(t||document.body).appendChild(e)}e=document.getElementById("giscus-container"),"IntersectionObserver"in window&&e?(t=new IntersectionObserver(function(e){e.some(function(e){return e.isIntersecting})&&(s(),t.disconnect())},{rootMargin:"200px 0px"}),t.observe(e)):s();function o(e){var t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}addEventListener("message",function(e){if(e.origin!=="https://giscus.app")return;i()}),window.addEventListener("onColorSchemeChange",i);function i(){o(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class="site-footer"><section class="copyright">版權所有 &copy;
+2023 -
+2026 WellWells</section><section class="powerby">主題 Stack 由 Jimmy 設計</section></footer><script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script></main></div><script type="text/javascript" src="/ts/main.cebe0a6b92a2ce423957ade66f4512fb944bc21e5157cdeda28c81e94d30c63c.js" defer></script></body></html>

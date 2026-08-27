@@ -1,0 +1,153 @@
+direction: right
+
+vars: {
+  d2-config: {
+    pad: 50
+  }
+}
+
+# Global Styles
+style: {
+  fill: "#F9FAFB"
+}
+
+# Modern Class Definitions
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+    }
+  }
+  modern_bypass: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+      stroke-dash: 5
+      opacity: 0.9
+    }
+  }
+}
+
+# --- Client ---
+Client: "User Device\nWindows / macOS / Linux\n(WireGuard Client)" {
+  class: modern_node
+  style: {
+    fill: "#DBEAFE"
+    stroke: "#2563EB"
+    font-color: "#1E40AF"
+  }
+}
+
+# --- Routing Logic ---
+RoutingLogic: Split Tunneling Logic {
+  style: {
+    stroke: "#A5B4FC"
+    fill: "#F5F3FF"
+    stroke-dash: 5
+    border-radius: 24
+    shadow: false
+    font-size: 20
+  }
+
+  TunnelPath: "🔒 WARP Secure Tunnel\nAllowedIPs: 0.0.0.0/0" {
+    class: modern_node
+    style: {
+      fill: "#DDD6FE"
+      stroke: "#7C3AED"
+      font-color: "#5B21B6"
+    }
+  }
+
+  DirectPath: "🚀 Exclusion List (Direct)\nDisallowed IPs" {
+    class: modern_node
+    style: {
+      fill: "#E2E8F0"
+      stroke: "#475569"
+      stroke-dash: 4
+      font-color: "#334155"
+    }
+  }
+}
+
+# --- Targets ---
+Internet: "🌐 General Internet\nGoogle / Netflix / Web" {
+  class: modern_node
+  style: {
+    fill: "#D1FAE5"
+    stroke: "#059669"
+    font-color: "#047857"
+  }
+}
+
+BypassTargets: {
+  style: {
+    stroke: "transparent"
+    fill: "transparent"
+  }
+  
+  Dcard: "🚫 App / Website\n(Cloudflare Bypass)" {
+    class: modern_bypass
+    style: {
+      fill: "#FFE4E6"
+      stroke: "#E11D48"
+      font-color: "#BE123C"
+    }
+  }
+
+  LocalResources: "🏠 Local / Tailscale\nNAS / Printer / 100.64.0.0 \nwellstsai.com" {
+    class: modern_bypass
+    style: {
+      fill: "#FEF3C7"
+      stroke: "#D97706"
+      font-color: "#B45309"
+    }
+  }
+}
+
+# --- Connection Relations ---
+Client -> RoutingLogic.TunnelPath: Encapsulate All Traffic {
+  style: {
+    stroke: "#8B5CF6"
+    stroke-width: 4
+    animated: true
+    font-color: "#6D28D9"
+  }
+}
+
+Client -> RoutingLogic.DirectPath: Static Route Bypass {
+  style: {
+    stroke: "#64748B"
+    stroke-width: 2
+    stroke-dash: 5
+    font-color: "#475569"
+  }
+}
+
+RoutingLogic.TunnelPath -> Internet: Via Cloudflare Egress {
+  style: {
+    stroke: "#8B5CF6"
+    stroke-width: 3
+    animated: true
+    font-color: "#6D28D9"
+  }
+}
+
+RoutingLogic.DirectPath -> BypassTargets.Dcard: ISP Direct Connection {
+  style: {
+    stroke: "#94A3B8"
+    stroke-width: 2
+    font-color: "#64748B"
+  }
+}
+RoutingLogic.DirectPath -> BypassTargets.LocalResources: LAN Access {
+  style: {
+    stroke: "#94A3B8"
+    stroke-width: 2
+    font-color: "#64748B"
+  }
+}

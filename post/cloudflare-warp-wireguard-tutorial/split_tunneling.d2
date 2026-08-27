@@ -1,0 +1,153 @@
+direction: right
+
+vars: {
+  d2-config: {
+    pad: 50
+  }
+}
+
+# 全域樣式設定
+style: {
+  fill: "#F9FAFB"
+}
+
+# 現代化類別定義
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+    }
+  }
+  modern_bypass: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+      stroke-dash: 5
+      opacity: 0.9
+    }
+  }
+}
+
+# --- 來源端點 ---
+Client: "🖥️ 使用者設備\nWindows / macOS / Linux\n(WireGuard Client)" {
+  class: modern_node
+  style: {
+    fill: "#DBEAFE"
+    stroke: "#2563EB"
+    font-color: "#1E40AF"
+  }
+}
+
+# --- 路由決策中心 ---
+RoutingLogic: 路由分流決策 {
+  style: {
+    stroke: "#A5B4FC"
+    fill: "#F5F3FF"
+    stroke-dash: 5
+    border-radius: 24
+    shadow: false
+    font-size: 20
+  }
+
+  TunnelPath: "🔒 WARP 加密隧道\nAllowedIPs: 0.0.0.0/0" {
+    class: modern_node
+    style: {
+      fill: "#DDD6FE"
+      stroke: "#7C3AED"
+      font-color: "#5B21B6"
+    }
+  }
+
+  DirectPath: "🚀 排除名單 (Direct)\nDisallowed IPs" {
+    class: modern_node
+    style: {
+      fill: "#E2E8F0"
+      stroke: "#475569"
+      stroke-dash: 4
+      font-color: "#334155"
+    }
+  }
+}
+
+# --- 終端目標 ---
+Internet: "🌐 一般網際網路\nGoogle / Netflix / Web" {
+  class: modern_node
+  style: {
+    fill: "#D1FAE5"
+    stroke: "#059669"
+    font-color: "#047857"
+  }
+}
+
+BypassTargets: {
+  style: {
+    stroke: "transparent"
+    fill: "transparent"
+  }
+  
+  Dcard: "🚫 Dcard\n(排除 CF 出口)" {
+    class: modern_bypass
+    style: {
+      fill: "#FFE4E6"
+      stroke: "#E11D48"
+      font-color: "#BE123C"
+    }
+  }
+
+  LocalResources: "🏠 內網 / Tailscale\nNAS / Printer / 100.64.0.0 \nwellstsai.com" {
+    class: modern_bypass
+    style: {
+      fill: "#FEF3C7"
+      stroke: "#D97706"
+      font-color: "#B45309"
+    }
+  }
+}
+
+# --- 連線關係 ---
+Client -> RoutingLogic.TunnelPath: 封裝所有流量 {
+  style: {
+    stroke: "#8B5CF6"
+    stroke-width: 4
+    animated: true
+    font-color: "#6D28D9"
+  }
+}
+
+Client -> RoutingLogic.DirectPath: 靜態路由排除 {
+  style: {
+    stroke: "#64748B"
+    stroke-width: 2
+    stroke-dash: 5
+    font-color: "#475569"
+  }
+}
+
+RoutingLogic.TunnelPath -> Internet: 透過 Cloudflare 出口 {
+  style: {
+    stroke: "#8B5CF6"
+    stroke-width: 3
+    animated: true
+    font-color: "#6D28D9"
+  }
+}
+
+RoutingLogic.DirectPath -> BypassTargets.Dcard: 原始 ISP 直連 {
+  style: {
+    stroke: "#94A3B8"
+    stroke-width: 2
+    font-color: "#64748B"
+  }
+}
+RoutingLogic.DirectPath -> BypassTargets.LocalResources: 區域網路存取 {
+  style: {
+    stroke: "#94A3B8"
+    stroke-width: 2
+    font-color: "#64748B"
+  }
+}

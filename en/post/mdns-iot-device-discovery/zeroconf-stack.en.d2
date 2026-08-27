@@ -1,0 +1,54 @@
+direction: down
+
+# Global class definition
+classes: {
+  layer_style: {
+    style: {
+      stroke-width: 2
+      border-radius: 12
+    }
+  }
+}
+
+# Main technology stack container
+ZeroConf_Stack: ZeroConf Stack {
+  style: {
+    stroke: "#4A5568"
+    fill: "#F8FAFC"
+    border-radius: 15
+  }
+
+  # Layer 3
+  L3: DNS-SD {
+    class: layer_style
+    label: "Layer 3: DNS-SD\nService Discovery\nEnumerate service types on network"
+    style: {
+      fill: "#E3F2FD"
+      stroke: "#1976D2"
+    }
+  }
+
+  # Layer 2
+  L2: mDNS {
+    class: layer_style
+    label: "Layer 2: mDNS\nName Resolution\nResolve .local domains to IPs"
+    style: {
+      fill: "#E8F5E9"
+      stroke: "#2E7D32"
+    }
+  }
+
+  # Layer 1
+  L1: IPv4LL_ARP {
+    class: layer_style
+    label: "Layer 1: IPv4LL / ARP\nAddress Configuration\nAuto-configure 169.254.x.x addresses"
+    style: {
+      fill: "#FFF3E0"
+      stroke: "#EF6C00"
+    }
+  }
+
+  # Relationships
+  L3 -> L2: Locate services via names
+  L2 -> L1: Establish underlying communication via IP
+}
