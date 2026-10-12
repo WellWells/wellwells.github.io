@@ -1,0 +1,154 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    pad: 40
+  }
+}
+
+# 全域樣式設定
+style: {
+  fill: "transparent"
+}
+
+# 現代化類別定義
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 16
+      shadow: false
+    }
+  }
+}
+
+路由策略差異: {
+  style: {
+    stroke: "transparent"
+    fill: "transparent"
+    font-color: "#3B82F6"
+    font-size: 24
+    bold: true
+  }
+
+  WARP: "Cloudflare WARP｜自動路徑優化" {
+    width: 800
+    style: {
+      fill: "#F0F9FF"
+      stroke: "#2563EB"
+      font-color: "#1E40AF"
+      border-radius: 20
+      stroke-width: 1
+    }
+
+    User: "使用者 (臺灣)" {
+      class: modern_node
+      style: {
+        fill: "#DBEAFE"
+        stroke: "#2563EB"
+        font-color: "#1E40AF"
+      }
+    }
+
+    EdgeNodes: "☁️ Cloudflare 邊緣節點群" {
+      style: {
+        fill: "#D1FAE5"
+        stroke: "#059669"
+        font-color: "#047857"
+        border-radius: 12
+      }
+
+      TW: "臺北 PoP\n(自動選擇)" {class: modern_node; style: {fill: "#ECFDF5"; stroke: "#059669"; font-color: "#047857"}}
+      HK: "香港 PoP" {class: modern_node; style: {fill: "#F0FDF4"; stroke: "#86EFAC"; font-color: "#166534"; opacity: 0.6}}
+      JP: "東京 PoP" {class: modern_node; style: {fill: "#F0FDF4"; stroke: "#86EFAC"; font-color: "#166534"; opacity: 0.6}}
+    }
+
+    Target: "🌐 目標網站" {
+      class: modern_node
+      style: {
+        fill: "#F9FAFB"
+        stroke: "#9CA3AF"
+        font-color: "#4B5563"
+      }
+    }
+
+    User -> EdgeNodes.TW: "Anycast 自動路由\n選擇最近節點 ⚡" {
+      style: {
+        stroke: "#2563EB"
+        stroke-width: 4
+        animated: true
+        font-color: "#1E40AF"
+      }
+    }
+    EdgeNodes -> Target: "Cloudflare 骨幹網路" {
+      style: {
+        stroke: "#059669"
+        stroke-width: 4
+        animated: true
+        font-color: "#047857"
+      }
+    }
+  }
+
+  VPN: "傳統 VPN｜手動節點選擇" {
+    width: 800
+    style: {
+      fill: "#FFF7ED"
+      stroke: "#E11D48"
+      font-color: "#BE123C"
+      border-radius: 20
+      stroke-dash: 5
+      stroke-width: 1
+    }
+
+    User: "使用者 (臺灣)" {
+      class: modern_node
+      style: {
+        fill: "#DBEAFE"
+        stroke: "#2563EB"
+        font-color: "#1E40AF"
+      }
+    }
+
+    VPNServers: "🌏 VPN 節點池 (使用者自選)" {
+      style: {
+        fill: "#FFE4E6"
+        stroke: "#E11D48"
+        font-color: "#BE123C"
+        border-radius: 12
+      }
+
+      US: "美國\n解鎖 Netflix US" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      JP: "日本\n解鎖日區內容" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      DE: "德國\n歐盟隱私合規" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      SG: "新加坡\n亞太中轉" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+    }
+
+    Target: "🌐 目標網站" {
+      class: modern_node
+      style: {
+        fill: "#F9FAFB"
+        stroke: "#9CA3AF"
+        font-color: "#4B5563"
+      }
+    }
+
+    User -> VPNServers: "跨國繞行\n增加延遲 📈" {
+      style: {
+        stroke: "#E11D48"
+        stroke-dash: 5
+        stroke-width: 2
+        font-color: "#BE123C"
+      }
+    }
+    VPNServers -> Target: "公共網際網路路由" {
+      style: {
+        stroke: "#4B5563"
+        stroke-width: 2
+        font-color: "#4B5563"
+      }
+    }
+  }
+}

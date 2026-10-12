@@ -1,0 +1,7 @@
+User-agent: Googlebot
+Disallow: /tags/*/index.xml
+Disallow: /*/tags/*/index.xml
+Disallow: /categories/*/index.xml
+Disallow: /*/categories/*/index.xml
+
+Sitemap: https://wellstsai.com/sitemap.xml
