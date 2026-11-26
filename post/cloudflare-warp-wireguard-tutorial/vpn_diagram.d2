@@ -1,0 +1,141 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    pad: 50
+  }
+}
+
+# 全域樣式設定
+style: {
+  fill: "#F9FAFB"
+}
+
+# 現代化類別定義
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+    }
+  }
+  modern_bypass: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 18
+      shadow: false
+      stroke-dash: 5
+      opacity: 0.9
+    }
+  }
+}
+
+# 使用者設備
+User: "🖥️ 使用者設備\n114.32.x.x\n(Your Home IP)" {
+  class: modern_node
+  style: {
+    fill: "#DBEAFE"
+    stroke: "#2563EB"
+    font-color: "#1E40AF"
+  }
+}
+
+# 🚧 ISP 防火牆
+ISP: "🚧 ISP 防火牆\n無法解讀封包內容\n(攔截失敗 ❌)" {
+  class: modern_bypass
+  style: {
+    fill: "#FFE4E6"
+    stroke: "#E11D48"
+    font-color: "#BE123C"
+  }
+}
+
+# 加密隧道
+SecureTunnel: {
+  label: "🔒 WireGuard 通道"
+  style: {
+    stroke: "#A5B4FC"
+    fill: "#F5F3FF"
+    stroke-dash: 5
+    border-radius: 24
+    shadow: false
+    font-size: 20
+  }
+
+  Traffic: "📦 數據封包加密中\nwellstsai.com" {
+    class: modern_node
+    style: {
+      fill: "#DDD6FE"
+      stroke: "#7C3AED"
+      font-color: "#5B21B6"
+    }
+  }
+}
+
+# 網際網路環境
+InternetEnv: {
+  label: "🌍 網際網路環境"
+  style: {
+    stroke: "#E5E7EB"
+    fill: "transparent"
+    stroke-dash: 3
+    border-radius: 20
+    font-size: 20
+  }
+
+  CloudflareNode: "☁️ Cloudflare\n104.28.200.XXX\n(WARP 出口)" {
+    class: modern_node
+    style: {
+      fill: "#D1FAE5"
+      stroke: "#059669"
+      font-color: "#047857"
+    }
+  }
+
+  WebsiteNode: "🌐 目標網站\n✅ 正常存取" {
+    class: modern_node
+    style: {
+      fill: "#D1FAE5"
+      stroke: "#059669"
+      font-color: "#047857"
+    }
+  }
+}
+
+# 連線邏輯
+User -> SecureTunnel.Traffic: 加密進入 {
+  style: {
+    stroke: "#2563EB"
+    stroke-width: 4
+    animated: true
+  }
+}
+
+SecureTunnel.Traffic -> InternetEnv.CloudflareNode: 加密出口 {
+  style: {
+    stroke: "#7C3AED"
+    stroke-width: 4
+    animated: true
+  }
+}
+
+InternetEnv.CloudflareNode -> InternetEnv.WebsiteNode: 代理請求 {
+  style: {
+    stroke: "#059669"
+    stroke-width: 2
+  }
+}
+
+# ISP 指向隧道
+ISP -> SecureTunnel: 嘗試偵測 {
+  target-arrowhead.shape: cf-one
+  style: {
+    stroke: "#E11D48"
+    stroke-dash: 3
+    stroke-width: 2
+  }
+}

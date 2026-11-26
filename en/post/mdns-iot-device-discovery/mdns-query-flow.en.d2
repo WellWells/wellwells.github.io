@@ -1,0 +1,89 @@
+direction: right
+style.fill: "#fff"
+
+# --- Class Definitions ---
+classes: {
+  packet: {
+    style: {
+      stroke-width: 2
+      font-size: 12
+    }
+  }
+}
+
+# --- Node Definitions ---
+
+# 1. Client (User - Hand Up Icon)
+client: {
+  icon: https://www.svgrepo.com/show/525580/user-hand-up.svg
+  label: "User"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# 2. Network (LAN)
+network: Local Network (LAN) {
+  shape: cloud
+  style: {
+    fill: "#F5F5F5"
+    stroke: "#9E9E9E"
+    stroke-dash: 3
+  }
+  # Tooltip removed as requested
+}
+
+# 3. Printer
+printer: {
+  icon: https://www.svgrepo.com/show/530658/printer.svg
+  label: "Printer"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# 4. Other (Computer/Laptop)
+other: {
+  icon: https://www.svgrepo.com/show/530234/laptop.svg
+  label: "Computer"
+  style: {
+    stroke: transparent
+    fill: transparent
+    shadow: false
+  }
+}
+
+# --- Connections ---
+
+# Step 1: Query
+client -> network: "1. mDNS Query\n(Who is printer.local?)" {
+  class: packet
+  style.stroke: "#1565C0"
+}
+
+# Step 2: Propagation
+network -> other: "2a. [Mismatch]\nIgnored (Drop)" {
+  style: {
+    stroke-dash: 3
+    opacity: 0.5
+    stroke: "#D32F2F"
+  }
+}
+
+network -> printer: "2b. [Match]\nProcess Query" {
+  class: packet
+  style.stroke: "#2E7D32"
+}
+
+# Step 3: Response
+printer -> client: "3. mDNS Response\n(A Record: 192.168.1.50)" {
+  class: packet
+  style: {
+    stroke: "#2E7D32"
+    animated: true
+  }
+}

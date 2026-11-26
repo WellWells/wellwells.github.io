@@ -1,0 +1,54 @@
+direction: down
+
+# 定義全域類別
+classes: {
+  layer_style: {
+    style: {
+      stroke-width: 2
+      border-radius: 12
+    }
+  }
+}
+
+# 技術堆疊主容器
+ZeroConf_Stack: ZeroConf 技術堆疊 {
+  style: {
+    stroke: "#4A5568"
+    fill: "#F8FAFC"
+    border-radius: 15
+  }
+
+  # Layer 3
+  L3: DNS-SD {
+    class: layer_style
+    label: "Layer 3: DNS-SD\n服務發現 (Discovery)\n列舉網路中的功能類型"
+    style: {
+      fill: "#E3F2FD"
+      stroke: "#1976D2"
+    }
+  }
+
+  # Layer 2
+  L2: mDNS {
+    class: layer_style
+    label: "Layer 2: mDNS\n名稱解析 (Resolution)\n將 .local 域名解析為 IP"
+    style: {
+      fill: "#E8F5E9"
+      stroke: "#2E7D32"
+    }
+  }
+
+  # Layer 1
+  L1: IPv4LL_ARP {
+    class: layer_style
+    label: "Layer 1: IPv4LL / ARP\n位址設定 (Addressing)\n自動宣告 169.254.x.x 位址"
+    style: {
+      fill: "#FFF3E0"
+      stroke: "#EF6C00"
+    }
+  }
+
+  # 關係連線
+  L3 -> L2: 透過名稱定位服務
+  L2 -> L1: 透過 IP 建立底層通訊
+}

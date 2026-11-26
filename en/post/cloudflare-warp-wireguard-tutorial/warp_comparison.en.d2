@@ -1,0 +1,154 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    pad: 40
+  }
+}
+
+# Global Styles
+style: {
+  fill: "transparent"
+}
+
+# Modern Class Definitions
+classes: {
+  modern_node: {
+    style: {
+      stroke-width: 2
+      border-radius: 16
+      font-size: 16
+      shadow: false
+    }
+  }
+}
+
+Routing Strategy Comparison: {
+  style: {
+    stroke: "transparent"
+    fill: "transparent"
+    font-color: "#3B82F6"
+    font-size: 24
+    bold: true
+  }
+
+  WARP: "Cloudflare WARP | Automated Path Optimization" {
+    width: 800
+    style: {
+      fill: "#F0F9FF"
+      stroke: "#2563EB"
+      font-color: "#1E40AF"
+      border-radius: 20
+      stroke-width: 1
+    }
+
+    User: "User (Taiwan)" {
+      class: modern_node
+      style: {
+        fill: "#DBEAFE"
+        stroke: "#2563EB"
+        font-color: "#1E40AF"
+      }
+    }
+    
+    EdgeNodes: "Cloudflare Edge Nodes" {
+      style: {
+        fill: "#D1FAE5"
+        stroke: "#059669"
+        font-color: "#047857"
+        border-radius: 12
+      }
+
+      TW: "Taipei PoP\n(Auto Selection)" {class: modern_node; style: {fill: "#ECFDF5"; stroke: "#059669"; font-color: "#047857"}}
+      HK: "Hong Kong PoP" {class: modern_node; style: {fill: "#F0FDF4"; stroke: "#86EFAC"; font-color: "#166534"; opacity: 0.6}}
+      JP: "Tokyo PoP" {class: modern_node; style: {fill: "#F0FDF4"; stroke: "#86EFAC"; font-color: "#166534"; opacity: 0.6}}
+    }
+
+    Target: "🌐 Target Website" {
+      class: modern_node
+      style: {
+        fill: "#F9FAFB"
+        stroke: "#9CA3AF"
+        font-color: "#4B5563"
+      }
+    }
+
+    User -> EdgeNodes.TW: "Anycast Routing\nClosest Node ⚡" {
+      style: {
+        stroke: "#2563EB"
+        stroke-width: 4
+        animated: true
+        font-color: "#1E40AF"
+      }
+    }
+    EdgeNodes -> Target: "Cloudflare Backbone Network" {
+      style: {
+        stroke: "#059669"
+        stroke-width: 4
+        animated: true
+        font-color: "#047857"
+      }
+    }
+  }
+
+  VPN: "Traditional VPN | Manual Server Selection" {
+    width: 800
+    style: {
+      fill: "#FFF7ED"
+      stroke: "#E11D48"
+      font-color: "#BE123C"
+      border-radius: 20
+      stroke-dash: 5
+      stroke-width: 1
+    }
+
+    User: "User (Taiwan)" {
+      class: modern_node
+      style: {
+        fill: "#DBEAFE"
+        stroke: "#2563EB"
+        font-color: "#1E40AF"
+      }
+    }
+
+    VPNServers: "VPN Server Pool (User Selection)" {
+      style: {
+        fill: "#FFE4E6"
+        stroke: "#E11D48"
+        font-color: "#BE123C"
+        border-radius: 12
+      }
+
+      US: "United States\nUnlock Netflix US" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      JP: "Japan\nUnlock JP Content" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      DE: "Germany\nPrivacy Compliance" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+      SG: "Singapore\nAPAC Relay" {class: modern_node; style: {fill: "#FFF1F2"; stroke: "#E11D48"; font-color: "#BE123C"}}
+    }
+
+    Target: "🌐 Target Website" {
+      class: modern_node
+      style: {
+        fill: "#F9FAFB"
+        stroke: "#9CA3AF"
+        font-color: "#4B5563"
+      }
+    }
+
+    User -> VPNServers: "Global Detour\nlatency 📈" {
+      style: {
+        stroke: "#E11D48"
+        stroke-dash: 5
+        stroke-width: 2
+        font-color: "#BE123C"
+      }
+    }
+    VPNServers -> Target: "Public Internet Routing" {
+      style: {
+        stroke: "#4B5563"
+        stroke-width: 2
+        font-color: "#4B5563"
+      }
+    }
+  }
+}
